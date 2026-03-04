@@ -6,6 +6,7 @@ import 'package:dnd_app/models/classes.dart';
 import 'package:dnd_app/models/races.dart';
 import 'package:dnd_app/models/backgrounds.dart';
 import 'package:dnd_app/theme/app_text_styles.dart';
+import 'package:dnd_app/models/skills.dart';
 
 class BasicInfoStep extends StatefulWidget {
   final Character character;
@@ -157,7 +158,7 @@ class BasicInfoStepState extends State<BasicInfoStep> {
           _buildTextField(
             controller: _subclassController,
             label: 'Unterklasse',
-            hint: 'z.B. Champion, Evokation',
+            hint: 'z.B. Champion, Hervorrufung',
           ),
           Text('Rasse', style: AppTextStyles.sectionTitle),
           _buildRaceDropdown(),
@@ -319,7 +320,7 @@ class BasicInfoStepState extends State<BasicInfoStep> {
                 {
                   ...?_selectedRace?.skillProficiencies,
                   ...?_selectedBackground?.skillProficiencies,
-                }.map((s) => _skillLabel(s)).join(', '),
+                }.map((s) => Skills.label(s)).join(', '),
               ),
             ],
             if (widget.useEdition2024 &&
@@ -397,30 +398,6 @@ class BasicInfoStepState extends State<BasicInfoStep> {
       'charisma':     'Charisma',
     };
     return labels[attribute] ?? attribute;
-  }
-
-  String _skillLabel(String skill) {
-    const labels = {
-      'acrobatics':     'Akrobatik',
-      'animalHandling': 'Tierführung',
-      'arcana':         'Arkanes Wissen',
-      'athletics':      'Athletik',
-      'deception':      'Täuschung',
-      'history':        'Geschichte',
-      'insight':        'Einsicht',
-      'intimidation':   'Einschüchterung',
-      'investigation':  'Untersuchung',
-      'medicine':       'Medizin',
-      'nature':         'Naturkunde',
-      'perception':     'Wahrnehmung',
-      'performance':    'Aufführung',
-      'persuasion':     'Überzeugung',
-      'religion':       'Religion',
-      'sleightOfHand':  'Fingerfertigkeit',
-      'stealth':        'Heimlichkeit',
-      'survival':       'Überleben',
-    };
-    return labels[skill] ?? skill;
   }
 
   String _formatAttributeBonuses(Map<String, int> bonuses) {

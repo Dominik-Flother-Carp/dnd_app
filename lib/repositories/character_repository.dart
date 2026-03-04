@@ -22,11 +22,8 @@ class CharacterRepository {
 
   // Alle Charaktere laden – für die Charakterliste
   Future<List<Character>> getAllCharacters() async {
-    print('Loading characters...');
     final db = await _dbHelper.database;
-    print('Database opened');
     final maps = await db.query('characters', orderBy: 'name ASC');
-    print('Found ${maps.length} characters');
     return maps.map((map) => Character.fromMap(map)).toList();
   }
 

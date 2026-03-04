@@ -6,6 +6,7 @@ import 'package:dnd_app/models/classes.dart';
 import 'package:dnd_app/models/races.dart';
 import 'package:dnd_app/models/backgrounds.dart';
 import 'package:dnd_app/theme/app_text_styles.dart';
+import 'package:dnd_app/models/skills.dart';
 
 class SkillsStep extends StatefulWidget {
   final Character character;
@@ -24,27 +25,6 @@ class SkillsStepState extends State<SkillsStep> {
   late Set<String> _preselectedSkills;
   late List<String> _availableSkills;
   late int _skillChoices;
-
-  static const Map<String, String> _skillLabels = {
-    'acrobatics':     'Akrobatik',
-    'animalHandling': 'Tierführung',
-    'arcana':         'Arkanes Wissen',
-    'athletics':      'Athletik',
-    'deception':      'Täuschung',
-    'history':        'Geschichte',
-    'insight':        'Einsicht',
-    'intimidation':   'Einschüchterung',
-    'investigation':  'Untersuchung',
-    'medicine':       'Medizin',
-    'nature':         'Naturkunde',
-    'perception':     'Wahrnehmung',
-    'performance':    'Aufführung',
-    'persuasion':     'Überzeugung',
-    'religion':       'Religion',
-    'sleightOfHand':  'Fingerfertigkeit',
-    'stealth':        'Heimlichkeit',
-    'survival':       'Überleben',
-  };
 
   @override
   void initState() {
@@ -232,7 +212,7 @@ class SkillsStepState extends State<SkillsStep> {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                _skillLabels[skill] ?? skill,
+                Skills.label(skill),
                 style: AppTextStyles.body.copyWith(
                   color: isDisabled ? Colors.grey[400] : Colors.black87,
                   fontWeight: isSelected && !isPreselected

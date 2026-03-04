@@ -36,7 +36,6 @@ class DatabaseHelper {
     // Gerätespezifischen Pfad für Datenbankdateien ermitteln
     final documentsDir = await getApplicationDocumentsDirectory();
     final path = join(documentsDir.path, 'dnd_app.db');
-    print('Database path: $path');
 
     return await openDatabase(
       path,

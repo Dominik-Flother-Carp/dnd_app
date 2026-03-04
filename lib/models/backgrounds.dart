@@ -34,7 +34,7 @@ const List<Background> backgrounds = [
     description: 'Du hast als Krimineller gelebt.',
   ),
   Background(
-    name: 'Volksmensch',
+    name: 'Volksheld',
     skillProficiencies: ['insight', 'persuasion'],
     toolProficiencies: ['Ein Handwerkswerkzeug'],
     languages: ['Eine Sprache nach Wahl'],
@@ -58,21 +58,21 @@ const List<Background> backgrounds = [
     description: 'Du entstammst einer adligen Familie.',
   ),
   Background(
-    name: 'Weise',
+    name: 'Weiser',
     skillProficiencies: ['arcana', 'history'],
     languages: ['Zwei Sprachen nach Wahl'],
     bonusAttribute2024: 'intelligence',
     description: 'Du hast dein Leben dem Studium gewidmet.',
   ),
   Background(
-    name: 'Ausgestoßener',
+    name: 'Sonderling',
     skillProficiencies: ['athletics', 'survival'],
     languages: ['Eine Sprache nach Wahl'],
     bonusAttribute2024: 'constitution',
     description: 'Du hast in der Wildnis überlebt.',
   ),
   Background(
-    name: 'Gildenhandwerker',
+    name: 'Gildenküsntler',
     skillProficiencies: ['insight', 'persuasion'],
     toolProficiencies: ['Ein Handwerkswerkzeug'],
     languages: ['Eine Sprache nach Wahl'],
@@ -94,7 +94,7 @@ const List<Background> backgrounds = [
     description: 'Du hast auf See gelebt.',
   ),
   Background(
-    name: 'Entertainer',
+    name: 'Unterhaltungskünstler',
     skillProficiencies: ['acrobatics', 'performance'],
     toolProficiencies: ['Verkleidungsset', 'Ein Musikinstrument'],
     bonusAttribute2024: 'charisma',

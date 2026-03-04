@@ -71,7 +71,7 @@ class _CharacterListScreenState extends State<CharacterListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('⚔️ Meine Charaktere'),
+        title: const Text('Meine Charaktere'),
       ),
 
       // Haupt-Inhalt

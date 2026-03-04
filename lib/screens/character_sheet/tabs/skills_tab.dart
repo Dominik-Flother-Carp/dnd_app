@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:dnd_app/models/character.dart';
 import 'package:dnd_app/theme/app_text_styles.dart';
+import 'package:dnd_app/models/skills.dart';
 
 class SkillsTab extends StatelessWidget {
   final Character character;
@@ -13,48 +14,6 @@ class SkillsTab extends StatelessWidget {
     required this.character,
     required this.themeColor,
   });
-
-  static const Map<String, String> _skillLabels = {
-    'acrobatics':     'Akrobatik',
-    'animalHandling': 'Tierführung',
-    'arcana':         'Arkanes Wissen',
-    'athletics':      'Athletik',
-    'deception':      'Täuschung',
-    'history':        'Geschichte',
-    'insight':        'Einsicht',
-    'intimidation':   'Einschüchterung',
-    'investigation':  'Untersuchung',
-    'medicine':       'Medizin',
-    'nature':         'Naturkunde',
-    'perception':     'Wahrnehmung',
-    'performance':    'Aufführung',
-    'persuasion':     'Überzeugung',
-    'religion':       'Religion',
-    'sleightOfHand':  'Fingerfertigkeit',
-    'stealth':        'Heimlichkeit',
-    'survival':       'Überleben',
-  };
-
-  static const Map<String, String> _skillAttributes = {
-    'acrobatics':     'GES',
-    'animalHandling': 'WEI',
-    'arcana':         'INT',
-    'athletics':      'STR',
-    'deception':      'CHA',
-    'history':        'INT',
-    'insight':        'WEI',
-    'intimidation':   'CHA',
-    'investigation':  'INT',
-    'medicine':       'WEI',
-    'nature':         'INT',
-    'perception':     'WEI',
-    'performance':    'CHA',
-    'persuasion':     'CHA',
-    'religion':       'INT',
-    'sleightOfHand':  'GES',
-    'stealth':        'GES',
-    'survival':       'WEI',
-  };
 
   @override
   Widget build(BuildContext context) {
@@ -117,14 +76,14 @@ class SkillsTab extends StatelessWidget {
               style: AppTextStyles.sectionTitle.copyWith(color: themeColor),
             ),
             const SizedBox(height: 12),
-            ..._skillLabels.keys.map((skillKey) {
+            ...Skills.labels.keys.map((skillKey) {
               final bonus        = character.skillBonus(skillKey);
               final isProficient = character.skillProficiencies[skillKey] ?? false;
               final hasExpertise = character.skillExpertise[skillKey] ?? false;
-              final attribute    = _skillAttributes[skillKey] ?? '';
+              final attribute    = Skills.attribute(skillKey);
 
               return _buildProficiencyRow(
-                label:        '${_skillLabels[skillKey]} ($attribute)',
+                label:        '${Skills.label(skillKey)} ($attribute)',
                 bonus:        bonus,
                 isProficient: isProficient,
                 hasExpertise: hasExpertise,
