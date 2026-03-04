@@ -19,7 +19,6 @@ class Character {
   String ideals;
   String bonds;
   String flaws;
-  int maxAttunements = 3;
   int hitDie;
   bool useEdition2024;
 
@@ -86,7 +85,6 @@ class Character {
     int copperPieces = 0,
     int electrumPieces = 0,
     int platinumPieces = 0,
-    int maxAttunements = 3,
     Map<String, bool>? skillProficiencies,
     Map<String, bool>? skillExpertise,
     Map<String, bool>? savingThrowProficiencies,

@@ -26,7 +26,7 @@ class OverviewTab extends StatelessWidget {
       children: [
         _buildCombatStats(context),
         const SizedBox(height: 16),
-        _buildAttributes(context),
+        _buildAttributes(),
       ],
     );
   }
@@ -185,7 +185,7 @@ class OverviewTab extends StatelessWidget {
 
   // ── Attribute ──────────────────────────────────────────────────────────────
 
-  Widget _buildAttributes(BuildContext context) {
+  Widget _buildAttributes() {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),

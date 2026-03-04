@@ -72,7 +72,6 @@ class DatabaseHelper {
         hitDie              INTEGER DEFAULT 8,
         armorClass          INTEGER DEFAULT 10,
         speed               INTEGER DEFAULT 9,
-        maxAttunements      INTEGER DEFAULT 3,
         goldPieces          INTEGER DEFAULT 0,
         silverPieces        INTEGER DEFAULT 0,
         copperPieces        INTEGER DEFAULT 0,
