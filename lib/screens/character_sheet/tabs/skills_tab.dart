@@ -8,12 +8,14 @@ import 'package:dnd_app/models/skills.dart';
 class SkillsTab extends StatefulWidget {
   final Character character;
   final Color themeColor;
+  final bool editMode;
   final Future<void> Function() onSave;
 
   const SkillsTab({
     super.key,
     required this.character,
     required this.themeColor,
+    required this.editMode,
     required this.onSave,
   });
 
@@ -22,7 +24,6 @@ class SkillsTab extends StatefulWidget {
 }
 
 class _SkillsTabState extends State<SkillsTab> {
-  bool _editMode = false;
 
   //Rotiert durch die Edit-States
   void _toggleSkill(String key, bool hasExpertise) {
@@ -60,26 +61,7 @@ class _SkillsTabState extends State<SkillsTab> {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        //Edit-Toggle
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Text(
-              _editMode ? 'Bearbeiten' : '',
-              style: AppTextStyles.bodySmall.copyWith(color: Colors.grey),
-            ),
-            const SizedBox(width: 8,),
-            IconButton(
-              icon: Icon(
-                _editMode ? Icons.edit_off : Icons.edit,
-                color: _editMode ? widget.themeColor : Colors.grey,
-              ),
-              tooltip: _editMode ? 'Bearbeitung beenden' : 'Bearbeiten',
-              onPressed: () => setState(() => _editMode = !_editMode),
-            ),
-          ],
-        ),
-        if (_editMode)
+        if (widget.editMode)
           Card(
             color: widget.themeColor.withOpacity(0.06),
             margin: const EdgeInsets.only(bottom: 12),
@@ -137,7 +119,7 @@ class _SkillsTabState extends State<SkillsTab> {
                 bonus:        bonus,
                 isProficient: isProficient,
                 hasExpertise: false,
-                onTap: _editMode ? () => _toggleSavingThrow(key) : null
+                onTap: widget.editMode ? () => _toggleSavingThrow(key) : null
               );
             }),
           ],
@@ -169,7 +151,7 @@ class _SkillsTabState extends State<SkillsTab> {
                 bonus:        bonus,
                 isProficient: isProficient,
                 hasExpertise: hasExpertise,
-                onTap: _editMode ? () => _toggleSkill(skillKey, hasExpertise) : null,
+                onTap: widget.editMode ? () => _toggleSkill(skillKey, hasExpertise) : null,
               );
             }),
           ],

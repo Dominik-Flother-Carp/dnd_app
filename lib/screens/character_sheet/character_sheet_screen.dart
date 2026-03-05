@@ -19,12 +19,12 @@ class CharacterSheetScreen extends StatefulWidget {
   State<CharacterSheetScreen> createState() => _CharacterSheetScreenState();
 }
 
-class _CharacterSheetScreenState extends State<CharacterSheetScreen>
-    with SingleTickerProviderStateMixin {
+class _CharacterSheetScreenState extends State<CharacterSheetScreen> with SingleTickerProviderStateMixin {
   final CharacterRepository _repository = CharacterRepository();
 
   Character? _character;
   bool _isLoading = true;
+  bool _editMode = false;
   late TabController _tabController;
 
   Color get _themeColor => _character?.useEdition2024 == true
@@ -86,12 +86,14 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
             OverviewTab(
               character: _character!,
               themeColor: _themeColor,
+              editMode: _editMode,
               onChanged: () => setState(() {}),
               onSave: _saveCharacter,
             ),
             SkillsTab(
               character: _character!,
               themeColor: _themeColor,
+              editMode: _editMode,
               onSave: _saveCharacter,
             ),
             _buildComingSoon('Ausrüstung'),
@@ -108,6 +110,16 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
       pinned: true,
       backgroundColor: _themeColor,
       foregroundColor: const Color(0xFFF5DEB3),
+      actions: [
+        IconButton(
+          icon: Icon(
+            _editMode ? Icons.edit_off : Icons.edit,
+            color: const Color(0xFFF5DEB3),
+          ),
+          tooltip: _editMode ? 'Bearbeitung beenden' : 'Bearbeiten',
+          onPressed: () => setState(() => _editMode = !_editMode),
+        ),
+      ],
       flexibleSpace: FlexibleSpaceBar(
         background: _buildHeader(),
       ),
@@ -160,29 +172,16 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  _buildSubtitle(),
-                  style: AppTextStyles.body.copyWith(
-                    color: const Color(0xFFF5DEB3).withOpacity(0.8),
+                GestureDetector(
+                  onTap: _editMode ? () => _showLevelDialog() : null,
+                  child: Text(
+                    _buildSubtitle(),
+                    style: AppTextStyles.body.copyWith(
+                      color: const Color(0xFFF5DEB3).withOpacity(0.8),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 4),
-                /*Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF5DEB3).withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    character.useEdition2024 ? 'D&D 2024' : 'D&D 2014',
-                    style: AppTextStyles.badgeSmall.copyWith(
-                      color: const Color(0xFFF5DEB3),
-                    ),
-                  ),
-                ),*/
               ],
             ),
           ),
@@ -220,4 +219,54 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
       ),
     );
   }
+
+  Future<void> _showLevelDialog() async {
+  await showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text('Stufe ändern', style: AppTextStyles.sectionTitle),
+      content: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.remove_circle_outline),
+            color: _themeColor,
+            onPressed: _character!.level > 1
+                ? () {
+                    setState(() => _character!.level--);
+                    _saveCharacter();
+                    Navigator.pop(context);
+                    _showLevelDialog();
+                  }
+                : null,
+          ),
+          Text(
+            '${_character!.level}',
+            style: AppTextStyles.statLarge.copyWith(color: _themeColor),
+          ),
+          IconButton(
+            icon: const Icon(Icons.add_circle_outline),
+            color: _themeColor,
+            onPressed: _character!.level < 20
+                ? () {
+                    setState(() => _character!.level++);
+                    _saveCharacter();
+                    Navigator.pop(context);
+                    _showLevelDialog();
+                  }
+                : null,
+          ),
+        ],
+      ),
+      actions: [
+        FilledButton(
+          onPressed: () => Navigator.pop(context),
+          style: FilledButton.styleFrom(backgroundColor: _themeColor),
+          child: Text('Fertig', style: AppTextStyles.body),
+        ),
+      ],
+    ),
+  );
+}
+
 }
