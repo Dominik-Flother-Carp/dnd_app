@@ -167,7 +167,7 @@ class SkillsStepState extends State<SkillsStep> {
           color: isPreselected
               ? Colors.grey[100]
               : isSelected
-                  ? const Color(0xFF8B0000).withOpacity(0.08)
+                  ? const Color(0xFF8B0000).withValues(alpha:0.08)
                   : Colors.white,
           border: Border.all(
             color: isPreselected

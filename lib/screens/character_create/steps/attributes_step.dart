@@ -34,6 +34,7 @@ class AttributesStepState extends State<AttributesStep> {
   int _int = 10, _wis = 10, _cha = 10;
 
   late int _freePoints;
+  // ignore: prefer_final_fields
   Map<String, int> _distributedPoints = {
     'strength': 0, 'dexterity': 0, 'constitution': 0,
     'intelligence': 0, 'wisdom': 0, 'charisma': 0,

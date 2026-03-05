@@ -74,7 +74,7 @@ class EditionStepState extends State<EditionStep> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.08) : Colors.white,
+          color: isSelected ? color.withValues(alpha:0.08) : Colors.white,
           border: Border.all(
             color: isSelected ? color : Colors.grey[300]!,
             width: isSelected ? 2 : 1,

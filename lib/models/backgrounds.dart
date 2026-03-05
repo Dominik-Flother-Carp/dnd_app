@@ -72,7 +72,7 @@ const List<Background> backgrounds = [
     description: 'Du hast in der Wildnis überlebt.',
   ),
   Background(
-    name: 'Gildenküsntler',
+    name: 'Gildenkünstler',
     skillProficiencies: ['insight', 'persuasion'],
     toolProficiencies: ['Ein Handwerkswerkzeug'],
     languages: ['Eine Sprache nach Wahl'],

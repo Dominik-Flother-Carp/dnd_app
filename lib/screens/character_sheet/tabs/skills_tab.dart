@@ -63,7 +63,7 @@ class _SkillsTabState extends State<SkillsTab> {
       children: [
         if (widget.editMode)
           Card(
-            color: widget.themeColor.withOpacity(0.06),
+            color: widget.themeColor.withValues(alpha:0.06),
             margin: const EdgeInsets.only(bottom: 12),
             child: Row(
               children: [

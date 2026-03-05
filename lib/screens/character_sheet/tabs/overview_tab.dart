@@ -174,7 +174,7 @@ class _OverviewTabState extends State<OverviewTab> {
                       .clamp(0.0, 1.0),
                   backgroundColor: Colors.transparent,
                   valueColor: AlwaysStoppedAnimation<Color>(
-                    Colors.blue.withOpacity(0.5),
+                    Colors.blue.withValues(alpha:0.5),
                   ),
                   minHeight: 8,
                 ),
@@ -238,9 +238,9 @@ class _OverviewTabState extends State<OverviewTab> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 6),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha:0.1),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: color.withOpacity(0.3)),
+            border: Border.all(color: color.withValues(alpha:0.3)),
           ),
           child: Column(
             children: [
@@ -266,7 +266,7 @@ class _OverviewTabState extends State<OverviewTab> {
           decoration: widget.editMode && onTap != null
               ? BoxDecoration(
                   border: Border.all(
-                    color: widget.themeColor.withOpacity(0.3),
+                    color: widget.themeColor.withValues(alpha:0.3),
                   ),
                   borderRadius: BorderRadius.circular(8),
                 )
@@ -345,7 +345,7 @@ class _OverviewTabState extends State<OverviewTab> {
           decoration: BoxDecoration(
             border: Border.all(
               color: widget.editMode
-                  ? widget.themeColor.withOpacity(0.4)
+                  ? widget.themeColor.withValues(alpha:0.4)
                   : Colors.grey[300]!,
               width: widget.editMode ? 1.5 : 1,
             ),
@@ -442,7 +442,7 @@ class _OverviewTabState extends State<OverviewTab> {
               width: widget.editMode ? 1.5 : 1,
             ),
             borderRadius: BorderRadius.circular(8),
-            color: _currencyColor(key).withOpacity(0.05),
+            color: _currencyColor(key).withValues(alpha:0.05),
           ),
           child: Column(
             children: [

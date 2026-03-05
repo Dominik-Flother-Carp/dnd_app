@@ -127,7 +127,7 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen> with Single
         controller: _tabController,
         indicatorColor: const Color(0xFFF5DEB3),
         labelColor: const Color(0xFFF5DEB3),
-        unselectedLabelColor: const Color(0xFFF5DEB3).withOpacity(0.5),
+        unselectedLabelColor: const Color(0xFFF5DEB3).withValues(alpha:0.5),
         labelStyle: AppTextStyles.label,
         tabs: const [
           Tab(text: 'Übersicht'),
@@ -147,7 +147,7 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen> with Single
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor: const Color(0xFFF5DEB3).withOpacity(0.2),
+            backgroundColor: const Color(0xFFF5DEB3).withValues(alpha:0.2),
             foregroundColor: const Color(0xFFF5DEB3),
             radius: 36,
             child: Text(
@@ -177,7 +177,7 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen> with Single
                   child: Text(
                     _buildSubtitle(),
                     style: AppTextStyles.body.copyWith(
-                      color: const Color(0xFFF5DEB3).withOpacity(0.8),
+                      color: const Color(0xFFF5DEB3).withValues(alpha:0.8),
                     ),
                   ),
                 ),
