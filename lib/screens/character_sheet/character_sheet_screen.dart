@@ -92,6 +92,7 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
             SkillsTab(
               character: _character!,
               themeColor: _themeColor,
+              onSave: _saveCharacter,
             ),
             _buildComingSoon('Ausrüstung'),
             _buildComingSoon('Zauber & Fähigkeiten'),
@@ -166,7 +167,7 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
                   ),
                 ),
                 const SizedBox(height: 4),
-                Container(
+                /*Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 8,
                     vertical: 2,
@@ -181,7 +182,7 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
                       color: const Color(0xFFF5DEB3),
                     ),
                   ),
-                ),
+                ),*/
               ],
             ),
           ),
@@ -212,7 +213,7 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
           Icon(Icons.construction, size: 48, color: Colors.grey[400]),
           const SizedBox(height: 12),
           Text(
-            '$label kommt in Phase 2',
+            '$label ist in Arbeit!',
             style: AppTextStyles.body.copyWith(color: Colors.grey[500]),
           ),
         ],
