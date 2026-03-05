@@ -1,9 +1,8 @@
-// lib/screens/character_sheet/tabs/overview_tab.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:dnd_app/models/character.dart';
 import 'package:dnd_app/theme/app_text_styles.dart';
+import 'package:dnd_app/models/attributes.dart';
 
 class OverviewTab extends StatefulWidget {
   final Character character;
@@ -102,11 +101,107 @@ class _OverviewTabState extends State<OverviewTab> {
                 _buildStatBox('Übung', '+${c.proficiencyBonus}'),
               ],
             ),
+            const Divider(height: 24),
+            _buildHitDiceSection(),
           ],
         ),
       ),
     );
   }
+
+  Widget _buildHitDiceSection() {
+  final available = c.level - c.usedHitDice;
+
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
+        children: [
+          Text('Trefferwürfel', style: AppTextStyles.cardTitle),
+          const Spacer(),
+          Text(
+            'W${c.hitDie}',
+            style: AppTextStyles.statMedium.copyWith(
+              color: widget.themeColor,
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: 8),
+      // Würfel-Anzeige
+      Wrap(
+        spacing: 6,
+        runSpacing: 6,
+        children: List.generate(c.level, (index) {
+          final isUsed = index >= available;
+          return Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: isUsed
+                  ? Colors.grey[300]
+                  : widget.themeColor.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(
+                color: isUsed
+                    ? Colors.grey[400]!
+                    : widget.themeColor,
+                width: 1.5,
+              ),
+            ),
+            child: Center(
+              child: Text(
+                'W${c.hitDie}',
+                style: AppTextStyles.labelXs.copyWith(
+                  color: isUsed
+                      ? Colors.grey[400]
+                      : widget.themeColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          );
+        }),
+      ),
+      const SizedBox(height: 8),
+      // Buttons
+      Row(
+        children: [
+          Text(
+            '$available / ${c.level} verfügbar',
+            style: AppTextStyles.bodySmall.copyWith(color: Colors.grey),
+          ),
+          const Spacer(),
+          if (c.usedHitDice > 0)
+            TextButton.icon(
+              onPressed: () {
+                setState(() => c.usedHitDice = 0);
+                _save();
+              },
+              icon: const Icon(Icons.refresh, size: 16),
+              label: Text('Lange Rast', style: AppTextStyles.bodySmall),
+              style: TextButton.styleFrom(
+                foregroundColor: widget.themeColor,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 4,
+                ),
+              ),
+            ),
+          const SizedBox(width: 8),
+          _buildHpButton(
+            label: 'Ausgeben',
+            icon: Icons.remove_circle_outline,
+            color: available > 0 ? widget.themeColor : Colors.grey,
+            onTap: available > 0
+                ? () => _showUseHitDiceDialog()
+                : () {},
+          ),
+        ],
+      ),
+    ],
+  );
+}
 
   Widget _buildHpSection() {
     final ratio = c.maxHitPoints > 0
@@ -332,7 +427,7 @@ class _OverviewTabState extends State<OverviewTab> {
       child: GestureDetector(
         onTap: widget.editMode
             ? () => _showNumberDialog(
-                  _attributeLabel(key),
+                  Attributes.label(key),
                   score,
                   min: 1,
                   max: 30,
@@ -378,18 +473,6 @@ class _OverviewTabState extends State<OverviewTab> {
       case 'wisdom':       c.wisdom       = value;
       case 'charisma':     c.charisma     = value;
     }
-  }
-
-  String _attributeLabel(String key) {
-    const labels = {
-      'strength':     'Stärke',
-      'dexterity':    'Geschicklichkeit',
-      'constitution': 'Konstitution',
-      'intelligence': 'Intelligenz',
-      'wisdom':       'Weisheit',
-      'charisma':     'Charisma',
-    };
-    return labels[key] ?? key;
   }
 
   // ── Währung ────────────────────────────────────────────────────────────────
@@ -493,6 +576,51 @@ class _OverviewTabState extends State<OverviewTab> {
   }
 
   // ── Dialoge ────────────────────────────────────────────────────────────────
+
+  Future<void> _showUseHitDiceDialog() async {
+    final available = c.level - c.usedHitDice;
+
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Trefferwürfel ausgeben',
+          style: AppTextStyles.sectionTitle,
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Verfügbar: $available W${c.hitDie}',
+              style: AppTextStyles.body,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Wirf einen W${c.hitDie} und addiere deinen '
+              'Konstitutionsmodifikator (${c.conModifier >= 0 ? '+${c.conModifier}' : '${c.conModifier}'}) '
+              'um TP zu regenerieren.',
+              style: AppTextStyles.bodySmall.copyWith(color: Colors.grey),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Abbrechen', style: AppTextStyles.body),
+          ),
+          FilledButton(
+            onPressed: () {
+              setState(() => c.usedHitDice++);
+              _save();
+              Navigator.pop(context);
+            },
+            style: FilledButton.styleFrom(backgroundColor: widget.themeColor),
+            child: Text('Würfel ausgeben', style: AppTextStyles.body),
+          ),
+        ],
+      ),
+    );
+  }
 
   Future<void> _showHpDialog() async {
     final controller = TextEditingController(
@@ -676,7 +804,6 @@ class _OverviewTabState extends State<OverviewTab> {
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           style: AppTextStyles.body,
           decoration: InputDecoration(
-            //labelText: '$min – $max',
             border: const OutlineInputBorder(),
           ),
           autofocus: true,
@@ -689,7 +816,7 @@ class _OverviewTabState extends State<OverviewTab> {
           FilledButton(
             onPressed: () {
               final value = int.tryParse(controller.text);
-              if (value != null && value >= min) {
+              if (value != null && value >= min && value <= max) {
                 onSave(value);
                 _save();
               }

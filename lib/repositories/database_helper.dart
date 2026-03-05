@@ -39,7 +39,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 3,
+      version: 4,
       onCreate: _createTables,
       onUpgrade: _onUpgrade,
     );
@@ -70,6 +70,7 @@ class DatabaseHelper {
         currentHitPoints    INTEGER DEFAULT 8,
         temporaryHitPoints  INTEGER DEFAULT 0,
         hitDie              INTEGER DEFAULT 8,
+        usedHitDice         INTEGER DEFAULT 0,
         armorClass          INTEGER DEFAULT 10,
         speed               INTEGER DEFAULT 9,
         goldPieces          INTEGER DEFAULT 0,
@@ -198,18 +199,21 @@ class DatabaseHelper {
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       await db.execute(
-        'ALTER TABLE characters ADD COLUMN useEdition2024 INTEGER DEFAULT 0'
+        'ALTER TABLE characters ADD COLUMN useEdition2024 INTEGER DEFAULT 0',
       );
     }
     if (oldVersion < 3) {
       await db.execute(
-        'ALTER TABLE characters ADD COLUMN skillProficiencies TEXT'
+        'ALTER TABLE characters ADD COLUMN skillProficiencies TEXT',
       );
+      await db.execute('ALTER TABLE characters ADD COLUMN skillExpertise TEXT');
       await db.execute(
-        'ALTER TABLE characters ADD COLUMN skillExpertise TEXT'
+        'ALTER TABLE characters ADD COLUMN savingThrowProficiencies TEXT',
       );
+    }
+    if (oldVersion < 4) {
       await db.execute(
-        'ALTER TABLE characters ADD COLUMN savingThrowProficiencies TEXT'
+        'ALTER TABLE characters ADD COLUMN usedHitDice INTEGER DEFAULT 0',
       );
     }
   }

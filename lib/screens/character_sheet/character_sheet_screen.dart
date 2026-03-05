@@ -10,16 +10,14 @@ import 'package:dnd_app/theme/app_text_styles.dart';
 class CharacterSheetScreen extends StatefulWidget {
   final String characterId;
 
-  const CharacterSheetScreen({
-    super.key,
-    required this.characterId,
-  });
+  const CharacterSheetScreen({super.key, required this.characterId});
 
   @override
   State<CharacterSheetScreen> createState() => _CharacterSheetScreenState();
 }
 
-class _CharacterSheetScreenState extends State<CharacterSheetScreen> with SingleTickerProviderStateMixin {
+class _CharacterSheetScreenState extends State<CharacterSheetScreen>
+    with SingleTickerProviderStateMixin {
   final CharacterRepository _repository = CharacterRepository();
 
   Character? _character;
@@ -54,15 +52,24 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen> with Single
 
   Future<void> _saveCharacter() async {
     if (_character == null) return;
-    await _repository.updateCharacter(_character!);
+    try {
+      await _repository.updateCharacter(_character!);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Fehler beim Speichern'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     if (_character == null) {
@@ -120,14 +127,12 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen> with Single
           onPressed: () => setState(() => _editMode = !_editMode),
         ),
       ],
-      flexibleSpace: FlexibleSpaceBar(
-        background: _buildHeader(),
-      ),
+      flexibleSpace: FlexibleSpaceBar(background: _buildHeader()),
       bottom: TabBar(
         controller: _tabController,
         indicatorColor: const Color(0xFFF5DEB3),
         labelColor: const Color(0xFFF5DEB3),
-        unselectedLabelColor: const Color(0xFFF5DEB3).withValues(alpha:0.5),
+        unselectedLabelColor: const Color(0xFFF5DEB3).withValues(alpha: 0.5),
         labelStyle: AppTextStyles.label,
         tabs: const [
           Tab(text: 'Übersicht'),
@@ -147,13 +152,11 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen> with Single
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor: const Color(0xFFF5DEB3).withValues(alpha:0.2),
+            backgroundColor: const Color(0xFFF5DEB3).withValues(alpha: 0.2),
             foregroundColor: const Color(0xFFF5DEB3),
             radius: 36,
             child: Text(
-              character.name.isNotEmpty
-                  ? character.name[0].toUpperCase()
-                  : '?',
+              character.name.isNotEmpty ? character.name[0].toUpperCase() : '?',
               style: AppTextStyles.avatarLarge.copyWith(
                 color: const Color(0xFFF5DEB3),
               ),
@@ -172,12 +175,35 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen> with Single
                   ),
                 ),
                 const SizedBox(height: 4),
-                GestureDetector(
-                  onTap: _editMode ? () => _showLevelDialog() : null,
-                  child: Text(
-                    _buildSubtitle(),
-                    style: AppTextStyles.body.copyWith(
-                      color: const Color(0xFFF5DEB3).withValues(alpha:0.8),
+                Flexible(
+                  child: GestureDetector(
+                    onTap: _editMode ? () => _showLevelDialog() : null,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            _buildSubtitle(),
+                            style: AppTextStyles.body.copyWith(
+                              color: const Color(
+                                0xFFF5DEB3,
+                              ).withValues(alpha: 0.8),
+                            ),
+                            softWrap: true,
+                            overflow: TextOverflow.visible,
+                          ),
+                        ),
+                        if (_editMode) ...[
+                          const SizedBox(width: 6),
+                          Icon(
+                            Icons.edit,
+                            size: 14,
+                            color: const Color(
+                              0xFFF5DEB3,
+                            ).withValues(alpha: 0.7),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                 ),
@@ -221,52 +247,51 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen> with Single
   }
 
   Future<void> _showLevelDialog() async {
-  await showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: Text('Stufe ändern', style: AppTextStyles.sectionTitle),
-      content: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.remove_circle_outline),
-            color: _themeColor,
-            onPressed: _character!.level > 1
-                ? () {
-                    setState(() => _character!.level--);
-                    _saveCharacter();
-                    Navigator.pop(context);
-                    _showLevelDialog();
-                  }
-                : null,
+    await showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: Text('Stufe ändern', style: AppTextStyles.sectionTitle),
+          content: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.remove_circle_outline),
+                color: _themeColor,
+                onPressed: _character!.level > 1
+                    ? () {
+                        setDialogState(() => _character!.level--);
+                        setState(() {});
+                        _saveCharacter();
+                      }
+                    : null,
+              ),
+              Text(
+                '${_character!.level}',
+                style: AppTextStyles.statLarge.copyWith(color: _themeColor),
+              ),
+              IconButton(
+                icon: const Icon(Icons.add_circle_outline),
+                color: _themeColor,
+                onPressed: _character!.level < 20
+                    ? () {
+                        setDialogState(() => _character!.level++);
+                        setState(() {});
+                        _saveCharacter();
+                      }
+                    : null,
+              ),
+            ],
           ),
-          Text(
-            '${_character!.level}',
-            style: AppTextStyles.statLarge.copyWith(color: _themeColor),
-          ),
-          IconButton(
-            icon: const Icon(Icons.add_circle_outline),
-            color: _themeColor,
-            onPressed: _character!.level < 20
-                ? () {
-                    setState(() => _character!.level++);
-                    _saveCharacter();
-                    Navigator.pop(context);
-                    _showLevelDialog();
-                  }
-                : null,
-          ),
-        ],
-      ),
-      actions: [
-        FilledButton(
-          onPressed: () => Navigator.pop(context),
-          style: FilledButton.styleFrom(backgroundColor: _themeColor),
-          child: Text('Fertig', style: AppTextStyles.body),
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.pop(context),
+              style: FilledButton.styleFrom(backgroundColor: _themeColor),
+              child: Text('Fertig', style: AppTextStyles.body),
+            ),
+          ],
         ),
-      ],
-    ),
-  );
-}
-
+      ),
+    );
+  }
 }

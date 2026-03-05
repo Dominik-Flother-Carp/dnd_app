@@ -73,7 +73,7 @@ class CharacterRepository {
 
   // Löscht custom content dessen Ersteller gelöscht wird
   // und der keinem anderen Charakter mehr zugewiesen ist
-  Future<void> _deleteOrphanedCustomContent(dynamic db, String creatorId) async {
+  Future<void> _deleteOrphanedCustomContent(Database db, String creatorId) async {
 
     // Alle custom Zauber dieses Erstellers finden
     final customSpells = await db.query(

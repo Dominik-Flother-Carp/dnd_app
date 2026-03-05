@@ -26,7 +26,7 @@ class SkillsTab extends StatefulWidget {
 class _SkillsTabState extends State<SkillsTab> {
 
   //Rotiert durch die Edit-States
-  void _toggleSkill(String key, bool hasExpertise) {
+  void _toggleSkill(String key) {
     setState(() {
       final isProficient = widget.character.skillProficiencies[key] ?? false;
       final hasExpertise = widget.character.skillExpertise[key] ?? false;
@@ -65,20 +65,23 @@ class _SkillsTabState extends State<SkillsTab> {
           Card(
             color: widget.themeColor.withValues(alpha:0.06),
             margin: const EdgeInsets.only(bottom: 12),
-            child: Row(
-              children: [
-                Icon(Icons.info_outline,
-                    size: 16, color: widget.themeColor),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'Tippe auf einen Kreis um den Status zu wechseln.',
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: widget.themeColor,
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline,
+                      size: 16, color: widget.themeColor),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Tippe auf einen Kreis um den Status zu wechseln.',
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: widget.themeColor,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         _buildSavingThrows(),
@@ -151,7 +154,7 @@ class _SkillsTabState extends State<SkillsTab> {
                 bonus:        bonus,
                 isProficient: isProficient,
                 hasExpertise: hasExpertise,
-                onTap: widget.editMode ? () => _toggleSkill(skillKey, hasExpertise) : null,
+                onTap: widget.editMode ? () => _toggleSkill(skillKey) : null,
               );
             }),
           ],

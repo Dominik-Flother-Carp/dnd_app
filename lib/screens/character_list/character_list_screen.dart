@@ -1,9 +1,13 @@
-import 'package:dnd_app/screens/character_create/character_create_screen.dart';
+// lib/screens/character_list/character_list_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:dnd_app/models/character.dart';
 import 'package:dnd_app/repositories/character_repository.dart';
 import 'package:dnd_app/screens/character_list/character_card.dart';
 import 'package:dnd_app/screens/character_sheet/character_sheet_screen.dart';
+import 'package:dnd_app/screens/character_create/character_create_screen.dart';
+import 'package:dnd_app/screens/compendium/compendium_screen.dart';
+import 'package:dnd_app/theme/app_text_styles.dart';
 
 class CharacterListScreen extends StatefulWidget {
   const CharacterListScreen({super.key});
@@ -13,49 +17,44 @@ class CharacterListScreen extends StatefulWidget {
 }
 
 class _CharacterListScreenState extends State<CharacterListScreen> {
-
   final CharacterRepository _repository = CharacterRepository();
   List<Character> _characters = [];
   bool _isLoading = true;
 
-  // initState wird einmal aufgerufen wenn der Screen das erste Mal gebaut wird
   @override
   void initState() {
     super.initState();
     _loadCharacters();
   }
 
-  // Charaktere aus der Datenbank laden und UI aktualisieren
   Future<void> _loadCharacters() async {
     setState(() => _isLoading = true);
-
     final characters = await _repository.getAllCharacters();
-
     setState(() {
       _characters = characters;
       _isLoading = false;
     });
   }
 
-  // Charakter löschen mit Bestätigungsdialog
   Future<void> _deleteCharacter(Character character) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Charakter löschen'),
+        title: Text('Charakter löschen', style: AppTextStyles.sectionTitle),
         content: Text(
           '${character.name} wirklich löschen? '
           'Diese Aktion kann nicht rückgängig gemacht werden.',
+          style: AppTextStyles.body,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Abbrechen'),
+            child: Text('Abbrechen', style: AppTextStyles.body),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Löschen'),
+            child: Text('Löschen', style: AppTextStyles.body),
           ),
         ],
       ),
@@ -63,7 +62,7 @@ class _CharacterListScreenState extends State<CharacterListScreen> {
 
     if (confirmed == true) {
       await _repository.deleteCharacter(character.id);
-      _loadCharacters(); // Liste neu laden
+      _loadCharacters();
     }
   }
 
@@ -71,75 +70,167 @@ class _CharacterListScreenState extends State<CharacterListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Meine Charaktere'),
+        title: Text('Meine Charaktere',
+            style: AppTextStyles.cardTitle.copyWith(
+              color: const Color(0xFFF5DEB3),
+            )),
       ),
-
-      // Haupt-Inhalt
+      drawer: _buildDrawer(context),
       body: _isLoading
-          // Ladeindikator solange Daten geladen werden
           ? const Center(child: CircularProgressIndicator())
-          // Leerer Zustand – noch keine Charaktere vorhanden
           : _characters.isEmpty
               ? _buildEmptyState()
-              // Liste der Charaktere
               : _buildCharacterList(),
-
-      // Floating Action Button zum Erstellen eines neuen Charakters
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           final created = await Navigator.push<bool>(
             context,
             MaterialPageRoute(
               builder: (context) => const CharacterCreateScreen(),
-              ),
+            ),
           );
           if (created == true) _loadCharacters();
         },
         icon: const Icon(Icons.add),
-        label: const Text('Neuer Charakter'),
+        label: Text('Neuer Charakter', style: AppTextStyles.body),
         backgroundColor: const Color(0xFF8B0000),
         foregroundColor: Colors.white,
       ),
     );
   }
 
-  // Widget für den leeren Zustand
+  Widget _buildDrawer(BuildContext context) {
+    return Drawer(
+      backgroundColor: const Color(0xFF2C1A0E),
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(24),
+              color: const Color(0xFF3B1F0A),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(
+                    Icons.shield,
+                    size: 48,
+                    color: Color(0xFFF5DEB3),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'D&D Companion',
+                    style: AppTextStyles.sectionTitle.copyWith(
+                      color: const Color(0xFFF5DEB3),
+                    ),
+                  ),
+                  Text(
+                    'Dein Begleiter am Spieltisch',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: const Color(0xFFF5DEB3).withValues(alpha: 0.6),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            _buildDrawerItem(
+              context,
+              icon: Icons.people,
+              label: 'Charaktere',
+              isActive: true,
+              onTap: () => Navigator.pop(context),
+            ),
+            _buildDrawerItem(
+              context,
+              icon: Icons.menu_book,
+              label: 'Kompendium',
+              isActive: false,
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const CompendiumScreen(),
+                  ),
+                );
+              },
+            ),
+            const Divider(color: Color(0xFF4A2F1A), height: 32),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                'Version 1.0',
+                style: AppTextStyles.labelXs.copyWith(
+                  color: const Color(0xFFF5DEB3).withValues(alpha: 0.3),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDrawerItem(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required bool isActive,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      leading: Icon(
+        icon,
+        color: isActive
+            ? const Color(0xFFF5DEB3)
+            : const Color(0xFFF5DEB3).withValues(alpha: 0.5),
+      ),
+      title: Text(
+        label,
+        style: AppTextStyles.body.copyWith(
+          color: isActive
+              ? const Color(0xFFF5DEB3)
+              : const Color(0xFFF5DEB3).withValues(alpha: 0.5),
+          fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+        ),
+      ),
+      tileColor: isActive
+          ? const Color(0xFFF5DEB3).withValues(alpha: 0.08)
+          : null,
+      onTap: onTap,
+    );
+  }
+
   Widget _buildEmptyState() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.person_add_alt_1,
-            size: 80,
-            color: Colors.grey[400],
-          ),
+          Icon(Icons.person_add_alt_1, size: 80, color: Colors.grey[400]),
           const SizedBox(height: 16),
           Text(
             'Noch keine Charaktere',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+            style: AppTextStyles.sectionTitle.copyWith(
               color: Colors.grey[600],
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'Tippe auf "Neuer Charakter" um loszulegen',
-            style: TextStyle(color: Colors.grey[500]),
+            style: AppTextStyles.bodySmall.copyWith(color: Colors.grey[500]),
           ),
         ],
       ),
     );
   }
 
-  // Widget für die Charakterliste
   Widget _buildCharacterList() {
     return RefreshIndicator(
-      // Runterziehen zum Neu-Laden
       onRefresh: _loadCharacters,
       child: ListView.builder(
-        // Anzahl der Elemente
         itemCount: _characters.length,
-        // Baut nur die Karten die gerade sichtbar sind – effizient bei langen Listen
         itemBuilder: (context, index) {
           final character = _characters[index];
           return CharacterCard(

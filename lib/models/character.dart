@@ -46,6 +46,8 @@ class Character {
   int _electrumPieces = 0;
   int _platinumPieces = 0;
 
+  int _usedHitDice = 0;
+
   // ── Fertigkeiten: true = geübt ─────────────────────────────────────────────
   Map<String, bool> skillProficiencies;
   Map<String, bool> skillExpertise;
@@ -85,6 +87,7 @@ class Character {
     int copperPieces = 0,
     int electrumPieces = 0,
     int platinumPieces = 0,
+    int usedHitDice = 0,
     Map<String, bool>? skillProficiencies,
     Map<String, bool>? skillExpertise,
     Map<String, bool>? savingThrowProficiencies,
@@ -113,6 +116,7 @@ class Character {
     _copperPieces = copperPieces.clamp(0, 9999999);
     _electrumPieces = electrumPieces.clamp(0, 9999999);
     _platinumPieces = platinumPieces.clamp(0, 9999999);
+    _usedHitDice = usedHitDice.clamp(0, _level);
   }
 
   // ── Getter & Setter mit Validierung ───────────────────────────────────────
@@ -185,6 +189,9 @@ class Character {
 
   int get platinumPieces => _platinumPieces;
   set platinumPieces(int value) => _platinumPieces = value.clamp(0, 9999999);
+
+  int get usedHitDice => _usedHitDice;
+  set usedHitDice(int value) => _usedHitDice = value.clamp(0, _level);
 
   // ── Automatische Berechnungen ─────────────────────────────────────────────
 
@@ -334,6 +341,7 @@ class Character {
       'skillProficiencies':       jsonEncode(skillProficiencies),
       'skillExpertise':           jsonEncode(skillExpertise),
       'savingThrowProficiencies': jsonEncode(savingThrowProficiencies),
+      'usedHitDice':          usedHitDice,
     };
   }
 
@@ -371,15 +379,10 @@ class Character {
       bonds:              map['bonds'] ?? '',
       flaws:              map['flaws'] ?? '',
       useEdition2024:     map['useEdition2024'] == 1,
-      skillProficiencies: map['skillProficiencies'] != null
-          ? Map<String, bool>.from(jsonDecode(map['skillProficiencies']))
-          : null,
-      skillExpertise: map['skillExpertise'] != null
-          ? Map<String, bool>.from(jsonDecode(map['skillExpertise']))
-          : null,
-      savingThrowProficiencies: map['savingThrowProficiencies'] != null
-          ? Map<String, bool>.from(jsonDecode(map['savingThrowProficiencies']))
-          : null,
-      );
+      skillProficiencies: map['skillProficiencies'] != null ? Map<String, bool>.from(jsonDecode(map['skillProficiencies'])) : null,
+      skillExpertise:     map['skillExpertise'] != null ? Map<String, bool>.from(jsonDecode(map['skillExpertise'])) : null,
+      savingThrowProficiencies: map['savingThrowProficiencies'] != null ? Map<String, bool>.from(jsonDecode(map['savingThrowProficiencies'])) : null,
+      usedHitDice:        map['usedHitDice'] ?? 0,
+    );
   }
 }

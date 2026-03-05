@@ -229,11 +229,11 @@ class AttributesStepState extends State<AttributesStep> {
                 : null,
           ),
           SizedBox(
-            width: 48,
+            width: 52,
             child: Column(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
                   decoration: BoxDecoration(
                     color: const Color(0xFF3B1F0A),
                     borderRadius: BorderRadius.circular(6),
@@ -241,7 +241,7 @@ class AttributesStepState extends State<AttributesStep> {
                   child: Text(
                     _modifierText(totalValue),
                     textAlign: TextAlign.center,
-                    style: AppTextStyles.statSmall.copyWith(
+                    style: AppTextStyles.statMedium.copyWith(
                       color: const Color(0xFFF5DEB3),
                     ),
                   ),

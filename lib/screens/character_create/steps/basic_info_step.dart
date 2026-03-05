@@ -7,6 +7,7 @@ import 'package:dnd_app/models/races.dart';
 import 'package:dnd_app/models/backgrounds.dart';
 import 'package:dnd_app/theme/app_text_styles.dart';
 import 'package:dnd_app/models/skills.dart';
+import 'package:dnd_app/models/attributes.dart';
 
 class BasicInfoStep extends StatefulWidget {
   final Character character;
@@ -291,7 +292,7 @@ class BasicInfoStepState extends State<BasicInfoStep> {
                 _buildDerivedRow(
                   Icons.auto_fix_high,
                   'Zauberattribut',
-                  _spellcastingAttributeLabel(
+                  Attributes.label(
                       _selectedClass!.spellcastingAttribute),
                 ),
             ],
@@ -328,7 +329,7 @@ class BasicInfoStepState extends State<BasicInfoStep> {
               _buildDerivedRow(
                 Icons.add_circle_outline,
                 'Attributbonus (2024)',
-                '+${_selectedBackground!.bonusValue2024} ${_attributeLabel(_selectedBackground!.bonusAttribute2024!)}',
+                '+${_selectedBackground!.bonusValue2024} ${Attributes.label(_selectedBackground!.bonusAttribute2024!)}',
               ),
           ],
         ),
@@ -379,30 +380,9 @@ class BasicInfoStepState extends State<BasicInfoStep> {
     );
   }
 
-  String _spellcastingAttributeLabel(String attribute) {
-    const labels = {
-      'intelligence': 'Intelligenz',
-      'wisdom':       'Weisheit',
-      'charisma':     'Charisma',
-    };
-    return labels[attribute] ?? attribute;
-  }
-
-  String _attributeLabel(String attribute) {
-    const labels = {
-      'strength':     'Stärke',
-      'dexterity':    'Geschicklichkeit',
-      'constitution': 'Konstitution',
-      'intelligence': 'Intelligenz',
-      'wisdom':       'Weisheit',
-      'charisma':     'Charisma',
-    };
-    return labels[attribute] ?? attribute;
-  }
-
   String _formatAttributeBonuses(Map<String, int> bonuses) {
     return bonuses.entries
-        .map((e) => '+${e.value} ${_attributeLabel(e.key)}')
+        .map((e) => '+${e.value} ${Attributes.label(e.key)}')
         .join(', ');
   }
 }
