@@ -3,6 +3,7 @@ class CharacterClass {
   final int hitDie;
   final String spellcastingAttribute; // '' wenn keine Zauberei
   final List<String> availableSkills; // Fertigkeiten aus denen gewählt werden kann
+  final List<String> proficientSavingThrows;
   final int skillChoices;             // Anzahl der wählbaren Fertigkeiten
 
   const CharacterClass({
@@ -10,6 +11,7 @@ class CharacterClass {
     required this.hitDie,
     this.spellcastingAttribute = '',
     required this.availableSkills,
+    required this.proficientSavingThrows,
     required this.skillChoices,
   });
 }
@@ -23,6 +25,9 @@ const List<CharacterClass> characterClasses = [
       'animalHandling', 'athletics', 'intimidation',
       'nature', 'perception', 'survival',
     ],
+    proficientSavingThrows: [
+      'strength', 'constitution'
+    ]
   ),
   CharacterClass(
     name: 'Barde',
@@ -36,6 +41,9 @@ const List<CharacterClass> characterClasses = [
       'performance', 'persuasion', 'religion', 'sleightOfHand',
       'stealth', 'survival',
     ],
+    proficientSavingThrows: [
+      'dexterity', 'charisma'
+    ]
   ),
   CharacterClass(
     name: 'Druide',
@@ -46,73 +54,9 @@ const List<CharacterClass> characterClasses = [
       'arcana', 'animalHandling', 'insight', 'medicine',
       'nature', 'perception', 'religion', 'survival',
     ],
-  ),
-  CharacterClass(
-    name: 'Kämpfer',
-    hitDie: 10,
-    skillChoices: 2,
-    availableSkills: [
-      'acrobatics', 'animalHandling', 'athletics', 'history',
-      'insight', 'intimidation', 'perception', 'survival',
-    ],
-  ),
-  CharacterClass(
-    name: 'Kleriker',
-    hitDie: 8,
-    spellcastingAttribute: 'wisdom',
-    skillChoices: 2,
-    availableSkills: [
-      'history', 'insight', 'medicine', 'persuasion', 'religion',
-    ],
-  ),
-  CharacterClass(
-    name: 'Magier',
-    hitDie: 6,
-    spellcastingAttribute: 'intelligence',
-    skillChoices: 2,
-    availableSkills: [
-      'arcana', 'history', 'insight', 'investigation',
-      'medicine', 'religion',
-    ],
-  ),
-  CharacterClass(
-    name: 'Mönch',
-    hitDie: 8,
-    skillChoices: 2,
-    availableSkills: [
-      'acrobatics', 'athletics', 'history', 'insight',
-      'religion', 'stealth',
-    ],
-  ),
-  CharacterClass(
-    name: 'Paladin',
-    hitDie: 10,
-    spellcastingAttribute: 'charisma',
-    skillChoices: 2,
-    availableSkills: [
-      'athletics', 'insight', 'intimidation',
-      'medicine', 'persuasion', 'religion',
-    ],
-  ),
-  CharacterClass(
-    name: 'Schurke',
-    hitDie: 8,
-    skillChoices: 4,
-    availableSkills: [
-      'acrobatics', 'athletics', 'deception', 'insight',
-      'intimidation', 'investigation', 'perception', 'performance',
-      'persuasion', 'sleightOfHand', 'stealth',
-    ],
-  ),
-  CharacterClass(
-    name: 'Waldläufer',
-    hitDie: 8,
-    spellcastingAttribute: 'wisdom',
-    skillChoices: 3,
-    availableSkills: [
-      'animalHandling', 'athletics', 'insight', 'investigation',
-      'nature', 'perception', 'stealth', 'survival',
-    ],
+    proficientSavingThrows: [
+      'intelligence', 'wisdom'
+    ]
   ),
   CharacterClass(
     name: 'Hexenmeister',
@@ -123,6 +67,97 @@ const List<CharacterClass> characterClasses = [
       'arcana', 'deception', 'history', 'intimidation',
       'investigation', 'nature', 'religion',
     ],
+    proficientSavingThrows: [
+      'wisdom', 'charisma'
+    ]
+  ),
+  CharacterClass(
+    name: 'Kämpfer',
+    hitDie: 10,
+    skillChoices: 2,
+    availableSkills: [
+      'acrobatics', 'animalHandling', 'athletics', 'history',
+      'insight', 'intimidation', 'perception', 'survival',
+    ],
+    proficientSavingThrows: [
+      'strength', 'constitution'
+    ]
+  ),
+  CharacterClass(
+    name: 'Kleriker',
+    hitDie: 8,
+    spellcastingAttribute: 'wisdom',
+    skillChoices: 2,
+    availableSkills: [
+      'history', 'insight', 'medicine', 'persuasion', 'religion',
+    ],
+    proficientSavingThrows: [
+      'wisdom', 'charisma'
+    ]
+  ),
+  CharacterClass(
+    name: 'Magier',
+    hitDie: 6,
+    spellcastingAttribute: 'intelligence',
+    skillChoices: 2,
+    availableSkills: [
+      'arcana', 'history', 'insight', 'investigation',
+      'medicine', 'religion',
+    ],
+    proficientSavingThrows: [
+      'intelligence', 'wisdom'
+    ]
+  ),
+  CharacterClass(
+    name: 'Mönch',
+    hitDie: 8,
+    skillChoices: 2,
+    availableSkills: [
+      'acrobatics', 'athletics', 'history', 'insight',
+      'religion', 'stealth',
+    ],
+    proficientSavingThrows: [
+      'strength', 'dexterity'
+    ]
+  ),
+  CharacterClass(
+    name: 'Paladin',
+    hitDie: 10,
+    spellcastingAttribute: 'charisma',
+    skillChoices: 2,
+    availableSkills: [
+      'athletics', 'insight', 'intimidation',
+      'medicine', 'persuasion', 'religion',
+    ],
+    proficientSavingThrows: [
+      'wisdom', 'charisma'
+    ]
+  ),
+  CharacterClass(
+    name: 'Schurke',
+    hitDie: 8,
+    skillChoices: 4,
+    availableSkills: [
+      'acrobatics', 'athletics', 'deception', 'insight',
+      'intimidation', 'investigation', 'perception', 'performance',
+      'persuasion', 'sleightOfHand', 'stealth',
+    ],
+    proficientSavingThrows: [
+      'dexterity', 'intelligence'
+    ]
+  ),
+  CharacterClass(
+    name: 'Waldläufer',
+    hitDie: 8,
+    spellcastingAttribute: 'wisdom',
+    skillChoices: 3,
+    availableSkills: [
+      'animalHandling', 'athletics', 'insight', 'investigation',
+      'nature', 'perception', 'stealth', 'survival',
+    ],
+    proficientSavingThrows: [
+      'strength', 'dexterity'
+    ]
   ),
   CharacterClass(
     name: 'Zauberer',
@@ -133,5 +168,8 @@ const List<CharacterClass> characterClasses = [
       'arcana', 'history', 'insight', 'investigation',
       'medicine', 'religion',
     ],
+    proficientSavingThrows: [
+      'charisma', 'constitution'
+    ]
   ),
 ];

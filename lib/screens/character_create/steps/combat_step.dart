@@ -45,7 +45,6 @@ class CombatStepState extends State<CombatStep> {
 
   void applyTo(Character character) {
     character.maxHitPoints     = int.tryParse(_maxHpController.text) ?? 8;
-    character.currentHitPoints = character.maxHitPoints;
     character.armorClass       = int.tryParse(_armorClassController.text) ?? 10;
   }
 

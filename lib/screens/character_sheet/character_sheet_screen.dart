@@ -118,6 +118,14 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
       backgroundColor: _themeColor,
       foregroundColor: const Color(0xFFF5DEB3),
       actions: [
+        OutlinedButton.icon(
+          label: Text("Lange Rast"),
+          icon: Icon(
+            Icons.refresh,
+            color: const Color(0xFFF5DEB3),
+          ),
+          onPressed: _showRestDialog,
+        ),
         IconButton(
           icon: Icon(
             _editMode ? Icons.edit_off : Icons.edit,
@@ -291,6 +299,45 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void longRest(){
+    setState(() {
+        _character!.currentHitPoints = _character!.maxHitPoints;
+        _character!.usedHitDice = 0;
+      }
+    );
+  }
+
+  Future<void> _showRestDialog() async {
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Lange Rast', style: AppTextStyles.sectionTitle),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("Lange Rast wirklich ausführen?")
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text("Abbrechen"),
+          ),
+          FilledButton(
+            onPressed: () {
+              longRest();
+              Navigator.pop(context);
+            },
+            style: FilledButton.styleFrom(backgroundColor: _themeColor),
+            child: Text('Ja', style: AppTextStyles.body),
+          ),
+        ],
       ),
     );
   }

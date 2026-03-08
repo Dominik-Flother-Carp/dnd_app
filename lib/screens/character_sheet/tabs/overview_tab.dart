@@ -172,22 +172,6 @@ class _OverviewTabState extends State<OverviewTab> {
             style: AppTextStyles.bodySmall.copyWith(color: Colors.grey),
           ),
           const Spacer(),
-          if (c.usedHitDice > 0)
-            TextButton.icon(
-              onPressed: () {
-                setState(() => c.usedHitDice = 0);
-                _save();
-              },
-              icon: const Icon(Icons.refresh, size: 16),
-              label: Text('Lange Rast', style: AppTextStyles.bodySmall),
-              style: TextButton.styleFrom(
-                foregroundColor: widget.themeColor,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 4,
-                ),
-              ),
-            ),
           const SizedBox(width: 8),
           _buildHpButton(
             label: 'Ausgeben',
