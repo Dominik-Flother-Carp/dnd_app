@@ -115,31 +115,27 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
 
   Widget _buildSliverAppBar(bool innerBoxIsScrolled) {
     return SliverAppBar(
-      expandedHeight: 160,
+      expandedHeight: 150,
       pinned: true,
       backgroundColor: _themeColor,
       foregroundColor: const Color(0xFFF5DEB3),
       actions: [
-        OutlinedButton.icon(
-          label: Text("Lange Rast", style: AppTextStyles.label),
-          icon: Icon(
-            Icons.refresh,
-            color: const Color(0xFFF5DEB3),
-          ),
-          onPressed: _showRestDialog,
+        _buildAppBarButton(icon: Icons.bedtime, onTap: _showRestDialog),
+        const SizedBox(width: 8),
+        _buildAppBarButton(
+          icon: _editMode ? Icons.edit_off : Icons.edit,
+          onTap: () => setState(() => _editMode = !_editMode),
         ),
-        IconButton(
-          icon: Icon(
-            _editMode ? Icons.edit_off : Icons.edit,
-            color: const Color(0xFFF5DEB3),
-          ),
-          tooltip: _editMode ? 'Bearbeitung beenden' : 'Bearbeiten',
-          onPressed: () => setState(() => _editMode = !_editMode),
-        ),
+        const SizedBox(width: 12),
       ],
-      flexibleSpace: FlexibleSpaceBar(background: _buildHeader()),
+      flexibleSpace: FlexibleSpaceBar(
+        background: _buildHeader(),
+        collapseMode: CollapseMode.pin,
+      ),
       bottom: TabBar(
+        isScrollable: true,
         controller: _tabController,
+        tabAlignment: TabAlignment.center,
         indicatorColor: const Color(0xFFF5DEB3),
         labelColor: const Color(0xFFF5DEB3),
         unselectedLabelColor: const Color(0xFFF5DEB3).withValues(alpha: 0.5),
@@ -154,74 +150,72 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
     );
   }
 
+  Widget _buildAppBarButton({
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(5),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF5DEB3).withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Icon(icon, color: const Color(0xFFF5DEB3), size: 30),
+      ),
+    );
+  }
+
   Widget _buildHeader() {
     final character = _character!;
-    return Container(
-      color: _themeColor,
-      padding: const EdgeInsets.fromLTRB(16, 48, 16, 8),
-      child: Row(
-        children: [
-          CircleAvatar(
-            backgroundColor: const Color(0xFFF5DEB3).withValues(alpha: 0.2),
-            foregroundColor: const Color(0xFFF5DEB3),
-            radius: 36,
-            child: Text(
-              character.name.isNotEmpty ? character.name[0].toUpperCase() : '?',
-              style: AppTextStyles.avatarLarge.copyWith(
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Container(
+        color: _themeColor,
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 48),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            /*CircleAvatar(...)*/
+            Text(
+              character.name,
+              style: AppTextStyles.screenTitle.copyWith(
                 color: const Color(0xFFF5DEB3),
               ),
             ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  character.name,
-                  style: AppTextStyles.screenTitle.copyWith(
-                    color: const Color(0xFFF5DEB3),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Flexible(
-                  child: GestureDetector(
-                    onTap: _editMode ? () => _showLevelDialog() : null,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            _buildSubtitle(),
-                            style: AppTextStyles.body.copyWith(
-                              color: const Color(
-                                0xFFF5DEB3,
-                              ).withValues(alpha: 0.8),
-                            ),
-                            softWrap: true,
-                            overflow: TextOverflow.visible,
-                          ),
-                        ),
-                        if (_editMode) ...[
-                          const SizedBox(width: 6),
-                          Icon(
-                            Icons.edit,
-                            size: 14,
-                            color: const Color(
-                              0xFFF5DEB3,
-                            ).withValues(alpha: 0.7),
-                          ),
-                        ],
-                      ],
+            const SizedBox(height: 4),
+            GestureDetector(
+              onTap: _editMode ? () => _showLevelDialog() : null,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(
+                    child: Text(
+                      _buildSubtitle(),
+                      style: AppTextStyles.body.copyWith(
+                        color: const Color(0xFFF5DEB3).withValues(alpha: 0.8),
+                      ),
+                      softWrap: true,
+                      overflow: TextOverflow.visible,
+                      textAlign: TextAlign.center,
                     ),
                   ),
-                ),
-                const SizedBox(height: 4),
-              ],
+                  if (_editMode) ...[
+                    const SizedBox(width: 6),
+                    Icon(
+                      Icons.edit,
+                      size: 14,
+                      color: const Color(0xFFF5DEB3).withValues(alpha: 0.7),
+                    ),
+                  ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -310,7 +304,10 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
   void longRest() {
     setState(() {
       _character!.currentHitPoints = _character!.maxHitPoints;
-      _character!.usedHitDice = (_character!.usedHitDice - (_character!.level / 2).floor()).clamp(0, _character!.level);
+      _character!.usedHitDice =
+          (_character!.usedHitDice -
+                  (_character!.level / 2).floor().clamp(1, _character!.level))
+              .clamp(0, _character!.level);
       _character!.temporaryHitPoints = 0;
       _character!.deathSaveSuccesses = 0;
       _character!.deathSaveFailures = 0;
@@ -318,68 +315,222 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
       for (final slot in _character!.spellSlots.values) {
         slot.current = slot.max;
       }
-    }
-    );
+    });
   }
 
   Future<void> _showRestDialog() async {
-    await showDialog(
+    await showModalBottomSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Lange Rast', style: AppTextStyles.sectionTitle),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) => Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Rast einlegen', style: AppTextStyles.sectionTitle),
+            const SizedBox(height: 8),
+            _buildRestOption(
+              icon: Icons.coffee,
+              title: 'Kurze Rast',
+              description: 'Trefferwürfel können ausgegeben werden.',
+              color: Colors.orange,
+              onTap: () {
+                Navigator.pop(context);
+                _showUseHitDiceDialog();
+              },
+            ),
+            const SizedBox(height: 12),
+            _buildRestOption(
+              icon: Icons.bedtime,
+              title: 'Lange Rast',
+              description:
+                  'TP, Zauberplätze und die Hälfte der Trefferwürfel werden wiederhergestellt.',
+              color: _themeColor,
+              onTap: () {
+                Navigator.pop(context);
+                longRest();
+              },
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showUseHitDiceDialog() async {
+  final available = _character!.level - _character!.usedHitDice;
+  int amount = 1;
+
+  await showDialog(
+    context: context,
+    builder: (context) => StatefulBuilder(
+      builder: (context, setDialogState) => AlertDialog(
+        title: Text(
+          'Trefferwürfel ausgeben',
+          style: AppTextStyles.sectionTitle,
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text("Lange Rast wirklich ausführen?", style: AppTextStyles.body)
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: _themeColor.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Verfügbar', style: AppTextStyles.bodySmall.copyWith(color: Colors.grey)),
+                  Text(
+                    '$available W${_character!.hitDie}',
+                    style: AppTextStyles.statMedium.copyWith(color: _themeColor),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.remove_circle_outline),
+                  color: _themeColor,
+                  onPressed: amount > 1
+                      ? () => setDialogState(() => amount--)
+                      : null,
+                ),
+                Column(
+                  children: [
+                    Text(
+                      '$amount',
+                      style: AppTextStyles.statLarge.copyWith(color: _themeColor),
+                    ),
+                    Text(
+                      'Würfel',
+                      style: AppTextStyles.labelXs.copyWith(color: Colors.grey),
+                    ),
+                  ],
+                ),
+                IconButton(
+                  icon: const Icon(Icons.add_circle_outline),
+                  color: _themeColor,
+                  onPressed: amount < available
+                      ? () => setDialogState(() => amount++)
+                      : null,
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Pro Würfel: W${_character!.hitDie} + KON (${_character!.conModifier >= 0 ? '+${_character!.conModifier}' : '${_character!.conModifier}'})',
+              style: AppTextStyles.bodySmall.copyWith(color: Colors.grey),
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
         actions: [
           TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text("Abbrechen"),
+            onPressed: () => Navigator.pop(context),
+            child: Text('Abbrechen', style: AppTextStyles.body),
           ),
           FilledButton(
             onPressed: () {
-              longRest();
+              setState(() => _character!.usedHitDice += amount);
               _saveCharacter();
               Navigator.pop(context);
             },
             style: FilledButton.styleFrom(backgroundColor: _themeColor),
-            child: Text('Ja', style: AppTextStyles.body),
+            child: Text('Ausgeben', style: AppTextStyles.body),
           ),
         ],
+      ),
+    ),
+  );
+}
+
+  Widget _buildRestOption({
+    required IconData icon,
+    required String title,
+    required String description,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.08),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, color: color, size: 24),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: AppTextStyles.cardTitle.copyWith(color: color),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    description,
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right, color: color.withValues(alpha: 0.5)),
+          ],
+        ),
       ),
     );
   }
 
   void _updateSpellSlots() {
-  final newSlots = calculateSpellSlots(
-    _character!.characterClass,
-    _character!.level,
-  );
+    final newSlots = calculateSpellSlots(
+      _character!.characterClass,
+      _character!.level,
+    );
 
-  if (newSlots.isEmpty) {
-    _character!.spellSlots = {};
-    return;
-  }
-
-  final updated = <int, SpellSlot>{};
-  for (final entry in newSlots.entries) {
-    final grade = entry.key;
-    final newMax = entry.value.max;
-    final existing = _character!.spellSlots[grade];
-
-    if (existing == null) {
-      updated[grade] = SpellSlot(max: newMax, current: newMax);
-    } else {
-      updated[grade] = SpellSlot(
-        max: newMax,
-        current: existing.current.clamp(0, newMax),
-      );
+    if (newSlots.isEmpty) {
+      _character!.spellSlots = {};
+      return;
     }
+
+    final updated = <int, SpellSlot>{};
+    for (final entry in newSlots.entries) {
+      final grade = entry.key;
+      final newMax = entry.value.max;
+      final existing = _character!.spellSlots[grade];
+
+      if (existing == null) {
+        updated[grade] = SpellSlot(max: newMax, current: newMax);
+      } else {
+        updated[grade] = SpellSlot(
+          max: newMax,
+          current: existing.current.clamp(0, newMax),
+        );
+      }
+    }
+    _character!.spellSlots = updated;
   }
-  _character!.spellSlots = updated;
-}
 }

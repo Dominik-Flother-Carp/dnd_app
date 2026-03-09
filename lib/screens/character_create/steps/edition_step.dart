@@ -56,6 +56,7 @@ class EditionStepState extends State<EditionStep> {
           isSelected: _useEdition2024,
           onTap: () => setState(() => _useEdition2024 = true),
           color: const Color(0xFF1B4F72),
+          disabled: true,
         ),
       ],
     );
@@ -65,18 +66,27 @@ class EditionStepState extends State<EditionStep> {
     required String title,
     required String subtitle,
     required bool isSelected,
-    required VoidCallback onTap,
     required Color color,
+    VoidCallback? onTap,
+    bool disabled = false,
   }) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: disabled ? null : onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? color.withValues(alpha:0.08) : Colors.white,
+          color: disabled
+              ? Colors.grey[100]
+              : isSelected
+              ? color.withValues(alpha: 0.08)
+              : Colors.white,
           border: Border.all(
-            color: isSelected ? color : Colors.grey[300]!,
+            color: disabled
+                ? Colors.grey[300]!
+                : isSelected
+                ? color
+                : Colors.grey[300]!,
             width: isSelected ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(12),
@@ -90,12 +100,20 @@ class EditionStepState extends State<EditionStep> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected ? color : Colors.grey[400]!,
+                  color: disabled
+                      ? Colors.grey[300]!
+                      : isSelected
+                      ? color
+                      : Colors.grey[400]!,
                   width: 2,
                 ),
-                color: isSelected ? color : Colors.transparent,
+                color: disabled
+                    ? Colors.grey[200]
+                    : isSelected
+                    ? color
+                    : Colors.transparent,
               ),
-              child: isSelected
+              child: isSelected && !disabled
                   ? const Icon(Icons.check, size: 14, color: Colors.white)
                   : null,
             ),
@@ -104,17 +122,44 @@ class EditionStepState extends State<EditionStep> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: AppTextStyles.cardTitle.copyWith(
-                      color: isSelected ? color : Colors.black87,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        title,
+                        style: AppTextStyles.cardTitle.copyWith(
+                          color: disabled
+                              ? Colors.grey[400]
+                              : isSelected
+                              ? color
+                              : Colors.black87,
+                        ),
+                      ),
+                      if (disabled) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            'Bald verfügbar',
+                            style: AppTextStyles.labelXs.copyWith(
+                              color: Colors.grey[500],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
                     style: AppTextStyles.bodySmall.copyWith(
-                      color: Colors.grey[600],
+                      color: disabled ? Colors.grey[400] : Colors.grey[600],
                     ),
                   ),
                 ],

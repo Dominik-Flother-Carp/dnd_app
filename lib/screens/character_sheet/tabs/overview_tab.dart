@@ -48,8 +48,6 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
           _buildSpellSlotsCard(),
         ],
         const SizedBox(height: 16),
-        _buildAttributesCard(),
-        const SizedBox(height: 16),
         _buildHitDiceCard(),
         const SizedBox(height: 16),
         _buildCurrencyCard(),
@@ -69,7 +67,7 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Kampfwerte',
+              'Allgemein',
               style: AppTextStyles.sectionTitle.copyWith(
                 color: widget.themeColor,
               ),
@@ -115,6 +113,8 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
                   _buildStatBox('Übung', '+${c.proficiencyBonus}'),
                 ],
               ),
+              const Divider(height: 24),
+              _buildAttributesContent(),
             ],
           ],
         ),
@@ -136,7 +136,7 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
     final available = c.level - c.usedHitDice;
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Wrap(
           spacing: 6,
@@ -169,21 +169,9 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
           }),
         ),
         const SizedBox(height: 8),
-        Row(
-          children: [
-            Text(
-              '$available / ${c.level} verfügbar',
-              style: AppTextStyles.bodySmall.copyWith(color: Colors.grey),
-            ),
-            const Spacer(),
-            const SizedBox(width: 8),
-            _buildHpButton(
-              label: 'Würfel nutzen',
-              icon: Icons.remove_circle_outline,
-              color: available > 0 ? widget.themeColor : Colors.grey,
-              onTap: available > 0 ? () => _showUseHitDiceDialog() : () {},
-            ),
-          ],
+        Text(
+          '$available / ${c.level} verfügbar',
+          style: AppTextStyles.bodySmall.copyWith(color: Colors.grey),
         ),
       ],
     );
@@ -565,14 +553,6 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
 
   // ── Attribute ──────────────────────────────────────────────────────────────
 
-  Widget _buildAttributesCard() {
-    return CollapsibleCard(
-      title: 'Attribute',
-      themeColor: widget.themeColor,
-      child: _buildAttributesContent(),
-    );
-  }
-
   Widget _buildAttributeBox(String label, int score, int modifier, String key) {
     final modText = modifier >= 0 ? '+$modifier' : '$modifier';
 
@@ -621,7 +601,6 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 16),
         Row(
           children: [
             _buildAttributeBox('STR', c.strength, c.strModifier, 'strength'),
@@ -776,109 +755,6 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
   }
 
   // ── Dialoge ────────────────────────────────────────────────────────────────
-
-  Future<void> _showUseHitDiceDialog() async {
-    final available = c.level - c.usedHitDice;
-    int amount = 1;
-
-    await showDialog(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: Text(
-            'Trefferwürfel nutzen',
-            style: AppTextStyles.sectionTitle,
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: widget.themeColor.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Verfügbar',
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: Colors.grey,
-                      ),
-                    ),
-                    Text(
-                      '$available W${c.hitDie}',
-                      style: AppTextStyles.statMedium.copyWith(
-                        color: widget.themeColor,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.remove_circle_outline),
-                    color: widget.themeColor,
-                    onPressed: amount > 1
-                        ? () => setDialogState(() => amount--)
-                        : null,
-                  ),
-                  Column(
-                    children: [
-                      Text(
-                        '$amount',
-                        style: AppTextStyles.statLarge.copyWith(
-                          color: widget.themeColor,
-                        ),
-                      ),
-                      Text(
-                        amount == 1 ? 'Würfel' : 'Würfel',
-                        style: AppTextStyles.labelXs.copyWith(
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.add_circle_outline),
-                    color: widget.themeColor,
-                    onPressed: amount < available
-                        ? () => setDialogState(() => amount++)
-                        : null,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Pro Würfel: W${c.hitDie} + KON (${c.conModifier >= 0 ? '+${c.conModifier}' : '${c.conModifier}'})',
-                style: AppTextStyles.bodySmall.copyWith(color: Colors.grey),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('Abbrechen', style: AppTextStyles.body),
-            ),
-            FilledButton(
-              onPressed: () {
-                setState(() => c.usedHitDice += amount);
-                _save();
-                Navigator.pop(context);
-              },
-              style: FilledButton.styleFrom(backgroundColor: widget.themeColor),
-              child: Text('Nutzen', style: AppTextStyles.body),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   Future<void> _showHpDialog() async {
     final controller = TextEditingController(text: '${c.currentHitPoints}');
