@@ -5,7 +5,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 
 class DatabaseHelper {
-
   // ── Singleton-Pattern ─────────────────────────────────────────────────────
   //
   // _instance ist die einzige Instanz dieser Klasse.
@@ -39,7 +38,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 4,
+      version: 7,
       onCreate: _createTables,
       onUpgrade: _onUpgrade,
     );
@@ -47,7 +46,6 @@ class DatabaseHelper {
 
   // Wird nur einmal aufgerufen – wenn die Datenbank neu angelegt wird
   Future<void> _createTables(Database db, int version) async {
-
     // ── Charaktere ──────────────────────────────────────────────────────────
     await db.execute('''
       CREATE TABLE characters (
@@ -86,7 +84,11 @@ class DatabaseHelper {
         useEdition2024      INTEGER DEFAULT 0,
         skillProficiencies       TEXT,
         skillExpertise           TEXT,
-        savingThrowProficiencies TEXT
+        savingThrowProficiencies TEXT,
+        deathSaveSuccesses  INTEGER DEFAULT 0,
+        deathSaveFailures   INTEGER DEFAULT 0,
+        isStabilized        INTEGER DEFAULT 0,
+        spellSlots          TEXT
       )
     ''');
 
@@ -215,6 +217,22 @@ class DatabaseHelper {
       await db.execute(
         'ALTER TABLE characters ADD COLUMN usedHitDice INTEGER DEFAULT 0',
       );
+    }
+    if (oldVersion < 5) {
+      await db.execute(
+        'ALTER TABLE characters ADD COLUMN deathSaveSuccesses INTEGER DEFAULT 0',
+      );
+      await db.execute(
+        'ALTER TABLE characters ADD COLUMN deathSaveFailures INTEGER DEFAULT 0',
+      );
+    }
+    if (oldVersion < 6) {
+      await db.execute(
+        'ALTER TABLE characters ADD COLUMN isStabilized INTEGER DEFAULT 0',
+      );
+    }
+    if (oldVersion < 7) {
+      await db.execute('ALTER TABLE characters ADD COLUMN spellSlots TEXT');
     }
   }
 }

@@ -1,5 +1,6 @@
 // lib/screens/character_create/character_create_screen.dart
 
+import 'package:dnd_app/models/classes.dart';
 import 'package:flutter/material.dart';
 import 'package:dnd_app/models/character.dart';
 import 'package:dnd_app/repositories/character_repository.dart';
@@ -41,7 +42,6 @@ class _CharacterCreateScreenState extends State<CharacterCreateScreen> {
       1 => _basicInfoKey.currentState?.validate()  ?? false,
       2 => _skillsKey.currentState?.validate()     ?? false,
       3 => _attributesKey.currentState?.validate() ?? false,
-      4 => _combatKey.currentState?.validate()     ?? false,
       _ => false,
     };
 
@@ -59,11 +59,9 @@ class _CharacterCreateScreenState extends State<CharacterCreateScreen> {
         _skillsKey.currentState?.applyTo(_character);
       case 3:
         _attributesKey.currentState?.applyTo(_character);
-      case 4:
-        _combatKey.currentState?.applyTo(_character);
     }
 
-    if (_currentStep == 4) {
+    if (_currentStep == 3) {
       await _saveCharacter();
       return;
     }
@@ -81,6 +79,21 @@ class _CharacterCreateScreenState extends State<CharacterCreateScreen> {
 
   Future<void> _saveCharacter() async {
     setState(() => _isSaving = true);
+    // Rettungswürfe übernehmen nach Klasse
+    characterClasses
+        .firstWhere((c) => c.name == _character.characterClass)
+        .proficientSavingThrows
+        .forEach((attr) => _character.savingThrowProficiencies[attr] = true);
+
+    final conMod = Character.modifier(_character.constitution);
+    _character.maxHitPoints = _character.hitDie + conMod;
+    _character.currentHitPoints = _character.maxHitPoints;
+
+    _character.spellSlots = calculateSpellSlots(
+      _character.characterClass,
+      _character.level,
+    );
+
     await _repository.insertCharacter(_character);
     if (mounted) Navigator.pop(context, true);
   }
@@ -115,68 +128,65 @@ class _CharacterCreateScreenState extends State<CharacterCreateScreen> {
   }
 
   Widget _buildProgressIndicator() {
-    final steps = ['Edition', 'Grunddaten', 'Fertigkeiten', 'Attribute', 'Kampfwerte'];
+  final steps = ['Edition', 'Grunddaten', 'Fertigkeiten', 'Attribute'];
 
-    return Container(
-      color: _themeColor,
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-      child: Row(
-        children: List.generate(steps.length, (index) {
-          final isActive = index == _currentStep;
-          final isDone   = index < _currentStep;
+  return Container(
+    color: _themeColor,
+    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+    child: Row(
+      children: List.generate(steps.length, (index) {
+        final isActive = index == _currentStep;
+        final isDone   = index < _currentStep;
 
-          return Expanded(
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 14,
-                  backgroundColor: isDone
-                      ? Colors.green
-                      : isActive
-                          ? const Color(0xFFF5DEB3)
-                          : Colors.grey[700],
-                  child: isDone
-                      ? const Icon(Icons.check, size: 16, color: Colors.white)
-                      : Text(
-                          '${index + 1}',
-                          style: AppTextStyles.labelXs.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: isActive
-                                ? _themeColor
-                                : Colors.grey[400],
-                          ),
+        return Expanded(
+          flex: isActive ? 3 : 1,
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 14,
+                backgroundColor: isDone
+                    ? Colors.green
+                    : isActive
+                        ? const Color(0xFFF5DEB3)
+                        : Colors.grey[700],
+                child: isDone
+                    ? const Icon(Icons.check, size: 16, color: Colors.white)
+                    : Text(
+                        '${index + 1}',
+                        style: AppTextStyles.labelXs.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: isActive ? _themeColor : Colors.grey[400],
                         ),
-                ),
+                      ),
+              ),
+              if (isActive) ...[
                 const SizedBox(width: 6),
                 Flexible(
                   child: Text(
                     steps[index],
                     style: AppTextStyles.labelXs.copyWith(
-                      color: isActive
-                          ? const Color(0xFFF5DEB3)
-                          : Colors.grey[500],
-                      fontWeight: isActive
-                          ? FontWeight.bold
-                          : FontWeight.normal,
+                      color: const Color(0xFFF5DEB3),
+                      fontWeight: FontWeight.bold,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                if (index < steps.length - 1)
-                  Expanded(
-                    child: Container(
-                      height: 1,
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      color: isDone ? Colors.green : Colors.grey[700],
-                    ),
-                  ),
               ],
-            ),
-          );
-        }),
-      ),
-    );
-  }
+              if (index < steps.length - 1)
+                Expanded(
+                  child: Container(
+                    height: 1,
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    color: isDone ? Colors.green : Colors.grey[700],
+                  ),
+                ),
+            ],
+          ),
+        );
+      }),
+    ),
+  );
+}
 
   Widget _buildCurrentStep() {
     return switch (_currentStep) {
@@ -241,9 +251,9 @@ class _CharacterCreateScreenState extends State<CharacterCreateScreen> {
                       color: Colors.white,
                     ),
                   )
-                : Icon(_currentStep == 4 ? Icons.save : Icons.arrow_forward),
+                : Icon(_currentStep == 3 ? Icons.save : Icons.arrow_forward),
             label: Text(
-              _currentStep == 4 ? 'Speichern' : 'Weiter',
+              _currentStep == 3 ? 'Speichern' : 'Weiter',
               style: AppTextStyles.body,
             ),
             style: FilledButton.styleFrom(

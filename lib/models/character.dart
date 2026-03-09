@@ -2,10 +2,12 @@
 
 import 'package:uuid/uuid.dart';
 import 'dart:convert';
+import 'package:dnd_app/models/skills.dart';
+import 'spell_slot.dart';
 
 class Character {
   final String id;
-  
+
   // ── Einfache Felder ohne Validierung ──────────────────────────────────────
   //
   String name;
@@ -21,12 +23,13 @@ class Character {
   String flaws;
   int hitDie;
   bool useEdition2024;
+  Map<int, SpellSlot> spellSlots;
 
   // ── Private Felder mit Validierung ────────────────────────────────────────
   // Der Unterstrich macht sie privat – Zugriff nur über Getter/Setter
   int _level = 1;
   int _experiencePoints = 0;
-  
+
   int _strength = 10;
   int _dexterity = 10;
   int _constitution = 10;
@@ -45,6 +48,11 @@ class Character {
   int _copperPieces = 0;
   int _electrumPieces = 0;
   int _platinumPieces = 0;
+
+  int _deathSaveSuccesses = 0;
+  int _deathSaveFailures = 0;
+
+  bool isStabilized = false;
 
   int _usedHitDice = 0;
 
@@ -88,14 +96,19 @@ class Character {
     int electrumPieces = 0,
     int platinumPieces = 0,
     int usedHitDice = 0,
+    int deathSaveSuccesses = 0,
+    int deathSaveFailures = 0,
+    bool isStabilized = false,
+    Map<int, SpellSlot>? spellSlots,
     Map<String, bool>? skillProficiencies,
     Map<String, bool>? skillExpertise,
     Map<String, bool>? savingThrowProficiencies,
-  })  : id = id ?? const Uuid().v4(),
-        skillProficiencies = skillProficiencies ?? _defaultSkillMap(),
-        skillExpertise = skillExpertise ?? _defaultSkillMap(),
-        savingThrowProficiencies =
-            savingThrowProficiencies ?? _defaultSavingThrowMap() {
+  }) : id = id ?? const Uuid().v4(),
+       skillProficiencies = skillProficiencies ?? _defaultSkillMap(),
+       skillExpertise = skillExpertise ?? _defaultSkillMap(),
+       savingThrowProficiencies =
+           savingThrowProficiencies ?? _defaultSavingThrowMap(),
+       spellSlots = spellSlots ?? {} {
     // Setter werden hier aufgerufen damit die Validierung greift –
     // auch beim ersten Erstellen eines Charakters
     _level = level.clamp(1, 20);
@@ -116,18 +129,25 @@ class Character {
     _copperPieces = copperPieces.clamp(0, 9999999);
     _electrumPieces = electrumPieces.clamp(0, 9999999);
     _platinumPieces = platinumPieces.clamp(0, 9999999);
+    _deathSaveSuccesses = deathSaveSuccesses.clamp(0, 3);
+    _deathSaveFailures = deathSaveFailures.clamp(0, 3);
     _usedHitDice = usedHitDice.clamp(0, _level);
   }
 
   // ── Getter & Setter mit Validierung ───────────────────────────────────────
+
+  int get deathSaveSuccesses => _deathSaveSuccesses;
+  set deathSaveSuccesses(int value) => _deathSaveSuccesses = value.clamp(0, 3);
+
+  int get deathSaveFailures => _deathSaveFailures;
+  set deathSaveFailures(int value) => _deathSaveFailures = value.clamp(0, 3);
 
   int get level => _level;
   set level(int value) => _level = value.clamp(1, 20);
 
   // Erfahrungspunkte: 355.000 XP ist das Maximum (Stufe 20 in D&D 5e)
   int get experiencePoints => _experiencePoints;
-  set experiencePoints(int value) =>
-      _experiencePoints = value.clamp(0, 355000);
+  set experiencePoints(int value) => _experiencePoints = value.clamp(0, 355000);
 
   // Attribute: Minimum 1, Maximum 30 (Göttliche Intervention etc.)
   int get strength => _strength;
@@ -238,151 +258,157 @@ class Character {
 
   int _attributeModifier(String attribute) {
     switch (attribute) {
-      case 'strength':     return strModifier;
-      case 'dexterity':    return dexModifier;
-      case 'constitution': return conModifier;
-      case 'intelligence': return intModifier;
-      case 'wisdom':       return wisModifier;
-      case 'charisma':     return chaModifier;
-      default:             return 0;
+      case 'strength':
+        return strModifier;
+      case 'dexterity':
+        return dexModifier;
+      case 'constitution':
+        return conModifier;
+      case 'intelligence':
+        return intModifier;
+      case 'wisdom':
+        return wisModifier;
+      case 'charisma':
+        return chaModifier;
+      default:
+        return 0;
     }
   }
 
-  int _skillBaseModifier(String skillKey) {
-    const skillAttributes = {
-      'acrobatics':     'dexterity',
-      'animalHandling': 'wisdom',
-      'arcana':         'intelligence',
-      'athletics':      'strength',
-      'deception':      'charisma',
-      'history':        'intelligence',
-      'insight':        'wisdom',
-      'intimidation':   'charisma',
-      'investigation':  'intelligence',
-      'medicine':       'wisdom',
-      'nature':         'intelligence',
-      'perception':     'wisdom',
-      'performance':    'charisma',
-      'persuasion':     'charisma',
-      'religion':       'intelligence',
-      'sleightOfHand':  'dexterity',
-      'stealth':        'dexterity',
-      'survival':       'wisdom',
-    };
-    return _attributeModifier(skillAttributes[skillKey] ?? '');
-  }
+  int _skillBaseModifier(String skillKey) =>
+      _attributeModifier(Skills.attributekeys[skillKey] ?? '');
 
   static Map<String, bool> _defaultSkillMap() => {
-    'acrobatics':     false,
+    'acrobatics': false,
     'animalHandling': false,
-    'arcana':         false,
-    'athletics':      false,
-    'deception':      false,
-    'history':        false,
-    'insight':        false,
-    'intimidation':   false,
-    'investigation':  false,
-    'medicine':       false,
-    'nature':         false,
-    'perception':     false,
-    'performance':    false,
-    'persuasion':     false,
-    'religion':       false,
-    'sleightOfHand':  false,
-    'stealth':        false,
-    'survival':       false,
+    'arcana': false,
+    'athletics': false,
+    'deception': false,
+    'history': false,
+    'insight': false,
+    'intimidation': false,
+    'investigation': false,
+    'medicine': false,
+    'nature': false,
+    'perception': false,
+    'performance': false,
+    'persuasion': false,
+    'religion': false,
+    'sleightOfHand': false,
+    'stealth': false,
+    'survival': false,
   };
 
   static Map<String, bool> _defaultSavingThrowMap() => {
-    'strength':     false,
-    'dexterity':    false,
+    'strength': false,
+    'dexterity': false,
     'constitution': false,
     'intelligence': false,
-    'wisdom':       false,
-    'charisma':     false,
+    'wisdom': false,
+    'charisma': false,
   };
 
   // ── Datenbank: Konvertierung ───────────────────────────────────────────────
 
   Map<String, dynamic> toMap() {
     return {
-      'id':                   id,
-      'name':                 name,
-      'race':                 race,
-      'characterClass':       characterClass,
-      'subclass':             subclass,
-      'level':                level,
-      'background':           background,
-      'alignment':            alignment,
-      'experiencePoints':     experiencePoints,
-      'strength':             strength,
-      'dexterity':            dexterity,
-      'constitution':         constitution,
-      'intelligence':         intelligence,
-      'wisdom':               wisdom,
-      'charisma':             charisma,
-      'maxHitPoints':         maxHitPoints,
-      'currentHitPoints':     currentHitPoints,
-      'temporaryHitPoints':   temporaryHitPoints,
-      'hitDie':               hitDie,
-      'armorClass':           armorClass,
-      'speed':                speed,
-      'goldPieces':           goldPieces,
-      'silverPieces':         silverPieces,
-      'copperPieces':         copperPieces,
-      'electrumPieces':       electrumPieces,
-      'platinumPieces':       platinumPieces,
-      'notes':                notes,
-      'personalityTraits':    personalityTraits,
-      'ideals':               ideals,
-      'bonds':                bonds,
-      'flaws':                flaws,
-      'useEdition2024':       useEdition2024 ? 1 : 0,
-      'skillProficiencies':       jsonEncode(skillProficiencies),
-      'skillExpertise':           jsonEncode(skillExpertise),
+      'id': id,
+      'name': name,
+      'race': race,
+      'characterClass': characterClass,
+      'subclass': subclass,
+      'level': level,
+      'background': background,
+      'alignment': alignment,
+      'experiencePoints': experiencePoints,
+      'strength': strength,
+      'dexterity': dexterity,
+      'constitution': constitution,
+      'intelligence': intelligence,
+      'wisdom': wisdom,
+      'charisma': charisma,
+      'maxHitPoints': maxHitPoints,
+      'currentHitPoints': currentHitPoints,
+      'temporaryHitPoints': temporaryHitPoints,
+      'hitDie': hitDie,
+      'armorClass': armorClass,
+      'speed': speed,
+      'goldPieces': goldPieces,
+      'silverPieces': silverPieces,
+      'copperPieces': copperPieces,
+      'electrumPieces': electrumPieces,
+      'platinumPieces': platinumPieces,
+      'notes': notes,
+      'personalityTraits': personalityTraits,
+      'ideals': ideals,
+      'bonds': bonds,
+      'flaws': flaws,
+      'useEdition2024': useEdition2024 ? 1 : 0,
+      'skillProficiencies': jsonEncode(skillProficiencies),
+      'skillExpertise': jsonEncode(skillExpertise),
       'savingThrowProficiencies': jsonEncode(savingThrowProficiencies),
-      'usedHitDice':          usedHitDice,
+      'spellSlots': jsonEncode(
+        spellSlots.map((k, v) => MapEntry(k.toString(), v.toMap())),
+      ),
+      'usedHitDice': usedHitDice,
+      'deathSaveSuccesses': deathSaveSuccesses,
+      'deathSaveFailures': deathSaveFailures,
+      'isStabilized': isStabilized ? 1 : 0,
     };
   }
 
   factory Character.fromMap(Map<String, dynamic> map) {
     return Character(
-      id:                 map['id'],
-      name:               map['name'],
-      race:               map['race'] ?? '',
-      characterClass:     map['characterClass'] ?? '',
-      subclass:           map['subclass'] ?? '',
-      level:              map['level'] ?? 1,
-      background:         map['background'] ?? '',
-      alignment:          map['alignment'] ?? '',
-      experiencePoints:   map['experiencePoints'] ?? 0,
-      strength:           map['strength'] ?? 10,
-      dexterity:          map['dexterity'] ?? 10,
-      constitution:       map['constitution'] ?? 10,
-      intelligence:       map['intelligence'] ?? 10,
-      wisdom:             map['wisdom'] ?? 10,
-      charisma:           map['charisma'] ?? 10,
-      maxHitPoints:       map['maxHitPoints'] ?? 8,
-      currentHitPoints:   map['currentHitPoints'] ?? 8,
+      id: map['id'],
+      name: map['name'],
+      race: map['race'] ?? '',
+      characterClass: map['characterClass'] ?? '',
+      subclass: map['subclass'] ?? '',
+      level: map['level'] ?? 1,
+      background: map['background'] ?? '',
+      alignment: map['alignment'] ?? '',
+      experiencePoints: map['experiencePoints'] ?? 0,
+      strength: map['strength'] ?? 10,
+      dexterity: map['dexterity'] ?? 10,
+      constitution: map['constitution'] ?? 10,
+      intelligence: map['intelligence'] ?? 10,
+      wisdom: map['wisdom'] ?? 10,
+      charisma: map['charisma'] ?? 10,
+      maxHitPoints: map['maxHitPoints'] ?? 8,
+      currentHitPoints: map['currentHitPoints'] ?? 8,
       temporaryHitPoints: map['temporaryHitPoints'] ?? 0,
-      hitDie:             map['hitDie'] ?? 8,
-      armorClass:         map['armorClass'] ?? 10,
-      speed:              map['speed'] ?? 9,
-      goldPieces:         map['goldPieces'] ?? 0,
-      silverPieces:       map['silverPieces'] ?? 0,
-      copperPieces:       map['copperPieces'] ?? 0,
-      electrumPieces:     map['electrumPieces'] ?? 0,
-      platinumPieces:     map['platinumPieces'] ?? 0,
-      notes:              map['notes'] ?? '',
-      personalityTraits:  map['personalityTraits'] ?? '',
-      ideals:             map['ideals'] ?? '',
-      bonds:              map['bonds'] ?? '',
-      flaws:              map['flaws'] ?? '',
-      useEdition2024:     map['useEdition2024'] == 1,
-      skillProficiencies: map['skillProficiencies'] != null ? Map<String, bool>.from(jsonDecode(map['skillProficiencies'])) : null,
-      skillExpertise:     map['skillExpertise'] != null ? Map<String, bool>.from(jsonDecode(map['skillExpertise'])) : null,
-      savingThrowProficiencies: map['savingThrowProficiencies'] != null ? Map<String, bool>.from(jsonDecode(map['savingThrowProficiencies'])) : null,
-      usedHitDice:        map['usedHitDice'] ?? 0,
+      hitDie: map['hitDie'] ?? 8,
+      armorClass: map['armorClass'] ?? 10,
+      speed: map['speed'] ?? 9,
+      goldPieces: map['goldPieces'] ?? 0,
+      silverPieces: map['silverPieces'] ?? 0,
+      copperPieces: map['copperPieces'] ?? 0,
+      electrumPieces: map['electrumPieces'] ?? 0,
+      platinumPieces: map['platinumPieces'] ?? 0,
+      notes: map['notes'] ?? '',
+      personalityTraits: map['personalityTraits'] ?? '',
+      ideals: map['ideals'] ?? '',
+      bonds: map['bonds'] ?? '',
+      flaws: map['flaws'] ?? '',
+      useEdition2024: map['useEdition2024'] == 1,
+      skillProficiencies: map['skillProficiencies'] != null
+          ? Map<String, bool>.from(jsonDecode(map['skillProficiencies']))
+          : null,
+      skillExpertise: map['skillExpertise'] != null
+          ? Map<String, bool>.from(jsonDecode(map['skillExpertise']))
+          : null,
+      savingThrowProficiencies: map['savingThrowProficiencies'] != null
+          ? Map<String, bool>.from(jsonDecode(map['savingThrowProficiencies']))
+          : null,
+      usedHitDice: map['usedHitDice'] ?? 0,
+      deathSaveSuccesses: map['deathSaveSuccesses'] ?? 0,
+      deathSaveFailures: map['deathSaveFailures'] ?? 0,
+      isStabilized: (map['isStabilized'] ?? 0) == 1,
+      spellSlots: map['spellSlots'] != null
+          ? (jsonDecode(map['spellSlots']) as Map<String, dynamic>).map(
+              (k, v) => MapEntry(int.parse(k), SpellSlot.fromMap(v)),
+            )
+          : null,
     );
   }
 }

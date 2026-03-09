@@ -83,6 +83,18 @@ class BasicInfoStepState extends State<BasicInfoStep> {
     character.subclass  = _subclassController.text.trim();
     character.alignment = _selectedAlignment ?? '';
 
+    // Alle Rassen- und Hintergrundfertigkeiten zurücksetzen
+    for (final race in races) {
+      for (final skill in race.skillProficiencies) {
+        character.skillProficiencies[skill] = false;
+      }
+    }
+    for (final background in backgrounds) {
+      for (final skill in background.skillProficiencies) {
+        character.skillProficiencies[skill] = false;
+      }
+    }
+
     if (_selectedClass != null) {
       character.characterClass = _selectedClass!.name;
       character.hitDie         = _selectedClass!.hitDie;

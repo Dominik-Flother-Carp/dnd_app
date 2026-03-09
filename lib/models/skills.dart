@@ -49,6 +49,27 @@ class Skills {
     'survival':       'WEI',
   };
 
+  static const Map<String, String> attributekeys = {
+    'acrobatics':     'dexterity',
+      'animalHandling': 'wisdom',
+      'arcana':         'intelligence',
+      'athletics':      'strength',
+      'deception':      'charisma',
+      'history':        'intelligence',
+      'insight':        'wisdom',
+      'intimidation':   'charisma',
+      'investigation':  'intelligence',
+      'medicine':       'wisdom',
+      'nature':         'intelligence',
+      'perception':     'wisdom',
+      'performance':    'charisma',
+      'persuasion':     'charisma',
+      'religion':       'intelligence',
+      'sleightOfHand':  'dexterity',
+      'stealth':        'dexterity',
+      'survival':       'wisdom',
+  };
+
   /// Gibt den deutschen Namen einer Fertigkeit zurück
   static String label(String key) => labels[key] ?? key;
 

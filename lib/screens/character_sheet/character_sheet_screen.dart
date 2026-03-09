@@ -6,6 +6,8 @@ import 'package:dnd_app/repositories/character_repository.dart';
 import 'package:dnd_app/screens/character_sheet/tabs/overview_tab.dart';
 import 'package:dnd_app/screens/character_sheet/tabs/skills_tab.dart';
 import 'package:dnd_app/theme/app_text_styles.dart';
+import 'package:dnd_app/models/spell_slot.dart';
+import 'package:dnd_app/models/classes.dart';
 
 class CharacterSheetScreen extends StatefulWidget {
   final String characterId;
@@ -119,7 +121,7 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
       foregroundColor: const Color(0xFFF5DEB3),
       actions: [
         OutlinedButton.icon(
-          label: Text("Lange Rast"),
+          label: Text("Lange Rast", style: AppTextStyles.label),
           icon: Icon(
             Icons.refresh,
             color: const Color(0xFFF5DEB3),
@@ -269,6 +271,7 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
                 onPressed: _character!.level > 1
                     ? () {
                         setDialogState(() => _character!.level--);
+                        _updateSpellSlots();
                         setState(() {});
                         _saveCharacter();
                       }
@@ -284,6 +287,7 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
                 onPressed: _character!.level < 20
                     ? () {
                         setDialogState(() => _character!.level++);
+                        _updateSpellSlots();
                         setState(() {});
                         _saveCharacter();
                       }
@@ -303,11 +307,18 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
     );
   }
 
-  void longRest(){
+  void longRest() {
     setState(() {
-        _character!.currentHitPoints = _character!.maxHitPoints;
-        _character!.usedHitDice = 0;
+      _character!.currentHitPoints = _character!.maxHitPoints;
+      _character!.usedHitDice = (_character!.usedHitDice - (_character!.level / 2).floor()).clamp(0, _character!.level);
+      _character!.temporaryHitPoints = 0;
+      _character!.deathSaveSuccesses = 0;
+      _character!.deathSaveFailures = 0;
+      _character!.isStabilized = false;
+      for (final slot in _character!.spellSlots.values) {
+        slot.current = slot.max;
       }
+    }
     );
   }
 
@@ -319,7 +330,7 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text("Lange Rast wirklich ausführen?")
+            Text("Lange Rast wirklich ausführen?", style: AppTextStyles.body)
           ],
         ),
         actions: [
@@ -332,6 +343,7 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
           FilledButton(
             onPressed: () {
               longRest();
+              _saveCharacter();
               Navigator.pop(context);
             },
             style: FilledButton.styleFrom(backgroundColor: _themeColor),
@@ -341,4 +353,33 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
       ),
     );
   }
+
+  void _updateSpellSlots() {
+  final newSlots = calculateSpellSlots(
+    _character!.characterClass,
+    _character!.level,
+  );
+
+  if (newSlots.isEmpty) {
+    _character!.spellSlots = {};
+    return;
+  }
+
+  final updated = <int, SpellSlot>{};
+  for (final entry in newSlots.entries) {
+    final grade = entry.key;
+    final newMax = entry.value.max;
+    final existing = _character!.spellSlots[grade];
+
+    if (existing == null) {
+      updated[grade] = SpellSlot(max: newMax, current: newMax);
+    } else {
+      updated[grade] = SpellSlot(
+        max: newMax,
+        current: existing.current.clamp(0, newMax),
+      );
+    }
+  }
+  _character!.spellSlots = updated;
+}
 }

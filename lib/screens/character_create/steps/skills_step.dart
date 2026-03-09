@@ -27,25 +27,42 @@ class SkillsStepState extends State<SkillsStep> {
   late int _skillChoices;
 
   @override
-  void initState() {
-    super.initState();
+void initState() {
+  super.initState();
 
-    final selectedClass = characterClasses
-        .where((c) => c.name == widget.character.characterClass)
-        .firstOrNull;
-    _availableSkills = selectedClass?.availableSkills ?? [];
-    _skillChoices    = selectedClass?.skillChoices ?? 2;
+  final selectedClass = characterClasses
+      .where((c) => c.name == widget.character.characterClass)
+      .firstOrNull;
+  _availableSkills = selectedClass?.availableSkills ?? [];
+  _skillChoices    = selectedClass?.skillChoices ?? 2;
 
-    _preselectedSkills = widget.character.skillProficiencies.entries
+  // Nur Rassen- und Hintergrundfertigkeiten sind unveränderlich
+  final race = races
+      .where((r) => r.name == widget.character.race)
+      .firstOrNull;
+  final background = backgrounds
+      .where((b) => b.name == widget.character.background)
+      .firstOrNull;
+
+  _preselectedSkills = {
+    ...?race?.skillProficiencies,
+    ...?background?.skillProficiencies,
+  };
+
+  // Bereits gewählte Klassenfertigkeiten wiederherstellen
+  _selectedSkills.addAll(
+    widget.character.skillProficiencies.entries
         .where((e) => e.value == true)
         .map((e) => e.key)
-        .toSet();
+        .where((s) => _availableSkills.contains(s))
+        .where((s) => !_preselectedSkills.contains(s)),
+  );
 
-    final extraSkills = _preselectedSkills
-        .where((s) => !_availableSkills.contains(s))
-        .toList();
-    _availableSkills = [..._availableSkills, ...extraSkills];
-  }
+  final extraSkills = _preselectedSkills
+      .where((s) => !_availableSkills.contains(s))
+      .toList();
+  _availableSkills = [..._availableSkills, ...extraSkills];
+}
 
   bool validate() {
     if (_selectedSkills.length < _skillChoices) {
@@ -66,9 +83,16 @@ class SkillsStepState extends State<SkillsStep> {
   }
 
   void applyTo(Character character) {
-    for (final skill in _selectedSkills) {
-      character.skillProficiencies[skill] = true;
+    // Zuerst alle Klassenfertigkeiten zurücksetzen
+  for (final skill in _availableSkills) {
+    if (!_preselectedSkills.contains(skill)) {
+      character.skillProficiencies[skill] = false;
     }
+  }
+  // Dann nur die aktuell gewählten setzen
+  for (final skill in _selectedSkills) {
+    character.skillProficiencies[skill] = true;
+  }
   }
 
   void _toggleSkill(String skill) {

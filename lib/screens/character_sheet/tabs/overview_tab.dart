@@ -1,3 +1,4 @@
+import 'package:dnd_app/widgets/collapsible_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:dnd_app/models/character.dart';
@@ -38,8 +39,14 @@ class _OverviewTabState extends State<OverviewTab> {
       padding: const EdgeInsets.all(16),
       children: [
         _buildCombatCard(),
+        if (c.spellSlots.isNotEmpty) ...[
+          const SizedBox(height: 16),
+          _buildSpellSlotsCard(),
+        ],
         const SizedBox(height: 16),
         _buildAttributesCard(),
+        const SizedBox(height: 16),
+        _buildHitDiceCard(),
         const SizedBox(height: 16),
         _buildCurrencyCard(),
       ],
@@ -49,6 +56,8 @@ class _OverviewTabState extends State<OverviewTab> {
   // ── Kampfwerte ─────────────────────────────────────────────────────────────
 
   Widget _buildCombatCard() {
+    final isDying = c.currentHitPoints <= 0;
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -64,128 +73,117 @@ class _OverviewTabState extends State<OverviewTab> {
             const SizedBox(height: 16),
             _buildHpSection(),
             const Divider(height: 24),
-            Row(
-              children: [
-                _buildStatBox(
-                  'RK',
-                  '${c.armorClass}',
-                  onTap: widget.editMode
-                      ? () => _showNumberDialog(
+            if (isDying)
+              _buildDeathSavesSection()
+            else ...[
+              Row(
+                children: [
+                  _buildStatBox(
+                    'RK',
+                    '${c.armorClass}',
+                    onTap: widget.editMode
+                        ? () => _showNumberDialog(
                             'Rüstungsklasse',
                             c.armorClass,
                             min: 1,
                             max: 30,
                             onSave: (v) => setState(() => c.armorClass = v),
                           )
-                      : null,
-                ),
-                _buildStatBox(
-                  'Initiative',
-                  c.initiative >= 0
-                      ? '+${c.initiative}'
-                      : '${c.initiative}',
-                ),
-                _buildStatBox(
-                  'Bewegung',
-                  '${c.speed} m',
-                  onTap: widget.editMode
-                      ? () => _showNumberDialog(
+                        : null,
+                  ),
+                  _buildStatBox(
+                    'Initiative',
+                    c.initiative >= 0 ? '+${c.initiative}' : '${c.initiative}',
+                  ),
+                  _buildStatBox(
+                    'Bewegung',
+                    '${c.speed} m',
+                    onTap: widget.editMode
+                        ? () => _showNumberDialog(
                             'Bewegungsgeschwindigkeit',
                             c.speed,
                             min: 0,
                             max: 99,
                             onSave: (v) => setState(() => c.speed = v),
                           )
-                      : null,
-                ),
-                _buildStatBox('Übung', '+${c.proficiencyBonus}'),
-              ],
-            ),
-            const Divider(height: 24),
-            _buildHitDiceSection(),
+                        : null,
+                  ),
+                  _buildStatBox('Übung', '+${c.proficiencyBonus}'),
+                ],
+              ),
+            ],
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHitDiceSection() {
-  final available = c.level - c.usedHitDice;
+  // ── Trefferwürfel ──────────────────────────────────────────────────────────
 
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Row(
-        children: [
-          Text('Trefferwürfel', style: AppTextStyles.cardTitle),
-          const Spacer(),
-          Text(
-            'W${c.hitDie}',
-            style: AppTextStyles.statMedium.copyWith(
-              color: widget.themeColor,
-            ),
-          ),
-        ],
-      ),
-      const SizedBox(height: 8),
-      // Würfel-Anzeige
-      Wrap(
-        spacing: 6,
-        runSpacing: 6,
-        children: List.generate(c.level, (index) {
-          final isUsed = index >= available;
-          return Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: isUsed
-                  ? Colors.grey[300]
-                  : widget.themeColor.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(
+  Widget _buildHitDiceCard() {
+    return CollapsibleCard(
+      title: 'Trefferwürfel',
+      themeColor: widget.themeColor,
+      child: _buildHitDiceSection(),
+    );
+  }
+
+  Widget _buildHitDiceSection() {
+    final available = c.level - c.usedHitDice;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: List.generate(c.level, (index) {
+            final isUsed = index >= available;
+            return Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
                 color: isUsed
-                    ? Colors.grey[400]!
-                    : widget.themeColor,
-                width: 1.5,
-              ),
-            ),
-            child: Center(
-              child: Text(
-                'W${c.hitDie}',
-                style: AppTextStyles.labelXs.copyWith(
-                  color: isUsed
-                      ? Colors.grey[400]
-                      : widget.themeColor,
-                  fontWeight: FontWeight.bold,
+                    ? Colors.grey[300]
+                    : widget.themeColor.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
+                  color: isUsed ? Colors.grey[400]! : widget.themeColor,
+                  width: 1.5,
                 ),
               ),
+              child: Center(
+                child: Text(
+                  'W${c.hitDie}',
+                  style: AppTextStyles.labelXs.copyWith(
+                    color: isUsed ? Colors.grey[400] : widget.themeColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            );
+          }),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Text(
+              '$available / ${c.level} verfügbar',
+              style: AppTextStyles.bodySmall.copyWith(color: Colors.grey),
             ),
-          );
-        }),
-      ),
-      const SizedBox(height: 8),
-      // Buttons
-      Row(
-        children: [
-          Text(
-            '$available / ${c.level} verfügbar',
-            style: AppTextStyles.bodySmall.copyWith(color: Colors.grey),
-          ),
-          const Spacer(),
-          const SizedBox(width: 8),
-          _buildHpButton(
-            label: 'Ausgeben',
-            icon: Icons.remove_circle_outline,
-            color: available > 0 ? widget.themeColor : Colors.grey,
-            onTap: available > 0
-                ? () => _showUseHitDiceDialog()
-                : () {},
-          ),
-        ],
-      ),
-    ],
-  );
-}
+            const Spacer(),
+            const SizedBox(width: 8),
+            _buildHpButton(
+              label: 'Würfel nutzen',
+              icon: Icons.remove_circle_outline,
+              color: available > 0 ? widget.themeColor : Colors.grey,
+              onTap: available > 0 ? () => _showUseHitDiceDialog() : () {},
+            ),
+          ],
+        ),
+      ],
+    );
+  }
 
   Widget _buildHpSection() {
     final ratio = c.maxHitPoints > 0
@@ -195,8 +193,8 @@ class _OverviewTabState extends State<OverviewTab> {
     final hpColor = ratio > 0.5
         ? Colors.green
         : ratio > 0.25
-            ? Colors.orange
-            : Colors.red;
+        ? Colors.orange
+        : Colors.red;
 
     final hasTemp = c.temporaryHitPoints > 0;
 
@@ -207,7 +205,6 @@ class _OverviewTabState extends State<OverviewTab> {
           children: [
             Text('Trefferpunkte', style: AppTextStyles.cardTitle),
             const Spacer(),
-            // Aktuelle TP bearbeiten
             GestureDetector(
               onTap: () => _showHpDialog(),
               child: RichText(
@@ -231,10 +228,8 @@ class _OverviewTabState extends State<OverviewTab> {
           ],
         ),
         const SizedBox(height: 8),
-        // HP-Balken
         Stack(
           children: [
-            // Basis-Balken
             ClipRRect(
               borderRadius: BorderRadius.circular(4),
               child: LinearProgressIndicator(
@@ -244,16 +239,17 @@ class _OverviewTabState extends State<OverviewTab> {
                 minHeight: 8,
               ),
             ),
-            // Temporäre TP als blauer Overlay
             if (hasTemp)
               ClipRRect(
                 borderRadius: BorderRadius.circular(4),
                 child: LinearProgressIndicator(
-                  value: (c.temporaryHitPoints / c.maxHitPoints)
-                      .clamp(0.0, 1.0),
+                  value: (c.temporaryHitPoints / c.maxHitPoints).clamp(
+                    0.0,
+                    1.0,
+                  ),
                   backgroundColor: Colors.transparent,
                   valueColor: AlwaysStoppedAnimation<Color>(
-                    Colors.blue.withValues(alpha:0.5),
+                    Colors.blue.withValues(alpha: 0.5),
                   ),
                   minHeight: 8,
                 ),
@@ -261,7 +257,6 @@ class _OverviewTabState extends State<OverviewTab> {
           ],
         ),
         const SizedBox(height: 8),
-        // Buttons für TP-Verwaltung
         Row(
           children: [
             _buildHpButton(
@@ -317,18 +312,15 @@ class _OverviewTabState extends State<OverviewTab> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 6),
           decoration: BoxDecoration(
-            color: color.withValues(alpha:0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: color.withValues(alpha:0.3)),
+            border: Border.all(color: color.withValues(alpha: 0.3)),
           ),
           child: Column(
             children: [
               Icon(icon, size: 16, color: color),
               const SizedBox(height: 2),
-              Text(
-                label,
-                style: AppTextStyles.labelXs.copyWith(color: color),
-              ),
+              Text(label, style: AppTextStyles.labelXs.copyWith(color: color)),
             ],
           ),
         ),
@@ -345,7 +337,7 @@ class _OverviewTabState extends State<OverviewTab> {
           decoration: widget.editMode && onTap != null
               ? BoxDecoration(
                   border: Border.all(
-                    color: widget.themeColor.withValues(alpha:0.3),
+                    color: widget.themeColor.withValues(alpha: 0.3),
                   ),
                   borderRadius: BorderRadius.circular(8),
                 )
@@ -366,57 +358,226 @@ class _OverviewTabState extends State<OverviewTab> {
     );
   }
 
-  // ── Attribute ──────────────────────────────────────────────────────────────
+  Widget _buildDeathSavesSection() {
+    if (c.isStabilized) {
+      return Column(
+        children: [
+          const SizedBox(height: 8),
+          Icon(Icons.favorite, color: Colors.green[300], size: 32),
+          const SizedBox(height: 8),
+          Text(
+            'Stabilisiert',
+            style: AppTextStyles.sectionTitle.copyWith(
+              color: Colors.green[400],
+            ),
+          ),
+          const SizedBox(height: 4),
+          Center(
+            child: Text(
+              'Der Charakter ist bewusstlos aber stabil.',
+              style: AppTextStyles.bodySmall.copyWith(color: Colors.grey),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+      );
+    }
 
-  Widget _buildAttributesCard() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      children: [
+        Text(
+          'Todesrettungswürfe',
+          style: AppTextStyles.cardTitle,
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 20),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Text(
-              'Attribute',
-              style: AppTextStyles.sectionTitle.copyWith(
-                color: widget.themeColor,
-              ),
+            _buildDeathSaveGroup(
+              label: 'Erfolge',
+              count: c.deathSaveSuccesses,
+              color: Colors.green,
+              icon: Icons.check,
+              onTap: (index, filled) {
+                setState(() => c.deathSaveSuccesses = filled ? index : index + 1);
+                _save();
+              },
             ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                _buildAttributeBox('STR', c.strength,     c.strModifier, 'strength'),
-                _buildAttributeBox('GES', c.dexterity,    c.dexModifier, 'dexterity'),
-                _buildAttributeBox('KON', c.constitution, c.conModifier, 'constitution'),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                _buildAttributeBox('INT', c.intelligence, c.intModifier, 'intelligence'),
-                _buildAttributeBox('WEI', c.wisdom,       c.wisModifier, 'wisdom'),
-                _buildAttributeBox('CHA', c.charisma,     c.chaModifier, 'charisma'),
-              ],
+            _buildDeathSaveGroup(
+              label: 'Misserfolge',
+              count: c.deathSaveFailures,
+              color: Colors.red,
+              icon: Icons.close,
+              onTap: (index, filled) {
+                setState(() => c.deathSaveFailures = filled ? index : index + 1);
+                _save();
+              },
             ),
           ],
         ),
-      ),
+        const SizedBox(height: 16),
+        TextButton.icon(
+          onPressed: () {
+            setState(() {
+              c.isStabilized = true;
+              c.deathSaveSuccesses = 0;
+              c.deathSaveFailures = 0;
+            });
+            _save();
+          },
+          icon: const Icon(Icons.favorite, color: Colors.green),
+          label: Text(
+            'Stabilisieren',
+            style: AppTextStyles.body.copyWith(color: Colors.green),
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _buildAttributeBox(
-      String label, int score, int modifier, String key) {
+  Widget _buildDeathSaveGroup({
+    required String label,
+    required int count,
+    required Color color,
+    required IconData icon,
+    required void Function(int index, bool filled) onTap,
+  }) {
+    return Column(
+      children: [
+        Text(label, style: AppTextStyles.bodySmall.copyWith(color: color)),
+        const SizedBox(height: 8),
+        Row(
+          children: List.generate(3, (index) {
+            final filled = index < count;
+            return GestureDetector(
+              onTap: () => onTap(index, filled),
+              child: Container(
+                width: 32,
+                height: 32,
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: filled ? color : Colors.transparent,
+                  border: Border.all(color: color, width: 2),
+                ),
+                child: filled
+                    ? Icon(icon, size: 18, color: Colors.white)
+                    : null,
+              ),
+            );
+          }),
+        ),
+      ],
+    );
+  }
+
+  // ── Zauberplätze ───────────────────────────────────────────────────────────
+
+  Widget _buildSpellSlotsCard() {
+    return CollapsibleCard(
+      title: 'Zauberplätze',
+      themeColor: widget.themeColor,
+      child: _buildSpellSlotsContent(),
+    );
+  }
+
+  Widget _buildSpellSlotsContent() {
+    return Column(
+      children: [
+        const SizedBox(height: 16),
+        ...c.spellSlots.entries.map((entry) {
+          final grade = entry.key;
+          final slot = entry.value;
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 72,
+                  child: Text(
+                    'Grad $grade',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Row(
+                    children: List.generate(slot.max, (index) {
+                      final filled = index < slot.current;
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            slot.current = filled ? index : index + 1;
+                          });
+                          _save();
+                        },
+                        child: Container(
+                          width: 28,
+                          height: 28,
+                          margin: const EdgeInsets.only(right: 6),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: filled
+                                ? widget.themeColor
+                                : Colors.transparent,
+                            border: Border.all(
+                              color: filled
+                                  ? widget.themeColor
+                                  : Colors.grey[400]!,
+                              width: 2,
+                            ),
+                          ),
+                          child: filled
+                              ? const Icon(
+                                  Icons.auto_awesome,
+                                  size: 14,
+                                  color: Colors.white,
+                                )
+                              : null,
+                        ),
+                      );
+                    }),
+                  ),
+                ),
+                Text(
+                  '${slot.current}/${slot.max}',
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: Colors.grey[500],
+                  ),
+                ),
+              ],
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
+  // ── Attribute ──────────────────────────────────────────────────────────────
+
+  Widget _buildAttributesCard() {
+    return CollapsibleCard(
+      title: 'Attribute',
+      themeColor: widget.themeColor,
+      child: _buildAttributesContent(),
+    );
+  }
+
+  Widget _buildAttributeBox(String label, int score, int modifier, String key) {
     final modText = modifier >= 0 ? '+$modifier' : '$modifier';
 
     return Expanded(
       child: GestureDetector(
         onTap: widget.editMode
             ? () => _showNumberDialog(
-                  Attributes.label(key),
-                  score,
-                  min: 1,
-                  max: 30,
-                  onSave: (v) => setState(() => _setAttributeValue(key, v)),
-                )
+                Attributes.label(key),
+                score,
+                min: 1,
+                max: 30,
+                onSave: (v) => setState(() => _setAttributeValue(key, v)),
+              )
             : null,
         child: Container(
           margin: const EdgeInsets.all(4),
@@ -424,7 +585,7 @@ class _OverviewTabState extends State<OverviewTab> {
           decoration: BoxDecoration(
             border: Border.all(
               color: widget.editMode
-                  ? widget.themeColor.withValues(alpha:0.4)
+                  ? widget.themeColor.withValues(alpha: 0.4)
                   : Colors.grey[300]!,
               width: widget.editMode ? 1.5 : 1,
             ),
@@ -448,45 +609,65 @@ class _OverviewTabState extends State<OverviewTab> {
     );
   }
 
+  Widget _buildAttributesContent() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            _buildAttributeBox('STR', c.strength, c.strModifier, 'strength'),
+            _buildAttributeBox('GES', c.dexterity, c.dexModifier, 'dexterity'),
+            _buildAttributeBox('KON', c.constitution, c.conModifier, 'constitution'),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            _buildAttributeBox('INT', c.intelligence, c.intModifier, 'intelligence'),
+            _buildAttributeBox('WEI', c.wisdom, c.wisModifier, 'wisdom'),
+            _buildAttributeBox('CHA', c.charisma, c.chaModifier, 'charisma'),
+          ],
+        ),
+      ],
+    );
+  }
+
   void _setAttributeValue(String key, int value) {
     switch (key) {
-      case 'strength':     c.strength     = value;
-      case 'dexterity':    c.dexterity    = value;
+      case 'strength':     c.strength = value;
+      case 'dexterity':    c.dexterity = value;
       case 'constitution': c.constitution = value;
       case 'intelligence': c.intelligence = value;
-      case 'wisdom':       c.wisdom       = value;
-      case 'charisma':     c.charisma     = value;
+      case 'wisdom':       c.wisdom = value;
+      case 'charisma':     c.charisma = value;
     }
   }
 
   // ── Währung ────────────────────────────────────────────────────────────────
 
   Widget _buildCurrencyCard() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return CollapsibleCard(
+      title: 'Währung',
+      themeColor: widget.themeColor,
+      child: _buildCurrencyContent(),
+    );
+  }
+
+  Widget _buildCurrencyContent() {
+    return Column(
+      children: [
+        const SizedBox(height: 16),
+        Row(
           children: [
-            Text(
-              'Währung',
-              style: AppTextStyles.sectionTitle.copyWith(
-                color: widget.themeColor,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                _buildCurrencyBox('PP', c.platinumPieces, 'platinum'),
-                _buildCurrencyBox('GP', c.goldPieces,     'gold'),
-                _buildCurrencyBox('EP', c.electrumPieces, 'electrum'),
-                _buildCurrencyBox('SP', c.silverPieces,   'silver'),
-                _buildCurrencyBox('KP', c.copperPieces,   'copper'),
-              ],
-            ),
+            _buildCurrencyBox('PP', c.platinumPieces, 'platinum'),
+            _buildCurrencyBox('GP', c.goldPieces, 'gold'),
+            _buildCurrencyBox('EP', c.electrumPieces, 'electrum'),
+            _buildCurrencyBox('SP', c.silverPieces, 'silver'),
+            _buildCurrencyBox('KP', c.copperPieces, 'copper'),
           ],
         ),
-      ),
+      ],
     );
   }
 
@@ -494,12 +675,12 @@ class _OverviewTabState extends State<OverviewTab> {
     return Expanded(
       child: GestureDetector(
         onTap: () => _showNumberDialog(
-                  _currencyLabel(key),
-                  amount,
-                  min: 0,
-                  max: 9999999,
-                  onSave: (v) => setState(() => _setCurrencyValue(key, v)),
-                ),
+          _currencyLabel(key),
+          amount,
+          min: 0,
+          max: 9999999,
+          onSave: (v) => setState(() => _setCurrencyValue(key, v)),
+        ),
         child: Container(
           margin: const EdgeInsets.all(4),
           padding: const EdgeInsets.symmetric(vertical: 10),
@@ -509,7 +690,7 @@ class _OverviewTabState extends State<OverviewTab> {
               width: widget.editMode ? 1.5 : 1,
             ),
             borderRadius: BorderRadius.circular(8),
-            color: _currencyColor(key).withValues(alpha:0.05),
+            color: _currencyColor(key).withValues(alpha: 0.05),
           ),
           child: Column(
             children: [
@@ -529,11 +710,11 @@ class _OverviewTabState extends State<OverviewTab> {
 
   void _setCurrencyValue(String key, int value) {
     switch (key) {
-      case 'platinum':  c.platinumPieces  = value;
-      case 'gold':      c.goldPieces      = value;
-      case 'electrum':  c.electrumPieces  = value;
-      case 'silver':    c.silverPieces    = value;
-      case 'copper':    c.copperPieces    = value;
+      case 'platinum': c.platinumPieces = value;
+      case 'gold':     c.goldPieces = value;
+      case 'electrum': c.electrumPieces = value;
+      case 'silver':   c.silverPieces = value;
+      case 'copper':   c.copperPieces = value;
     }
   }
 
@@ -563,59 +744,86 @@ class _OverviewTabState extends State<OverviewTab> {
 
   Future<void> _showUseHitDiceDialog() async {
     final available = c.level - c.usedHitDice;
+    int amount = 1;
 
     await showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'Trefferwürfel ausgeben',
-          style: AppTextStyles.sectionTitle,
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Verfügbar: $available W${c.hitDie}',
-              style: AppTextStyles.body,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: Text(
+            'Trefferwürfel ausgeben',
+            style: AppTextStyles.sectionTitle,
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Verfügbar: $available W${c.hitDie}',
+                style: AppTextStyles.body,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Wirf die Würfel und addiere pro Würfel deinen '
+                'Konstitutionsmodifikator (${c.conModifier >= 0 ? '+${c.conModifier}' : '${c.conModifier}'}).',
+                style: AppTextStyles.bodySmall.copyWith(color: Colors.grey),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.remove_circle_outline),
+                    onPressed: amount > 1
+                        ? () => setDialogState(() => amount--)
+                        : null,
+                  ),
+                  Text(
+                    '$amount',
+                    style: AppTextStyles.statLarge.copyWith(
+                      color: widget.themeColor,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.add_circle_outline),
+                    onPressed: amount < available
+                        ? () => setDialogState(() => amount++)
+                        : null,
+                  ),
+                ],
+              ),
+              Text(
+                amount == 1 ? '1 Würfel' : '$amount Würfel',
+                style: AppTextStyles.bodySmall.copyWith(color: Colors.grey),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Abbrechen', style: AppTextStyles.body),
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Wirf einen W${c.hitDie} und addiere deinen '
-              'Konstitutionsmodifikator (${c.conModifier >= 0 ? '+${c.conModifier}' : '${c.conModifier}'}) '
-              'um TP zu regenerieren.',
-              style: AppTextStyles.bodySmall.copyWith(color: Colors.grey),
+            FilledButton(
+              onPressed: () {
+                setState(() => c.usedHitDice += amount);
+                _save();
+                Navigator.pop(context);
+              },
+              style: FilledButton.styleFrom(backgroundColor: widget.themeColor),
+              child: Text('Ausgeben', style: AppTextStyles.body),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Abbrechen', style: AppTextStyles.body),
-          ),
-          FilledButton(
-            onPressed: () {
-              setState(() => c.usedHitDice++);
-              _save();
-              Navigator.pop(context);
-            },
-            style: FilledButton.styleFrom(backgroundColor: widget.themeColor),
-            child: Text('Würfel ausgeben', style: AppTextStyles.body),
-          ),
-        ],
       ),
     );
   }
 
   Future<void> _showHpDialog() async {
-    final controller = TextEditingController(
-      text: '${c.currentHitPoints}',
-    );
+    final controller = TextEditingController(text: '${c.currentHitPoints}');
 
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Trefferpunkte setzen',
-            style: AppTextStyles.sectionTitle),
+        title: Text('Trefferpunkte setzen', style: AppTextStyles.sectionTitle),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -648,8 +856,7 @@ class _OverviewTabState extends State<OverviewTab> {
               }
               Navigator.pop(context);
             },
-            style: FilledButton.styleFrom(
-                backgroundColor: widget.themeColor),
+            style: FilledButton.styleFrom(backgroundColor: widget.themeColor),
             child: Text('Speichern', style: AppTextStyles.body),
           ),
         ],
@@ -688,14 +895,19 @@ class _OverviewTabState extends State<OverviewTab> {
               final value = int.tryParse(controller.text);
               if (value != null) {
                 setState(() {
+                  if (isDamage && c.isStabilized) {
+                    c.isStabilized = false;
+                    c.deathSaveFailures = 1;
+                  }
                   if (isDamage) {
-                    // Schaden zieht zuerst temporäre TP ab
-                    final tempReduction =
-                        value.clamp(0, c.temporaryHitPoints);
+                    final tempReduction = value.clamp(0, c.temporaryHitPoints);
                     c.temporaryHitPoints -= tempReduction;
                     c.currentHitPoints -= (value - tempReduction);
                   } else {
                     c.currentHitPoints += value;
+                    c.isStabilized = false;
+                    c.deathSaveFailures = 0;
+                    c.deathSaveSuccesses = 0;
                   }
                 });
                 _save();
@@ -713,9 +925,7 @@ class _OverviewTabState extends State<OverviewTab> {
   }
 
   Future<void> _showTempHpDialog() async {
-    final controller = TextEditingController(
-      text: '${c.temporaryHitPoints}',
-    );
+    final controller = TextEditingController(text: '${c.temporaryHitPoints}');
 
     await showDialog(
       context: context,
@@ -753,9 +963,9 @@ class _OverviewTabState extends State<OverviewTab> {
               final value = int.tryParse(controller.text);
               if (value != null) {
                 setState(() {
-                  // Nur setzen wenn neuer Wert höher ist
-                  c.temporaryHitPoints =
-                      value > c.temporaryHitPoints ? value : c.temporaryHitPoints;
+                  c.temporaryHitPoints = value > c.temporaryHitPoints
+                      ? value
+                      : c.temporaryHitPoints;
                 });
                 _save();
               }
@@ -787,9 +997,7 @@ class _OverviewTabState extends State<OverviewTab> {
           keyboardType: TextInputType.number,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           style: AppTextStyles.body,
-          decoration: InputDecoration(
-            border: const OutlineInputBorder(),
-          ),
+          decoration: const InputDecoration(border: OutlineInputBorder()),
           autofocus: true,
         ),
         actions: [
@@ -806,8 +1014,7 @@ class _OverviewTabState extends State<OverviewTab> {
               }
               Navigator.pop(context);
             },
-            style: FilledButton.styleFrom(
-                backgroundColor: widget.themeColor),
+            style: FilledButton.styleFrom(backgroundColor: widget.themeColor),
             child: Text('Speichern', style: AppTextStyles.body),
           ),
         ],

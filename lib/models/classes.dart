@@ -1,7 +1,10 @@
+import 'package:dnd_app/models/spell_slot.dart';
+
 class CharacterClass {
   final String name;
   final int hitDie;
   final String spellcastingAttribute; // '' wenn keine Zauberei
+  final String? casterType;           // 'full', 'half' oder null
   final List<String> availableSkills; // Fertigkeiten aus denen gewählt werden kann
   final List<String> proficientSavingThrows;
   final int skillChoices;             // Anzahl der wählbaren Fertigkeiten
@@ -13,6 +16,7 @@ class CharacterClass {
     required this.availableSkills,
     required this.proficientSavingThrows,
     required this.skillChoices,
+    this.casterType,
   });
 }
 
@@ -20,6 +24,7 @@ const List<CharacterClass> characterClasses = [
   CharacterClass(
     name: 'Barbar',
     hitDie: 12,
+    casterType: '',
     skillChoices: 2,
     availableSkills: [
       'animalHandling', 'athletics', 'intimidation',
@@ -32,6 +37,7 @@ const List<CharacterClass> characterClasses = [
   CharacterClass(
     name: 'Barde',
     hitDie: 8,
+    casterType: 'full',
     spellcastingAttribute: 'charisma',
     skillChoices: 3,
     availableSkills: [
@@ -48,6 +54,7 @@ const List<CharacterClass> characterClasses = [
   CharacterClass(
     name: 'Druide',
     hitDie: 8,
+    casterType: 'full',
     spellcastingAttribute: 'wisdom',
     skillChoices: 2,
     availableSkills: [
@@ -61,6 +68,7 @@ const List<CharacterClass> characterClasses = [
   CharacterClass(
     name: 'Hexenmeister',
     hitDie: 8,
+    casterType: 'full',
     spellcastingAttribute: 'charisma',
     skillChoices: 2,
     availableSkills: [
@@ -74,6 +82,7 @@ const List<CharacterClass> characterClasses = [
   CharacterClass(
     name: 'Kämpfer',
     hitDie: 10,
+    casterType: '',
     skillChoices: 2,
     availableSkills: [
       'acrobatics', 'animalHandling', 'athletics', 'history',
@@ -86,6 +95,7 @@ const List<CharacterClass> characterClasses = [
   CharacterClass(
     name: 'Kleriker',
     hitDie: 8,
+    casterType: 'full',
     spellcastingAttribute: 'wisdom',
     skillChoices: 2,
     availableSkills: [
@@ -98,6 +108,7 @@ const List<CharacterClass> characterClasses = [
   CharacterClass(
     name: 'Magier',
     hitDie: 6,
+    casterType: 'full',
     spellcastingAttribute: 'intelligence',
     skillChoices: 2,
     availableSkills: [
@@ -111,6 +122,7 @@ const List<CharacterClass> characterClasses = [
   CharacterClass(
     name: 'Mönch',
     hitDie: 8,
+    casterType: '',
     skillChoices: 2,
     availableSkills: [
       'acrobatics', 'athletics', 'history', 'insight',
@@ -123,6 +135,7 @@ const List<CharacterClass> characterClasses = [
   CharacterClass(
     name: 'Paladin',
     hitDie: 10,
+    casterType: 'half',
     spellcastingAttribute: 'charisma',
     skillChoices: 2,
     availableSkills: [
@@ -136,6 +149,7 @@ const List<CharacterClass> characterClasses = [
   CharacterClass(
     name: 'Schurke',
     hitDie: 8,
+    casterType: '',
     skillChoices: 4,
     availableSkills: [
       'acrobatics', 'athletics', 'deception', 'insight',
@@ -149,6 +163,7 @@ const List<CharacterClass> characterClasses = [
   CharacterClass(
     name: 'Waldläufer',
     hitDie: 8,
+    casterType: 'half',
     spellcastingAttribute: 'wisdom',
     skillChoices: 3,
     availableSkills: [
@@ -162,14 +177,80 @@ const List<CharacterClass> characterClasses = [
   CharacterClass(
     name: 'Zauberer',
     hitDie: 6,
-    spellcastingAttribute: 'intelligence',
+    casterType: 'full',
+    spellcastingAttribute: 'charisma',
     skillChoices: 2,
     availableSkills: [
-      'arcana', 'history', 'insight', 'investigation',
-      'medicine', 'religion',
+      'arcana', 'deception', 'insight', 'intimidation',
+      'persuasion', 'religion', 'survival,'
     ],
     proficientSavingThrows: [
       'charisma', 'constitution'
     ]
   ),
 ];
+
+const Map<String, Map<int, List<int>>> spellSlotTable = {
+  'full': {
+     1: [2,0,0,0,0,0,0,0,0],
+     2: [3,0,0,0,0,0,0,0,0],
+     3: [4,2,0,0,0,0,0,0,0],
+     4: [4,3,0,0,0,0,0,0,0],
+     5: [4,3,2,0,0,0,0,0,0],
+     6: [4,3,3,0,0,0,0,0,0],
+     7: [4,3,3,1,0,0,0,0,0],
+     8: [4,3,3,2,0,0,0,0,0],
+     9: [4,3,3,3,1,0,0,0,0],
+    10: [4,3,3,3,2,0,0,0,0],
+    11: [4,3,3,3,2,1,0,0,0],
+    12: [4,3,3,3,2,1,0,0,0],
+    13: [4,3,3,3,2,1,1,0,0],
+    14: [4,3,3,3,2,1,1,0,0],
+    15: [4,3,3,3,2,1,1,1,0],
+    16: [4,3,3,3,2,1,1,1,0],
+    17: [4,3,3,3,2,1,1,1,1],
+    18: [4,3,3,3,3,1,1,1,1],
+    19: [4,3,3,3,3,2,1,1,1],
+    20: [4,3,3,3,3,2,2,1,1],
+  },
+  'half': {
+     1: [0,0,0,0,0,0,0,0,0],
+     2: [2,0,0,0,0,0,0,0,0],
+     3: [3,0,0,0,0,0,0,0,0],
+     4: [3,0,0,0,0,0,0,0,0],
+     5: [4,2,0,0,0,0,0,0,0],
+     6: [4,2,0,0,0,0,0,0,0],
+     7: [4,3,0,0,0,0,0,0,0],
+     8: [4,3,0,0,0,0,0,0,0],
+     9: [4,3,2,0,0,0,0,0,0],
+    10: [4,3,2,0,0,0,0,0,0],
+    11: [4,3,3,0,0,0,0,0,0],
+    12: [4,3,3,0,0,0,0,0,0],
+    13: [4,3,3,1,0,0,0,0,0],
+    14: [4,3,3,1,0,0,0,0,0],
+    15: [4,3,3,2,0,0,0,0,0],
+    16: [4,3,3,2,0,0,0,0,0],
+    17: [4,3,3,3,1,0,0,0,0],
+    18: [4,3,3,3,1,0,0,0,0],
+    19: [4,3,3,3,2,0,0,0,0],
+    20: [4,3,3,3,2,0,0,0,0],
+  },
+};
+
+Map<int, SpellSlot> calculateSpellSlots(String className, int level) {
+  final selectedClass = characterClasses
+      .where((c) => c.name == className)
+      .firstOrNull;
+  
+  final casterType = selectedClass?.casterType;
+  if (casterType == null) return {};
+
+  final slots = spellSlotTable[casterType]![level.clamp(1, 20)]!;
+  final result = <int, SpellSlot>{};
+  for (int i = 0; i < slots.length; i++) {
+    if (slots[i] > 0) {
+      result[i + 1] = SpellSlot(max: slots[i], current: slots[i]);
+    }
+  }
+  return result;
+}
