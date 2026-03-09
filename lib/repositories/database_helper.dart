@@ -188,6 +188,9 @@ Future<void> _createTables(Database db, int version) async {
     CREATE TABLE character_items (
       characterId TEXT NOT NULL,
       itemId      TEXT NOT NULL,
+      quantity    INTEGER DEFAULT 1,
+      isEquipped  INTEGER DEFAULT 0,
+      isAttuned   INTEGER DEFAULT 0,
       PRIMARY KEY (characterId, itemId),
       FOREIGN KEY (characterId) REFERENCES characters(id) ON DELETE CASCADE,
       FOREIGN KEY (itemId)      REFERENCES items(id)      ON DELETE CASCADE

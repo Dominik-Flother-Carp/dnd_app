@@ -34,12 +34,10 @@ class Item {
   ItemCategory category;
   ItemRarity rarity;
   bool requiresAttunement; // Erfordert Einstimmung?
-  bool isAttuned;          // Ist der Charakter eingestimmt?
 
   // ── Gewicht & Menge ───────────────────────────────────────────────────────
   double _weight = 0.0; // Gewicht in Pfund (D&D 5e Standard)
   int _quantity = 1;
-  bool isEquipped;      // Gerade ausgerüstet?
 
   // ── Waffeneigenschaften (nur relevant wenn category == weapon) ────────────
   String? damageDice;   // z.B. '1d8'
@@ -62,10 +60,8 @@ class Item {
     this.category = ItemCategory.misc,
     this.rarity = ItemRarity.common,
     this.requiresAttunement = false,
-    this.isAttuned = false,
     double weight = 0.0,
     int quantity = 1,
-    this.isEquipped = false,
     this.damageDice,
     this.damageType,
     this.isMagical = false,
@@ -74,7 +70,7 @@ class Item {
     int valueInCopper = 0,
   }) : id = id ?? const Uuid().v4() {
     _weight = weight.clamp(0.0, 9999.0);
-    _quantity = quantity.clamp(1, 9999);
+    _quantity = quantity.clamp(0, 9999);
     _magicBonus = magicBonus.clamp(0, 3);
     _armorClassBonus = armorClassBonus.clamp(0, 99);
     _valueInCopper = valueInCopper.clamp(0, 99999999);
@@ -86,7 +82,7 @@ class Item {
   set weight(double value) => _weight = value.clamp(0.0, 9999.0);
 
   int get quantity => _quantity;
-  set quantity(int value) => _quantity = value.clamp(1, 9999);
+  set quantity(int value) => _quantity = value.clamp(0, 9999);
 
   // Magischer Bonus: 0 bis +3 (D&D 5e Maximum)
   int get magicBonus => _magicBonus;
@@ -122,10 +118,6 @@ class Item {
     return parts.join(', ');
   }
 
-  // Ob der Gegenstand gerade nutzbar ist
-  // (Einstimmung nötig aber nicht eingestimmt = nicht nutzbar)
-  bool get isUsable => !requiresAttunement || isAttuned;
-
   // ── Datenbank: Konvertierung ──────────────────────────────────────────────
 
   Map<String, dynamic> toMap() {
@@ -138,10 +130,8 @@ class Item {
       'category':           category.name,
       'rarity':             rarity.name,
       'requiresAttunement': requiresAttunement ? 1 : 0,
-      'isAttuned':          isAttuned ? 1 : 0,
       'weight':             weight,
       'quantity':           quantity,
-      'isEquipped':         isEquipped ? 1 : 0,
       'damageDice':         damageDice,
       'damageType':         damageType,
       'isMagical':          isMagical ? 1 : 0,
@@ -163,10 +153,8 @@ class Item {
       rarity:             ItemRarity.values.byName(
                             map['rarity'] ?? 'common'),
       requiresAttunement: map['requiresAttunement'] == 1,
-      isAttuned:          map['isAttuned'] == 1,
       weight:             (map['weight'] ?? 0.0).toDouble(),
       quantity:           map['quantity'] ?? 1,
-      isEquipped:         map['isEquipped'] == 1,
       damageDice:         map['damageDice'],
       damageType:         map['damageType'],
       isMagical:          map['isMagical'] == 1,
