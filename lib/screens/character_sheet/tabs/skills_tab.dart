@@ -23,8 +23,9 @@ class SkillsTab extends StatefulWidget {
   State<SkillsTab> createState() => _SkillsTabState();
 }
 
-class _SkillsTabState extends State<SkillsTab> {
-
+class _SkillsTabState extends State<SkillsTab> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
   //Rotiert durch die Edit-States
   void _toggleSkill(String key) {
     setState(() {
@@ -58,6 +59,7 @@ class _SkillsTabState extends State<SkillsTab> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [

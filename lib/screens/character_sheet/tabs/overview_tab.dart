@@ -25,7 +25,7 @@ class OverviewTab extends StatefulWidget {
   State<OverviewTab> createState() => _OverviewTabState();
 }
 
-class _OverviewTabState extends State<OverviewTab> {
+class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClientMixin {
   Character get c => widget.character;
 
   void _save() {
@@ -34,7 +34,11 @@ class _OverviewTabState extends State<OverviewTab> {
   }
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
@@ -400,7 +404,9 @@ class _OverviewTabState extends State<OverviewTab> {
               color: Colors.green,
               icon: Icons.check,
               onTap: (index, filled) {
-                setState(() => c.deathSaveSuccesses = filled ? index : index + 1);
+                setState(
+                  () => c.deathSaveSuccesses = filled ? index : index + 1,
+                );
                 _save();
               },
             ),
@@ -410,7 +416,9 @@ class _OverviewTabState extends State<OverviewTab> {
               color: Colors.red,
               icon: Icons.close,
               onTap: (index, filled) {
-                setState(() => c.deathSaveFailures = filled ? index : index + 1);
+                setState(
+                  () => c.deathSaveFailures = filled ? index : index + 1,
+                );
                 _save();
               },
             ),
@@ -618,13 +626,23 @@ class _OverviewTabState extends State<OverviewTab> {
           children: [
             _buildAttributeBox('STR', c.strength, c.strModifier, 'strength'),
             _buildAttributeBox('GES', c.dexterity, c.dexModifier, 'dexterity'),
-            _buildAttributeBox('KON', c.constitution, c.conModifier, 'constitution'),
+            _buildAttributeBox(
+              'KON',
+              c.constitution,
+              c.conModifier,
+              'constitution',
+            ),
           ],
         ),
         const SizedBox(height: 8),
         Row(
           children: [
-            _buildAttributeBox('INT', c.intelligence, c.intModifier, 'intelligence'),
+            _buildAttributeBox(
+              'INT',
+              c.intelligence,
+              c.intModifier,
+              'intelligence',
+            ),
             _buildAttributeBox('WEI', c.wisdom, c.wisModifier, 'wisdom'),
             _buildAttributeBox('CHA', c.charisma, c.chaModifier, 'charisma'),
           ],
@@ -635,12 +653,18 @@ class _OverviewTabState extends State<OverviewTab> {
 
   void _setAttributeValue(String key, int value) {
     switch (key) {
-      case 'strength':     c.strength = value;
-      case 'dexterity':    c.dexterity = value;
-      case 'constitution': c.constitution = value;
-      case 'intelligence': c.intelligence = value;
-      case 'wisdom':       c.wisdom = value;
-      case 'charisma':     c.charisma = value;
+      case 'strength':
+        c.strength = value;
+      case 'dexterity':
+        c.dexterity = value;
+      case 'constitution':
+        c.constitution = value;
+      case 'intelligence':
+        c.intelligence = value;
+      case 'wisdom':
+        c.wisdom = value;
+      case 'charisma':
+        c.charisma = value;
     }
   }
 
@@ -710,33 +734,44 @@ class _OverviewTabState extends State<OverviewTab> {
 
   void _setCurrencyValue(String key, int value) {
     switch (key) {
-      case 'platinum': c.platinumPieces = value;
-      case 'gold':     c.goldPieces = value;
-      case 'electrum': c.electrumPieces = value;
-      case 'silver':   c.silverPieces = value;
-      case 'copper':   c.copperPieces = value;
+      case 'platinum':
+        c.platinumPieces = value;
+      case 'gold':
+        c.goldPieces = value;
+      case 'electrum':
+        c.electrumPieces = value;
+      case 'silver':
+        c.silverPieces = value;
+      case 'copper':
+        c.copperPieces = value;
     }
   }
 
   String _currencyLabel(String key) {
     const labels = {
       'platinum': 'Platinmünzen',
-      'gold':     'Goldmünzen',
+      'gold': 'Goldmünzen',
       'electrum': 'Elektrummünzen',
-      'silver':   'Silbermünzen',
-      'copper':   'Kupfermünzen',
+      'silver': 'Silbermünzen',
+      'copper': 'Kupfermünzen',
     };
     return labels[key] ?? key;
   }
 
   Color _currencyColor(String key) {
     switch (key) {
-      case 'platinum': return Colors.blueGrey;
-      case 'gold':     return const Color(0xFFB8860B);
-      case 'electrum': return Colors.teal;
-      case 'silver':   return Colors.grey;
-      case 'copper':   return const Color(0xFFB87333);
-      default:         return Colors.grey;
+      case 'platinum':
+        return Colors.blueGrey;
+      case 'gold':
+        return const Color(0xFFB8860B);
+      case 'electrum':
+        return Colors.teal;
+      case 'silver':
+        return Colors.grey;
+      case 'copper':
+        return const Color(0xFFB87333);
+      default:
+        return Colors.grey;
     }
   }
 
@@ -751,21 +786,35 @@ class _OverviewTabState extends State<OverviewTab> {
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
           title: Text(
-            'Trefferwürfel ausgeben',
+            'Trefferwürfel nutzen',
             style: AppTextStyles.sectionTitle,
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                'Verfügbar: $available W${c.hitDie}',
-                style: AppTextStyles.body,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Wirf die Würfel und addiere pro Würfel deinen '
-                'Konstitutionsmodifikator (${c.conModifier >= 0 ? '+${c.conModifier}' : '${c.conModifier}'}).',
-                style: AppTextStyles.bodySmall.copyWith(color: Colors.grey),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: widget.themeColor.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Verfügbar',
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: Colors.grey,
+                      ),
+                    ),
+                    Text(
+                      '$available W${c.hitDie}',
+                      style: AppTextStyles.statMedium.copyWith(
+                        color: widget.themeColor,
+                      ),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 16),
               Row(
@@ -773,27 +822,41 @@ class _OverviewTabState extends State<OverviewTab> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.remove_circle_outline),
+                    color: widget.themeColor,
                     onPressed: amount > 1
                         ? () => setDialogState(() => amount--)
                         : null,
                   ),
-                  Text(
-                    '$amount',
-                    style: AppTextStyles.statLarge.copyWith(
-                      color: widget.themeColor,
-                    ),
+                  Column(
+                    children: [
+                      Text(
+                        '$amount',
+                        style: AppTextStyles.statLarge.copyWith(
+                          color: widget.themeColor,
+                        ),
+                      ),
+                      Text(
+                        amount == 1 ? 'Würfel' : 'Würfel',
+                        style: AppTextStyles.labelXs.copyWith(
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
                   ),
                   IconButton(
                     icon: const Icon(Icons.add_circle_outline),
+                    color: widget.themeColor,
                     onPressed: amount < available
                         ? () => setDialogState(() => amount++)
                         : null,
                   ),
                 ],
               ),
+              const SizedBox(height: 8),
               Text(
-                amount == 1 ? '1 Würfel' : '$amount Würfel',
+                'Pro Würfel: W${c.hitDie} + KON (${c.conModifier >= 0 ? '+${c.conModifier}' : '${c.conModifier}'})',
                 style: AppTextStyles.bodySmall.copyWith(color: Colors.grey),
+                textAlign: TextAlign.center,
               ),
             ],
           ),
@@ -809,7 +872,7 @@ class _OverviewTabState extends State<OverviewTab> {
                 Navigator.pop(context);
               },
               style: FilledButton.styleFrom(backgroundColor: widget.themeColor),
-              child: Text('Ausgeben', style: AppTextStyles.body),
+              child: Text('Nutzen', style: AppTextStyles.body),
             ),
           ],
         ),
