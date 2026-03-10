@@ -759,9 +759,10 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
   Future<void> _showHpDialog() async {
     final controller = TextEditingController(text: '${c.currentHitPoints}');
 
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
+    try {
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
         title: Text('Trefferpunkte setzen', style: AppTextStyles.sectionTitle),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -801,12 +802,16 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
         ],
       ),
     );
+    } finally {
+      controller.dispose();
+    }
   }
 
   Future<void> _showDamageHealDialog({required bool isDamage}) async {
     final controller = TextEditingController();
 
-    await showDialog(
+    try {
+      await showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
@@ -861,12 +866,16 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
         ],
       ),
     );
+    } finally {
+      controller.dispose();
+    }
   }
 
   Future<void> _showTempHpDialog() async {
     final controller = TextEditingController(text: '${c.temporaryHitPoints}');
 
-    await showDialog(
+    try {
+      await showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Temporäre TP', style: AppTextStyles.sectionTitle),
@@ -916,6 +925,9 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
         ],
       ),
     );
+    } finally {
+      controller.dispose();
+    }
   }
 
   Future<void> _showNumberDialog(
@@ -927,7 +939,8 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
   }) async {
     final controller = TextEditingController(text: '$currentValue');
 
-    await showDialog(
+    try {
+      await showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(label, style: AppTextStyles.sectionTitle),
@@ -959,5 +972,8 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
         ],
       ),
     );
+    } finally {
+      controller.dispose();
+    }
   }
 }

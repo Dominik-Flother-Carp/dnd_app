@@ -5,6 +5,7 @@ import 'package:dnd_app/models/character.dart';
 import 'package:dnd_app/repositories/character_repository.dart';
 import 'package:dnd_app/screens/character_sheet/tabs/overview_tab.dart';
 import 'package:dnd_app/screens/character_sheet/tabs/skills_tab.dart';
+import 'package:dnd_app/screens/character_sheet/tabs/inventory_tab.dart';
 import 'package:dnd_app/theme/app_text_styles.dart';
 import 'package:dnd_app/models/spell_slot.dart';
 import 'package:dnd_app/models/classes.dart';
@@ -105,7 +106,10 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
               editMode: _editMode,
               onSave: _saveCharacter,
             ),
-            _buildComingSoon('Ausrüstung'),
+            InventoryTab(
+              character: _character!,
+              themeColor: _themeColor,
+            ),
             _buildComingSoon('Zauber & Fähigkeiten'),
           ],
         ),
@@ -179,7 +183,6 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            /*CircleAvatar(...)*/
             Text(
               character.name,
               style: AppTextStyles.screenTitle.copyWith(

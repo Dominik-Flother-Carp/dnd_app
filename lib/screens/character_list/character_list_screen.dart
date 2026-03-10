@@ -1,5 +1,6 @@
 // lib/screens/character_list/character_list_screen.dart
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:dnd_app/models/character.dart';
 import 'package:dnd_app/repositories/character_repository.dart';
@@ -7,6 +8,7 @@ import 'package:dnd_app/screens/character_list/character_card.dart';
 import 'package:dnd_app/screens/character_sheet/character_sheet_screen.dart';
 import 'package:dnd_app/screens/character_create/character_create_screen.dart';
 import 'package:dnd_app/screens/compendium/compendium_screen.dart';
+import 'package:dnd_app/models/classes.dart';
 import 'package:dnd_app/theme/app_text_styles.dart';
 
 class CharacterListScreen extends StatefulWidget {
@@ -66,6 +68,56 @@ class _CharacterListScreenState extends State<CharacterListScreen> {
     }
   }
 
+  // ── Dev-Shortcut ──────────────────────────────────────────────────────────
+
+  Future<void> _createDevCharacter() async {
+    final character = Character(name: 'Testcharakter')
+      ..characterClass = 'Magier'
+      ..subclass = 'Hervorrufung'
+      ..race = 'Mensch'
+      ..background = 'Einsiedler'
+      ..alignment = 'Neutral Gut'
+      ..level = 5
+      ..hitDie = 6
+      ..strength = 8
+      ..dexterity = 14
+      ..constitution = 13
+      ..intelligence = 17
+      ..wisdom = 12
+      ..charisma = 10
+      ..armorClass = 12
+      ..speed = 9
+      ..maxHitPoints = 28
+      ..currentHitPoints = 20
+      ..experiencePoints = 6500
+      ..useEdition2024 = false
+      ..skillProficiencies = {
+        'arcana': true,
+        'history': true,
+        'investigation': true,
+        'insight': true,
+      }
+      ..savingThrowProficiencies = {
+        'intelligence': true,
+        'wisdom': true,
+      }
+      ..spellSlots = calculateSpellSlots('Magier', 5)
+      ..goldPieces = 35;
+
+    await _repository.insertCharacter(character);
+    await _loadCharacters();
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Dev-Charakter erstellt'),
+          duration: Duration(seconds: 2),
+          backgroundColor: Color(0xFF3B1F0A),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,6 +126,15 @@ class _CharacterListScreenState extends State<CharacterListScreen> {
             style: AppTextStyles.cardTitle.copyWith(
               color: const Color(0xFFF5DEB3),
             )),
+        // Nur im Debug-Mode sichtbar
+        actions: [
+          if (kDebugMode)
+            IconButton(
+              icon: const Icon(Icons.science_outlined),
+              tooltip: 'Dev-Charakter erstellen',
+              onPressed: _createDevCharacter,
+            ),
+        ],
       ),
       drawer: _buildDrawer(context),
       body: _isLoading

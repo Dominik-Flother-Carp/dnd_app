@@ -182,7 +182,7 @@ const List<CharacterClass> characterClasses = [
     skillChoices: 2,
     availableSkills: [
       'arcana', 'deception', 'insight', 'intimidation',
-      'persuasion', 'religion', 'survival,'
+      'persuasion', 'religion', 'survival',
     ],
     proficientSavingThrows: [
       'charisma', 'constitution'
@@ -241,11 +241,19 @@ Map<int, SpellSlot> calculateSpellSlots(String className, int level) {
   final selectedClass = characterClasses
       .where((c) => c.name == className)
       .firstOrNull;
-  
-  final casterType = selectedClass?.casterType;
-  if (casterType == null) return {};
 
-  final slots = spellSlotTable[casterType]![level.clamp(1, 20)]!;
+  final casterType = selectedClass?.casterType;
+
+  // Kein Zauberer: casterType ist null oder leer
+  if (casterType == null || casterType.isEmpty) return {};
+
+  // Unbekannter casterType (sollte nicht vorkommen, aber sicher ist sicher)
+  final table = spellSlotTable[casterType];
+  if (table == null) return {};
+
+  final slots = table[level.clamp(1, 20)];
+  if (slots == null) return {};
+
   final result = <int, SpellSlot>{};
   for (int i = 0; i < slots.length; i++) {
     if (slots[i] > 0) {

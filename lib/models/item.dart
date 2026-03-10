@@ -1,6 +1,7 @@
 // lib/models/item.dart
 
 import 'package:uuid/uuid.dart';
+import 'package:flutter/material.dart';
 
 // Kategorie des Gegenstands
 enum ItemCategory {
@@ -13,6 +14,32 @@ enum ItemCategory {
   misc,      // Sonstiges
 }
 
+extension ItemCategoryExtension on ItemCategory {
+  String get label {
+    switch (this) {
+      case ItemCategory.weapon:     return 'Waffen';
+      case ItemCategory.armor:      return 'Rüstung';
+      case ItemCategory.shield:     return 'Schilde';
+      case ItemCategory.tool:       return 'Werkzeug';
+      case ItemCategory.consumable: return 'Verbrauchsgegenstände';
+      case ItemCategory.treasure:   return 'Schätze';
+      case ItemCategory.misc:       return 'Sonstiges';
+    }
+  }
+
+  IconData get icon {
+    switch (this) {
+      case ItemCategory.weapon:     return Icons.sports_martial_arts;
+      case ItemCategory.armor:      return Icons.security;
+      case ItemCategory.shield:     return Icons.shield;
+      case ItemCategory.tool:       return Icons.handyman;
+      case ItemCategory.consumable: return Icons.local_pharmacy;
+      case ItemCategory.treasure:   return Icons.diamond;
+      case ItemCategory.misc:       return Icons.category;
+    }
+  }
+}
+
 // Seltenheit des Gegenstands (D&D 5e Standard)
 enum ItemRarity {
   common,    // Gewöhnlich
@@ -21,6 +48,30 @@ enum ItemRarity {
   veryRare,  // Sehr selten
   legendary, // Legendär
   artifact,  // Artefakt
+}
+
+extension ItemRarityExtension on ItemRarity {
+  String get label {
+    switch (this) {
+      case ItemRarity.common:    return 'Gewöhnlich';
+      case ItemRarity.uncommon:  return 'Ungewöhnlich';
+      case ItemRarity.rare:      return 'Selten';
+      case ItemRarity.veryRare:  return 'Sehr selten';
+      case ItemRarity.legendary: return 'Legendär';
+      case ItemRarity.artifact:  return 'Artefakt';
+    }
+  }
+
+  Color get color {
+    switch (this) {
+      case ItemRarity.common:    return Colors.grey;
+      case ItemRarity.uncommon:  return Colors.green;
+      case ItemRarity.rare:      return Colors.blue;
+      case ItemRarity.veryRare:  return Colors.purple;
+      case ItemRarity.legendary: return Colors.orange;
+      case ItemRarity.artifact:  return Colors.red;
+    }
+  }
 }
 
 class Item {

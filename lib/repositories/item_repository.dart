@@ -1,36 +1,38 @@
 // lib/repositories/item_repository.dart
 
 import 'package:dnd_app/models/item.dart';
+import 'package:dnd_app/models/character_items.dart';
 import 'package:dnd_app/repositories/database_helper.dart';
 
 class ItemRepository {
-  final DatabaseHelper _db = DatabaseHelper();
+  final _db = DatabaseHelper();
 
   // ── Gegenstände eines Charakters laden ────────────────────────────────────
 
-  Future<List<Item>> getItemsForCharacter(String characterId) async {
+  Future<List<CharacterItem>> getItemsForCharacter(String characterId) async {
     final db = await _db.database;
     final results = await db.rawQuery('''
-      SELECT i.*, ci.isEquipped, ci.isAttuned
+      SELECT i.*, ci.quantity, ci.isEquipped, ci.isAttuned, ci.characterId
       FROM items i
       JOIN character_items ci ON i.id = ci.itemId
       WHERE ci.characterId = ?
     ''', [characterId]);
-    return results.map((map) => Item.fromMap(map)).toList();
+
+    return results.map((map) {
+      final item = Item.fromMap(map);
+      return CharacterItem.fromMap(map, item);
+    }).toList();
   }
 
   // ── Gegenstand erstellen und Charakter zuweisen ───────────────────────────
 
-  Future<void> addItemToCharacter(String characterId, Item item) async {
+  Future<void> addItemToCharacter(CharacterItem characterItem) async {
     final db = await _db.database;
-    await db.insert('items', item.toMap());
-    await db.insert('character_items', {
-      'characterId': characterId,
-      'itemId':      item.id,
-    });
+    await db.insert('items', characterItem.item.toMap());
+    await db.insert('character_items', characterItem.toMap());
   }
 
-  // ── Gegenstand aktualisieren ──────────────────────────────────────────────
+  // ── Item-Vorlage aktualisieren ────────────────────────────────────────────
 
   Future<void> updateItem(Item item) async {
     final db = await _db.database;
@@ -42,36 +44,53 @@ class ItemRepository {
     );
   }
 
+  // ── Charakterspezifischen Zustand aktualisieren ───────────────────────────
+
+  Future<void> updateCharacterItem(CharacterItem characterItem) async {
+    final db = await _db.database;
+    await db.update(
+      'character_items',
+      characterItem.toMap(),
+      where: 'characterId = ? AND itemId = ?',
+      whereArgs: [characterItem.characterId, characterItem.item.id],
+    );
+  }
+
   // ── Gegenstand entfernen ──────────────────────────────────────────────────
 
-  Future<void> removeItemFromCharacter(
-      String characterId, String itemId) async {
+  Future<void> removeItemFromCharacter(CharacterItem characterItem) async {
     final db = await _db.database;
     await db.delete(
       'character_items',
       where: 'characterId = ? AND itemId = ?',
-      whereArgs: [characterId, itemId],
+      whereArgs: [characterItem.characterId, characterItem.item.id],
     );
-    // Gegenstand selbst nur löschen wenn er keinem anderen Charakter gehört
-    final remaining = await db.query(
-      'character_items',
-      where: 'itemId = ?',
-      whereArgs: [itemId],
-    );
-    if (remaining.isEmpty) {
-      await db.delete('items', where: 'id = ?', whereArgs: [itemId]);
+    // Item nur löschen wenn es kein Standardobjekt ist und
+    // keinem anderen Charakter gehört
+    if (characterItem.item.isCustom) {
+      final remaining = await db.query(
+        'character_items',
+        where: 'itemId = ?',
+        whereArgs: [characterItem.item.id],
+      );
+      if (remaining.isEmpty) {
+        await db.delete(
+          'items',
+          where: 'id = ?',
+          whereArgs: [characterItem.item.id],
+        );
+      }
     }
   }
 
   // ── Menge aktualisieren, bei 0 entfernen ─────────────────────────────────
 
-  Future<void> updateQuantity(
-      String characterId, Item item, int newQuantity) async {
+  Future<void> updateQuantity(CharacterItem characterItem, int newQuantity) async {
     if (newQuantity <= 0) {
-      await removeItemFromCharacter(characterId, item.id);
+      await removeItemFromCharacter(characterItem);
     } else {
-      item.quantity = newQuantity;
-      await updateItem(item);
+      characterItem.quantity = newQuantity;
+      await updateCharacterItem(characterItem);
     }
   }
 }

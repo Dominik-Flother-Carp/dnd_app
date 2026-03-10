@@ -15,7 +15,7 @@ class CharacterItem {
     int quantity = 1,
     this.isEquipped = false,
     this.isAttuned = false,
-  }) : _quantity = quantity.clamp(1, 9999);
+  }) : _quantity = quantity.clamp(0, 9999);
 
   int get quantity => _quantity;
   set quantity(int value) => _quantity = value.clamp(0, 9999);
