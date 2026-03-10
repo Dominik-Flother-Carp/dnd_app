@@ -10,13 +10,207 @@ import 'package:dnd_app/theme/app_text_styles.dart';
 import 'package:dnd_app/models/spell_slot.dart';
 import 'package:dnd_app/models/classes.dart';
 
+// ── Level-Dialog ──────────────────────────────────────────────────────────────
+
+class _LevelDialogResult {
+  final int level;
+  const _LevelDialogResult(this.level);
+}
+
+class _LevelDialog extends StatefulWidget {
+  final int currentLevel;
+  final Color themeColor;
+
+  const _LevelDialog({
+    required this.currentLevel,
+    required this.themeColor,
+  });
+
+  @override
+  State<_LevelDialog> createState() => _LevelDialogState();
+}
+
+class _LevelDialogState extends State<_LevelDialog> {
+  late int _level;
+
+  @override
+  void initState() {
+    super.initState();
+    _level = widget.currentLevel;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Stufe ändern', style: AppTextStyles.sectionTitle),
+      content: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.remove_circle_outline),
+            color: widget.themeColor,
+            onPressed: _level > 1
+                ? () => setState(() => _level--)
+                : null,
+          ),
+          Text(
+            '$_level',
+            style: AppTextStyles.statLarge
+                .copyWith(color: widget.themeColor),
+          ),
+          IconButton(
+            icon: const Icon(Icons.add_circle_outline),
+            color: widget.themeColor,
+            onPressed: _level < 20
+                ? () => setState(() => _level++)
+                : null,
+          ),
+        ],
+      ),
+      actions: [
+        FilledButton(
+          onPressed: () =>
+              Navigator.pop(context, _LevelDialogResult(_level)),
+          style: FilledButton.styleFrom(
+              backgroundColor: widget.themeColor),
+          child: Text('Fertig', style: AppTextStyles.body),
+        ),
+      ],
+    );
+  }
+}
+
+// ── Trefferwürfel-Dialog ──────────────────────────────────────────────────────
+
+class _HitDiceDialogResult {
+  final int amount;
+  const _HitDiceDialogResult(this.amount);
+}
+
+class _HitDiceDialog extends StatefulWidget {
+  final int available;
+  final int hitDie;
+  final int conModifier;
+  final Color themeColor;
+
+  const _HitDiceDialog({
+    required this.available,
+    required this.hitDie,
+    required this.conModifier,
+    required this.themeColor,
+  });
+
+  @override
+  State<_HitDiceDialog> createState() => _HitDiceDialogState();
+}
+
+class _HitDiceDialogState extends State<_HitDiceDialog> {
+  int _amount = 1;
+
+  @override
+  Widget build(BuildContext context) {
+    final conText = widget.conModifier >= 0
+        ? '+${widget.conModifier}'
+        : '${widget.conModifier}';
+
+    return AlertDialog(
+      title: Text(
+        'Trefferwürfel ausgeben',
+        style: AppTextStyles.sectionTitle,
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: widget.themeColor.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Verfügbar',
+                    style: AppTextStyles.bodySmall
+                        .copyWith(color: Colors.grey)),
+                Text(
+                  '${widget.available} W${widget.hitDie}',
+                  style: AppTextStyles.statMedium
+                      .copyWith(color: widget.themeColor),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.remove_circle_outline),
+                color: widget.themeColor,
+                onPressed: _amount > 1
+                    ? () => setState(() => _amount--)
+                    : null,
+              ),
+              Column(
+                children: [
+                  Text(
+                    '$_amount',
+                    style: AppTextStyles.statLarge
+                        .copyWith(color: widget.themeColor),
+                  ),
+                  Text(
+                    'Würfel',
+                    style: AppTextStyles.labelXs
+                        .copyWith(color: Colors.grey),
+                  ),
+                ],
+              ),
+              IconButton(
+                icon: const Icon(Icons.add_circle_outline),
+                color: widget.themeColor,
+                onPressed: _amount < widget.available
+                    ? () => setState(() => _amount++)
+                    : null,
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Pro Würfel: W${widget.hitDie} + KON ($conText)',
+            style:
+                AppTextStyles.bodySmall.copyWith(color: Colors.grey),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text('Abbrechen', style: AppTextStyles.body),
+        ),
+        FilledButton(
+          onPressed: () =>
+              Navigator.pop(context, _HitDiceDialogResult(_amount)),
+          style: FilledButton.styleFrom(
+              backgroundColor: widget.themeColor),
+          child: Text('Ausgeben', style: AppTextStyles.body),
+        ),
+      ],
+    );
+  }
+}
+
+// ── Haupt-Screen ──────────────────────────────────────────────────────────────
+
 class CharacterSheetScreen extends StatefulWidget {
   final String characterId;
 
   const CharacterSheetScreen({super.key, required this.characterId});
 
   @override
-  State<CharacterSheetScreen> createState() => _CharacterSheetScreenState();
+  State<CharacterSheetScreen> createState() =>
+      _CharacterSheetScreenState();
 }
 
 class _CharacterSheetScreenState extends State<CharacterSheetScreen>
@@ -46,7 +240,8 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
   }
 
   Future<void> _loadCharacter() async {
-    final character = await _repository.getCharacterById(widget.characterId);
+    final character =
+        await _repository.getCharacterById(widget.characterId);
     setState(() {
       _character = character;
       _isLoading = false;
@@ -72,14 +267,17 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(
+          body: Center(child: CircularProgressIndicator()));
     }
 
     if (_character == null) {
       return Scaffold(
-        appBar: AppBar(title: Text('Fehler', style: AppTextStyles.cardTitle)),
+        appBar: AppBar(
+            title: Text('Fehler', style: AppTextStyles.cardTitle)),
         body: Center(
-          child: Text('Charakter nicht gefunden', style: AppTextStyles.body),
+          child: Text('Charakter nicht gefunden',
+              style: AppTextStyles.body),
         ),
       );
     }
@@ -124,7 +322,8 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
       backgroundColor: _themeColor,
       foregroundColor: const Color(0xFFF5DEB3),
       actions: [
-        _buildAppBarButton(icon: Icons.bedtime, onTap: _showRestDialog),
+        _buildAppBarButton(
+            icon: Icons.bedtime, onTap: _showRestDialog),
         const SizedBox(width: 8),
         _buildAppBarButton(
           icon: _editMode ? Icons.edit_off : Icons.edit,
@@ -142,7 +341,8 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
         tabAlignment: TabAlignment.center,
         indicatorColor: const Color(0xFFF5DEB3),
         labelColor: const Color(0xFFF5DEB3),
-        unselectedLabelColor: const Color(0xFFF5DEB3).withValues(alpha: 0.5),
+        unselectedLabelColor:
+            const Color(0xFFF5DEB3).withValues(alpha: 0.5),
         labelStyle: AppTextStyles.label,
         tabs: const [
           Tab(text: 'Übersicht'),
@@ -185,9 +385,8 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
           children: [
             Text(
               character.name,
-              style: AppTextStyles.screenTitle.copyWith(
-                color: const Color(0xFFF5DEB3),
-              ),
+              style: AppTextStyles.screenTitle
+                  .copyWith(color: const Color(0xFFF5DEB3)),
             ),
             const SizedBox(height: 4),
             GestureDetector(
@@ -199,7 +398,8 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
                     child: Text(
                       _buildSubtitle(),
                       style: AppTextStyles.body.copyWith(
-                        color: const Color(0xFFF5DEB3).withValues(alpha: 0.8),
+                        color: const Color(0xFFF5DEB3)
+                            .withValues(alpha: 0.8),
                       ),
                       softWrap: true,
                       overflow: TextOverflow.visible,
@@ -211,7 +411,8 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
                     Icon(
                       Icons.edit,
                       size: 14,
-                      color: const Color(0xFFF5DEB3).withValues(alpha: 0.7),
+                      color: const Color(0xFFF5DEB3)
+                          .withValues(alpha: 0.7),
                     ),
                   ],
                 ],
@@ -246,7 +447,8 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
           const SizedBox(height: 12),
           Text(
             '$label ist in Arbeit!',
-            style: AppTextStyles.body.copyWith(color: Colors.grey[500]),
+            style:
+                AppTextStyles.body.copyWith(color: Colors.grey[500]),
           ),
         ],
       ),
@@ -254,63 +456,28 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
   }
 
   Future<void> _showLevelDialog() async {
-    await showDialog(
+    final result = await showDialog<_LevelDialogResult>(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: Text('Stufe ändern', style: AppTextStyles.sectionTitle),
-          content: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.remove_circle_outline),
-                color: _themeColor,
-                onPressed: _character!.level > 1
-                    ? () {
-                        setDialogState(() => _character!.level--);
-                        _updateSpellSlots();
-                        setState(() {});
-                        _saveCharacter();
-                      }
-                    : null,
-              ),
-              Text(
-                '${_character!.level}',
-                style: AppTextStyles.statLarge.copyWith(color: _themeColor),
-              ),
-              IconButton(
-                icon: const Icon(Icons.add_circle_outline),
-                color: _themeColor,
-                onPressed: _character!.level < 20
-                    ? () {
-                        setDialogState(() => _character!.level++);
-                        _updateSpellSlots();
-                        setState(() {});
-                        _saveCharacter();
-                      }
-                    : null,
-              ),
-            ],
-          ),
-          actions: [
-            FilledButton(
-              onPressed: () => Navigator.pop(context),
-              style: FilledButton.styleFrom(backgroundColor: _themeColor),
-              child: Text('Fertig', style: AppTextStyles.body),
-            ),
-          ],
-        ),
+      builder: (_) => _LevelDialog(
+        currentLevel: _character!.level,
+        themeColor: _themeColor,
       ),
     );
+    if (result != null) {
+      setState(() => _character!.level = result.level);
+      _updateSpellSlots();
+      await _saveCharacter();
+    }
   }
 
   void longRest() {
     setState(() {
       _character!.currentHitPoints = _character!.maxHitPoints;
-      _character!.usedHitDice =
-          (_character!.usedHitDice -
-                  (_character!.level / 2).floor().clamp(1, _character!.level))
-              .clamp(0, _character!.level);
+      _character!.usedHitDice = (_character!.usedHitDice -
+              (_character!.level / 2)
+                  .floor()
+                  .clamp(1, _character!.level))
+          .clamp(0, _character!.level);
       _character!.temporaryHitPoints = 0;
       _character!.deathSaveSuccesses = 0;
       _character!.deathSaveFailures = 0;
@@ -325,7 +492,8 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
     await showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (context) => Padding(
         padding: const EdgeInsets.all(24),
@@ -365,96 +533,21 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
   }
 
   Future<void> _showUseHitDiceDialog() async {
-  final available = _character!.level - _character!.usedHitDice;
-  int amount = 1;
-
-  await showDialog(
-    context: context,
-    builder: (context) => StatefulBuilder(
-      builder: (context, setDialogState) => AlertDialog(
-        title: Text(
-          'Trefferwürfel ausgeben',
-          style: AppTextStyles.sectionTitle,
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: _themeColor.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Verfügbar', style: AppTextStyles.bodySmall.copyWith(color: Colors.grey)),
-                  Text(
-                    '$available W${_character!.hitDie}',
-                    style: AppTextStyles.statMedium.copyWith(color: _themeColor),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.remove_circle_outline),
-                  color: _themeColor,
-                  onPressed: amount > 1
-                      ? () => setDialogState(() => amount--)
-                      : null,
-                ),
-                Column(
-                  children: [
-                    Text(
-                      '$amount',
-                      style: AppTextStyles.statLarge.copyWith(color: _themeColor),
-                    ),
-                    Text(
-                      'Würfel',
-                      style: AppTextStyles.labelXs.copyWith(color: Colors.grey),
-                    ),
-                  ],
-                ),
-                IconButton(
-                  icon: const Icon(Icons.add_circle_outline),
-                  color: _themeColor,
-                  onPressed: amount < available
-                      ? () => setDialogState(() => amount++)
-                      : null,
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Pro Würfel: W${_character!.hitDie} + KON (${_character!.conModifier >= 0 ? '+${_character!.conModifier}' : '${_character!.conModifier}'})',
-              style: AppTextStyles.bodySmall.copyWith(color: Colors.grey),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Abbrechen', style: AppTextStyles.body),
-          ),
-          FilledButton(
-            onPressed: () {
-              setState(() => _character!.usedHitDice += amount);
-              _saveCharacter();
-              Navigator.pop(context);
-            },
-            style: FilledButton.styleFrom(backgroundColor: _themeColor),
-            child: Text('Ausgeben', style: AppTextStyles.body),
-          ),
-        ],
+    final available = _character!.level - _character!.usedHitDice;
+    final result = await showDialog<_HitDiceDialogResult>(
+      context: context,
+      builder: (_) => _HitDiceDialog(
+        available: available,
+        hitDie: _character!.hitDie,
+        conModifier: _character!.conModifier,
+        themeColor: _themeColor,
       ),
-    ),
-  );
-}
+    );
+    if (result != null) {
+      setState(() => _character!.usedHitDice += result.amount);
+      await _saveCharacter();
+    }
+  }
 
   Widget _buildRestOption({
     required IconData icon,
@@ -469,7 +562,8 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.08),
-          border: Border.all(color: color.withValues(alpha: 0.3)),
+          border:
+              Border.all(color: color.withValues(alpha: 0.3)),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -487,21 +581,18 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: AppTextStyles.cardTitle.copyWith(color: color),
-                  ),
+                  Text(title,
+                      style: AppTextStyles.cardTitle
+                          .copyWith(color: color)),
                   const SizedBox(height: 2),
-                  Text(
-                    description,
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: Colors.grey[600],
-                    ),
-                  ),
+                  Text(description,
+                      style: AppTextStyles.bodySmall
+                          .copyWith(color: Colors.grey[600])),
                 ],
               ),
             ),
-            Icon(Icons.chevron_right, color: color.withValues(alpha: 0.5)),
+            Icon(Icons.chevron_right,
+                color: color.withValues(alpha: 0.5)),
           ],
         ),
       ),

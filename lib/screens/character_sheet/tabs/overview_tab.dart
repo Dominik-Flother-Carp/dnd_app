@@ -5,6 +5,318 @@ import 'package:dnd_app/models/character.dart';
 import 'package:dnd_app/theme/app_text_styles.dart';
 import 'package:dnd_app/models/attributes.dart';
 
+// ── Dialog-Widgets ────────────────────────────────────────────────────────────
+
+class _NumberDialogResult {
+  final int value;
+  const _NumberDialogResult(this.value);
+}
+
+class _NumberDialog extends StatefulWidget {
+  final String label;
+  final int currentValue;
+  final int min;
+  final int max;
+  final Color themeColor;
+
+  const _NumberDialog({
+    required this.label,
+    required this.currentValue,
+    required this.min,
+    required this.max,
+    required this.themeColor,
+  });
+
+  @override
+  State<_NumberDialog> createState() => _NumberDialogState();
+}
+
+class _NumberDialogState extends State<_NumberDialog> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: '${widget.currentValue}');
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(widget.label, style: AppTextStyles.sectionTitle),
+      content: TextField(
+        controller: _controller,
+        keyboardType: TextInputType.number,
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        style: AppTextStyles.body,
+        decoration: const InputDecoration(border: OutlineInputBorder()),
+        autofocus: true,
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text('Abbrechen', style: AppTextStyles.body),
+        ),
+        FilledButton(
+          onPressed: () {
+            final value = int.tryParse(_controller.text);
+            if (value != null &&
+                value >= widget.min &&
+                value <= widget.max) {
+              Navigator.pop(context, _NumberDialogResult(value));
+            }
+          },
+          style: FilledButton.styleFrom(
+              backgroundColor: widget.themeColor),
+          child: Text('Speichern', style: AppTextStyles.body),
+        ),
+      ],
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _HpDialogResult {
+  final int value;
+  const _HpDialogResult(this.value);
+}
+
+class _HpDialog extends StatefulWidget {
+  final int currentHp;
+  final int maxHp;
+  final Color themeColor;
+
+  const _HpDialog({
+    required this.currentHp,
+    required this.maxHp,
+    required this.themeColor,
+  });
+
+  @override
+  State<_HpDialog> createState() => _HpDialogState();
+}
+
+class _HpDialogState extends State<_HpDialog> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: '${widget.currentHp}');
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title:
+          Text('Trefferpunkte setzen', style: AppTextStyles.sectionTitle),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('Maximum: ${widget.maxHp}', style: AppTextStyles.body),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _controller,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            style: AppTextStyles.body,
+            decoration: const InputDecoration(
+              labelText: 'Aktuelle TP',
+              border: OutlineInputBorder(),
+            ),
+            autofocus: true,
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text('Abbrechen', style: AppTextStyles.body),
+        ),
+        FilledButton(
+          onPressed: () {
+            final value = int.tryParse(_controller.text);
+            if (value != null) {
+              Navigator.pop(context, _HpDialogResult(value));
+            }
+          },
+          style: FilledButton.styleFrom(
+              backgroundColor: widget.themeColor),
+          child: Text('Speichern', style: AppTextStyles.body),
+        ),
+      ],
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _DamageHealDialogResult {
+  final int value;
+  const _DamageHealDialogResult(this.value);
+}
+
+class _DamageHealDialog extends StatefulWidget {
+  final bool isDamage;
+
+  const _DamageHealDialog({required this.isDamage});
+
+  @override
+  State<_DamageHealDialog> createState() => _DamageHealDialogState();
+}
+
+class _DamageHealDialogState extends State<_DamageHealDialog> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(
+        widget.isDamage ? 'Schaden erleiden' : 'Heilen',
+        style: AppTextStyles.sectionTitle,
+      ),
+      content: TextField(
+        controller: _controller,
+        keyboardType: TextInputType.number,
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        style: AppTextStyles.body,
+        decoration: InputDecoration(
+          labelText:
+              widget.isDamage ? 'Schadenspunkte' : 'Heilungspunkte',
+          border: const OutlineInputBorder(),
+        ),
+        autofocus: true,
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text('Abbrechen', style: AppTextStyles.body),
+        ),
+        FilledButton(
+          onPressed: () {
+            final value = int.tryParse(_controller.text);
+            if (value != null) {
+              Navigator.pop(context, _DamageHealDialogResult(value));
+            }
+          },
+          style: FilledButton.styleFrom(
+            backgroundColor:
+                widget.isDamage ? Colors.red : Colors.green,
+          ),
+          child: Text('Bestätigen', style: AppTextStyles.body),
+        ),
+      ],
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _TempHpDialogResult {
+  final int value;
+  const _TempHpDialogResult(this.value);
+}
+
+class _TempHpDialog extends StatefulWidget {
+  final int currentTempHp;
+
+  const _TempHpDialog({required this.currentTempHp});
+
+  @override
+  State<_TempHpDialog> createState() => _TempHpDialogState();
+}
+
+class _TempHpDialogState extends State<_TempHpDialog> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        TextEditingController(text: '${widget.currentTempHp}');
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Temporäre TP', style: AppTextStyles.sectionTitle),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'Temporäre TP stapeln sich nicht – '
+            'nur der höhere Wert zählt.',
+            style:
+                AppTextStyles.bodySmall.copyWith(color: Colors.grey),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _controller,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            style: AppTextStyles.body,
+            decoration: const InputDecoration(
+              labelText: 'Temporäre TP',
+              border: OutlineInputBorder(),
+            ),
+            autofocus: true,
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text('Abbrechen', style: AppTextStyles.body),
+        ),
+        FilledButton(
+          onPressed: () {
+            final value = int.tryParse(_controller.text);
+            if (value != null) {
+              Navigator.pop(context, _TempHpDialogResult(value));
+            }
+          },
+          style:
+              FilledButton.styleFrom(backgroundColor: Colors.blue),
+          child: Text('Setzen', style: AppTextStyles.body),
+        ),
+      ],
+    );
+  }
+}
+
+// ── Haupt-Widget ──────────────────────────────────────────────────────────────
+
 class OverviewTab extends StatefulWidget {
   final Character character;
   final Color themeColor;
@@ -25,7 +337,8 @@ class OverviewTab extends StatefulWidget {
   State<OverviewTab> createState() => _OverviewTabState();
 }
 
-class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClientMixin {
+class _OverviewTabState extends State<OverviewTab>
+    with AutomaticKeepAliveClientMixin {
   Character get c => widget.character;
 
   void _save() {
@@ -55,7 +368,7 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
     );
   }
 
-  // ── Kampfwerte ─────────────────────────────────────────────────────────────
+  // ── Kampfwerte ──────────────────────────────────────────────────────────────
 
   Widget _buildCombatCard() {
     final isDying = c.currentHitPoints <= 0;
@@ -68,9 +381,8 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
           children: [
             Text(
               'Allgemein',
-              style: AppTextStyles.sectionTitle.copyWith(
-                color: widget.themeColor,
-              ),
+              style: AppTextStyles.sectionTitle
+                  .copyWith(color: widget.themeColor),
             ),
             const SizedBox(height: 16),
             _buildHpSection(),
@@ -85,29 +397,28 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
                     '${c.armorClass}',
                     onTap: widget.editMode
                         ? () => _showNumberDialog(
-                            'Rüstungsklasse',
-                            c.armorClass,
+                            'Rüstungsklasse', c.armorClass,
                             min: 1,
                             max: 30,
-                            onSave: (v) => setState(() => c.armorClass = v),
-                          )
+                            onSave: (v) =>
+                                setState(() => c.armorClass = v))
                         : null,
                   ),
                   _buildStatBox(
                     'Initiative',
-                    c.initiative >= 0 ? '+${c.initiative}' : '${c.initiative}',
+                    c.initiative >= 0
+                        ? '+${c.initiative}'
+                        : '${c.initiative}',
                   ),
                   _buildStatBox(
                     'Bewegung',
                     '${c.speed} m',
                     onTap: widget.editMode
                         ? () => _showNumberDialog(
-                            'Bewegungsgeschwindigkeit',
-                            c.speed,
+                            'Bewegungsgeschwindigkeit', c.speed,
                             min: 0,
                             max: 99,
-                            onSave: (v) => setState(() => c.speed = v),
-                          )
+                            onSave: (v) => setState(() => c.speed = v))
                         : null,
                   ),
                   _buildStatBox('Übung', '+${c.proficiencyBonus}'),
@@ -122,7 +433,7 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
     );
   }
 
-  // ── Trefferwürfel ──────────────────────────────────────────────────────────
+  // ── Trefferwürfel ───────────────────────────────────────────────────────────
 
   Widget _buildHitDiceCard() {
     return CollapsibleCard(
@@ -152,7 +463,9 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
                     : widget.themeColor.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(6),
                 border: Border.all(
-                  color: isUsed ? Colors.grey[400]! : widget.themeColor,
+                  color: isUsed
+                      ? Colors.grey[400]!
+                      : widget.themeColor,
                   width: 1.5,
                 ),
               ),
@@ -160,7 +473,9 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
                 child: Text(
                   'W${c.hitDie}',
                   style: AppTextStyles.labelXs.copyWith(
-                    color: isUsed ? Colors.grey[400] : widget.themeColor,
+                    color: isUsed
+                        ? Colors.grey[400]
+                        : widget.themeColor,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -178,16 +493,13 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
   }
 
   Widget _buildHpSection() {
-    final ratio = c.maxHitPoints > 0
-        ? c.currentHitPoints / c.maxHitPoints
-        : 0.0;
-
+    final ratio =
+        c.maxHitPoints > 0 ? c.currentHitPoints / c.maxHitPoints : 0.0;
     final hpColor = ratio > 0.5
         ? Colors.green
         : ratio > 0.25
-        ? Colors.orange
-        : Colors.red;
-
+            ? Colors.orange
+            : Colors.red;
     final hasTemp = c.temporaryHitPoints > 0;
 
     return Column(
@@ -203,15 +515,16 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
                 text: TextSpan(
                   children: [
                     TextSpan(
-                      text: '${c.currentHitPoints} / ${c.maxHitPoints}',
-                      style: AppTextStyles.statLarge.copyWith(color: hpColor),
+                      text:
+                          '${c.currentHitPoints} / ${c.maxHitPoints}',
+                      style: AppTextStyles.statLarge
+                          .copyWith(color: hpColor),
                     ),
                     if (hasTemp)
                       TextSpan(
                         text: ' +${c.temporaryHitPoints}',
-                        style: AppTextStyles.statMedium.copyWith(
-                          color: Colors.blue,
-                        ),
+                        style: AppTextStyles.statMedium
+                            .copyWith(color: Colors.blue),
                       ),
                   ],
                 ),
@@ -235,14 +548,11 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
               ClipRRect(
                 borderRadius: BorderRadius.circular(4),
                 child: LinearProgressIndicator(
-                  value: (c.temporaryHitPoints / c.maxHitPoints).clamp(
-                    0.0,
-                    1.0,
-                  ),
+                  value: (c.temporaryHitPoints / c.maxHitPoints)
+                      .clamp(0.0, 1.0),
                   backgroundColor: Colors.transparent,
                   valueColor: AlwaysStoppedAnimation<Color>(
-                    Colors.blue.withValues(alpha: 0.5),
-                  ),
+                      Colors.blue.withValues(alpha: 0.5)),
                   minHeight: 8,
                 ),
               ),
@@ -312,7 +622,8 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
             children: [
               Icon(icon, size: 16, color: color),
               const SizedBox(height: 2),
-              Text(label, style: AppTextStyles.labelXs.copyWith(color: color)),
+              Text(label,
+                  style: AppTextStyles.labelXs.copyWith(color: color)),
             ],
           ),
         ),
@@ -320,7 +631,8 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
     );
   }
 
-  Widget _buildStatBox(String label, String value, {VoidCallback? onTap}) {
+  Widget _buildStatBox(String label, String value,
+      {VoidCallback? onTap}) {
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
@@ -329,19 +641,15 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
           decoration: widget.editMode && onTap != null
               ? BoxDecoration(
                   border: Border.all(
-                    color: widget.themeColor.withValues(alpha: 0.3),
-                  ),
+                      color: widget.themeColor.withValues(alpha: 0.3)),
                   borderRadius: BorderRadius.circular(8),
                 )
               : null,
           child: Column(
             children: [
-              Text(
-                value,
-                style: AppTextStyles.statLarge.copyWith(
-                  color: widget.themeColor,
-                ),
-              ),
+              Text(value,
+                  style: AppTextStyles.statLarge
+                      .copyWith(color: widget.themeColor)),
               Text(label, style: AppTextStyles.labelXs),
             ],
           ),
@@ -357,17 +665,15 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
           const SizedBox(height: 8),
           Icon(Icons.favorite, color: Colors.green[300], size: 32),
           const SizedBox(height: 8),
-          Text(
-            'Stabilisiert',
-            style: AppTextStyles.sectionTitle.copyWith(
-              color: Colors.green[400],
-            ),
-          ),
+          Text('Stabilisiert',
+              style: AppTextStyles.sectionTitle
+                  .copyWith(color: Colors.green[400])),
           const SizedBox(height: 4),
           Center(
             child: Text(
               'Der Charakter ist bewusstlos aber stabil.',
-              style: AppTextStyles.bodySmall.copyWith(color: Colors.grey),
+              style: AppTextStyles.bodySmall
+                  .copyWith(color: Colors.grey),
               textAlign: TextAlign.center,
             ),
           ),
@@ -377,11 +683,9 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
 
     return Column(
       children: [
-        Text(
-          'Todesrettungswürfe',
-          style: AppTextStyles.cardTitle,
-          textAlign: TextAlign.center,
-        ),
+        Text('Todesrettungswürfe',
+            style: AppTextStyles.cardTitle,
+            textAlign: TextAlign.center),
         const SizedBox(height: 20),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -392,9 +696,8 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
               color: Colors.green,
               icon: Icons.check,
               onTap: (index, filled) {
-                setState(
-                  () => c.deathSaveSuccesses = filled ? index : index + 1,
-                );
+                setState(() => c.deathSaveSuccesses =
+                    filled ? index : index + 1);
                 _save();
               },
             ),
@@ -404,9 +707,8 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
               color: Colors.red,
               icon: Icons.close,
               onTap: (index, filled) {
-                setState(
-                  () => c.deathSaveFailures = filled ? index : index + 1,
-                );
+                setState(() => c.deathSaveFailures =
+                    filled ? index : index + 1);
                 _save();
               },
             ),
@@ -423,10 +725,9 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
             _save();
           },
           icon: const Icon(Icons.favorite, color: Colors.green),
-          label: Text(
-            'Stabilisieren',
-            style: AppTextStyles.body.copyWith(color: Colors.green),
-          ),
+          label: Text('Stabilisieren',
+              style:
+                  AppTextStyles.body.copyWith(color: Colors.green)),
         ),
       ],
     );
@@ -441,7 +742,8 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
   }) {
     return Column(
       children: [
-        Text(label, style: AppTextStyles.bodySmall.copyWith(color: color)),
+        Text(label,
+            style: AppTextStyles.bodySmall.copyWith(color: color)),
         const SizedBox(height: 8),
         Row(
           children: List.generate(3, (index) {
@@ -468,7 +770,7 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
     );
   }
 
-  // ── Zauberplätze ───────────────────────────────────────────────────────────
+  // ── Zauberplätze ────────────────────────────────────────────────────────────
 
   Widget _buildSpellSlotsCard() {
     return CollapsibleCard(
@@ -491,12 +793,9 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
               children: [
                 SizedBox(
                   width: 72,
-                  child: Text(
-                    'Grad $grade',
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: Colors.grey[600],
-                    ),
-                  ),
+                  child: Text('Grad $grade',
+                      style: AppTextStyles.bodySmall
+                          .copyWith(color: Colors.grey[600])),
                 ),
                 Expanded(
                   child: Row(
@@ -505,7 +804,8 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
                       return GestureDetector(
                         onTap: () {
                           setState(() {
-                            slot.current = filled ? index : index + 1;
+                            slot.current =
+                                filled ? index : index + 1;
                           });
                           _save();
                         },
@@ -526,23 +826,17 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
                             ),
                           ),
                           child: filled
-                              ? const Icon(
-                                  Icons.auto_awesome,
-                                  size: 14,
-                                  color: Colors.white,
-                                )
+                              ? const Icon(Icons.auto_awesome,
+                                  size: 14, color: Colors.white)
                               : null,
                         ),
                       );
                     }),
                   ),
                 ),
-                Text(
-                  '${slot.current}/${slot.max}',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: Colors.grey[500],
-                  ),
-                ),
+                Text('${slot.current}/${slot.max}',
+                    style: AppTextStyles.bodySmall
+                        .copyWith(color: Colors.grey[500])),
               ],
             ),
           );
@@ -551,21 +845,23 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
     );
   }
 
-  // ── Attribute ──────────────────────────────────────────────────────────────
+  // ── Attribute ───────────────────────────────────────────────────────────────
 
-  Widget _buildAttributeBox(String label, int score, int modifier, String key) {
+  Widget _buildAttributeBox(
+      String label, int score, int modifier, String key) {
     final modText = modifier >= 0 ? '+$modifier' : '$modifier';
 
     return Expanded(
       child: GestureDetector(
         onTap: widget.editMode
             ? () => _showNumberDialog(
-                Attributes.label(key),
-                score,
-                min: 1,
-                max: 30,
-                onSave: (v) => setState(() => _setAttributeValue(key, v)),
-              )
+                  Attributes.label(key),
+                  score,
+                  min: 1,
+                  max: 30,
+                  onSave: (v) =>
+                      setState(() => _setAttributeValue(key, v)),
+                )
             : null,
         child: Container(
           margin: const EdgeInsets.all(4),
@@ -583,12 +879,9 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
             children: [
               Text(label, style: AppTextStyles.label),
               const SizedBox(height: 4),
-              Text(
-                modText,
-                style: AppTextStyles.statLarge.copyWith(
-                  color: widget.themeColor,
-                ),
-              ),
+              Text(modText,
+                  style: AppTextStyles.statLarge
+                      .copyWith(color: widget.themeColor)),
               Text('$score', style: AppTextStyles.labelXs),
             ],
           ),
@@ -603,27 +896,23 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
       children: [
         Row(
           children: [
-            _buildAttributeBox('STR', c.strength, c.strModifier, 'strength'),
-            _buildAttributeBox('GES', c.dexterity, c.dexModifier, 'dexterity'),
             _buildAttributeBox(
-              'KON',
-              c.constitution,
-              c.conModifier,
-              'constitution',
-            ),
+                'STR', c.strength, c.strModifier, 'strength'),
+            _buildAttributeBox(
+                'GES', c.dexterity, c.dexModifier, 'dexterity'),
+            _buildAttributeBox(
+                'KON', c.constitution, c.conModifier, 'constitution'),
           ],
         ),
         const SizedBox(height: 8),
         Row(
           children: [
             _buildAttributeBox(
-              'INT',
-              c.intelligence,
-              c.intModifier,
-              'intelligence',
-            ),
-            _buildAttributeBox('WEI', c.wisdom, c.wisModifier, 'wisdom'),
-            _buildAttributeBox('CHA', c.charisma, c.chaModifier, 'charisma'),
+                'INT', c.intelligence, c.intModifier, 'intelligence'),
+            _buildAttributeBox(
+                'WEI', c.wisdom, c.wisModifier, 'wisdom'),
+            _buildAttributeBox(
+                'CHA', c.charisma, c.chaModifier, 'charisma'),
           ],
         ),
       ],
@@ -647,7 +936,7 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
     }
   }
 
-  // ── Währung ────────────────────────────────────────────────────────────────
+  // ── Währung ─────────────────────────────────────────────────────────────────
 
   Widget _buildCurrencyCard() {
     return CollapsibleCard(
@@ -697,12 +986,9 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
           ),
           child: Column(
             children: [
-              Text(
-                '$amount',
-                style: AppTextStyles.statMedium.copyWith(
-                  color: _currencyColor(key),
-                ),
-              ),
+              Text('$amount',
+                  style: AppTextStyles.statMedium
+                      .copyWith(color: _currencyColor(key))),
               Text(label, style: AppTextStyles.labelXs),
             ],
           ),
@@ -754,179 +1040,63 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
     }
   }
 
-  // ── Dialoge ────────────────────────────────────────────────────────────────
+  // ── Dialog-Aufrufe ──────────────────────────────────────────────────────────
 
   Future<void> _showHpDialog() async {
-    final controller = TextEditingController(text: '${c.currentHitPoints}');
-
-    try {
-      await showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-        title: Text('Trefferpunkte setzen', style: AppTextStyles.sectionTitle),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Maximum: ${c.maxHitPoints}', style: AppTextStyles.body),
-            const SizedBox(height: 12),
-            TextField(
-              controller: controller,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              style: AppTextStyles.body,
-              decoration: const InputDecoration(
-                labelText: 'Aktuelle TP',
-                border: OutlineInputBorder(),
-              ),
-              autofocus: true,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Abbrechen', style: AppTextStyles.body),
-          ),
-          FilledButton(
-            onPressed: () {
-              final value = int.tryParse(controller.text);
-              if (value != null) {
-                setState(() => c.currentHitPoints = value);
-                _save();
-              }
-              Navigator.pop(context);
-            },
-            style: FilledButton.styleFrom(backgroundColor: widget.themeColor),
-            child: Text('Speichern', style: AppTextStyles.body),
-          ),
-        ],
+    final result = await showDialog<_HpDialogResult>(
+      context: context,
+      builder: (_) => _HpDialog(
+        currentHp: c.currentHitPoints,
+        maxHp: c.maxHitPoints,
+        themeColor: widget.themeColor,
       ),
     );
-    } finally {
-      controller.dispose();
+    if (result != null) {
+      setState(() => c.currentHitPoints = result.value);
+      _save();
     }
   }
 
   Future<void> _showDamageHealDialog({required bool isDamage}) async {
-    final controller = TextEditingController();
-
-    try {
-      await showDialog(
+    final result = await showDialog<_DamageHealDialogResult>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          isDamage ? 'Schaden erleiden' : 'Heilen',
-          style: AppTextStyles.sectionTitle,
-        ),
-        content: TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          style: AppTextStyles.body,
-          decoration: InputDecoration(
-            labelText: isDamage ? 'Schadenspunkte' : 'Heilungspunkte',
-            border: const OutlineInputBorder(),
-          ),
-          autofocus: true,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Abbrechen', style: AppTextStyles.body),
-          ),
-          FilledButton(
-            onPressed: () {
-              final value = int.tryParse(controller.text);
-              if (value != null) {
-                setState(() {
-                  if (isDamage && c.isStabilized) {
-                    c.isStabilized = false;
-                    c.deathSaveFailures = 1;
-                  }
-                  if (isDamage) {
-                    final tempReduction = value.clamp(0, c.temporaryHitPoints);
-                    c.temporaryHitPoints -= tempReduction;
-                    c.currentHitPoints -= (value - tempReduction);
-                  } else {
-                    c.currentHitPoints += value;
-                    c.isStabilized = false;
-                    c.deathSaveFailures = 0;
-                    c.deathSaveSuccesses = 0;
-                  }
-                });
-                _save();
-              }
-              Navigator.pop(context);
-            },
-            style: FilledButton.styleFrom(
-              backgroundColor: isDamage ? Colors.red : Colors.green,
-            ),
-            child: Text('Bestätigen', style: AppTextStyles.body),
-          ),
-        ],
-      ),
+      builder: (_) => _DamageHealDialog(isDamage: isDamage),
     );
-    } finally {
-      controller.dispose();
+    if (result != null) {
+      setState(() {
+        if (isDamage) {
+          if (c.isStabilized) {
+            c.isStabilized = false;
+            c.deathSaveFailures = 1;
+          }
+          final tempReduction =
+              result.value.clamp(0, c.temporaryHitPoints);
+          c.temporaryHitPoints -= tempReduction;
+          c.currentHitPoints -= (result.value - tempReduction);
+        } else {
+          c.currentHitPoints += result.value;
+          c.isStabilized = false;
+          c.deathSaveFailures = 0;
+          c.deathSaveSuccesses = 0;
+        }
+      });
+      _save();
     }
   }
 
   Future<void> _showTempHpDialog() async {
-    final controller = TextEditingController(text: '${c.temporaryHitPoints}');
-
-    try {
-      await showDialog(
+    final result = await showDialog<_TempHpDialogResult>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Temporäre TP', style: AppTextStyles.sectionTitle),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Temporäre TP stapeln sich nicht – '
-              'nur der höhere Wert zählt.',
-              style: AppTextStyles.bodySmall.copyWith(color: Colors.grey),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: controller,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              style: AppTextStyles.body,
-              decoration: const InputDecoration(
-                labelText: 'Temporäre TP',
-                border: OutlineInputBorder(),
-              ),
-              autofocus: true,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Abbrechen', style: AppTextStyles.body),
-          ),
-          FilledButton(
-            onPressed: () {
-              final value = int.tryParse(controller.text);
-              if (value != null) {
-                setState(() {
-                  c.temporaryHitPoints = value > c.temporaryHitPoints
-                      ? value
-                      : c.temporaryHitPoints;
-                });
-                _save();
-              }
-              Navigator.pop(context);
-            },
-            style: FilledButton.styleFrom(backgroundColor: Colors.blue),
-            child: Text('Setzen', style: AppTextStyles.body),
-          ),
-        ],
-      ),
+      builder: (_) =>
+          _TempHpDialog(currentTempHp: c.temporaryHitPoints),
     );
-    } finally {
-      controller.dispose();
+    if (result != null) {
+      setState(() {
+        c.temporaryHitPoints = result.value > c.temporaryHitPoints
+            ? result.value
+            : c.temporaryHitPoints;
+      });
+      _save();
     }
   }
 
@@ -937,43 +1107,19 @@ class _OverviewTabState extends State<OverviewTab> with AutomaticKeepAliveClient
     required int max,
     required void Function(int) onSave,
   }) async {
-    final controller = TextEditingController(text: '$currentValue');
-
-    try {
-      await showDialog(
+    final result = await showDialog<_NumberDialogResult>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(label, style: AppTextStyles.sectionTitle),
-        content: TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          style: AppTextStyles.body,
-          decoration: const InputDecoration(border: OutlineInputBorder()),
-          autofocus: true,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Abbrechen', style: AppTextStyles.body),
-          ),
-          FilledButton(
-            onPressed: () {
-              final value = int.tryParse(controller.text);
-              if (value != null && value >= min && value <= max) {
-                onSave(value);
-                _save();
-              }
-              Navigator.pop(context);
-            },
-            style: FilledButton.styleFrom(backgroundColor: widget.themeColor),
-            child: Text('Speichern', style: AppTextStyles.body),
-          ),
-        ],
+      builder: (_) => _NumberDialog(
+        label: label,
+        currentValue: currentValue,
+        min: min,
+        max: max,
+        themeColor: widget.themeColor,
       ),
     );
-    } finally {
-      controller.dispose();
+    if (result != null) {
+      onSave(result.value);
+      _save();
     }
   }
 }

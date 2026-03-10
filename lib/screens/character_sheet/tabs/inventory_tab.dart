@@ -7,12 +7,318 @@ import 'package:dnd_app/models/character_items.dart';
 import 'package:dnd_app/repositories/item_repository.dart';
 import 'package:dnd_app/theme/app_text_styles.dart';
 
-// Kategorien bei denen "Ausgerüstet" sinnvoll ist
 const _equippableCategories = {
   ItemCategory.weapon,
   ItemCategory.armor,
   ItemCategory.shield,
 };
+
+// ── Rückgabewert des Dialogs ──────────────────────────────────────────────────
+
+class _ItemDialogResult {
+  final Item item;
+  final CharacterItem ci;
+  final bool isNew;
+  final bool remove;
+
+  const _ItemDialogResult({
+    required this.item,
+    required this.ci,
+    required this.isNew,
+    required this.remove,
+  });
+}
+
+// ── Dialog-Widget ─────────────────────────────────────────────────────────────
+
+class _ItemDialog extends StatefulWidget {
+  final CharacterItem? characterItem;
+  final String characterId;
+  final Color themeColor;
+  final int currentAttuneCount;
+
+  const _ItemDialog({
+    required this.characterId,
+    required this.themeColor,
+    required this.currentAttuneCount,
+    this.characterItem,
+  });
+
+  @override
+  State<_ItemDialog> createState() => _ItemDialogState();
+}
+
+class _ItemDialogState extends State<_ItemDialog> {
+  late final TextEditingController _nameController;
+  late final TextEditingController _descController;
+  late final TextEditingController _weightController;
+  late final TextEditingController _valueController;
+  late final TextEditingController _damageDiceController;
+
+  late ItemCategory _selectedCategory;
+  late ItemRarity _selectedRarity;
+  late bool _requiresAttunement;
+  late bool _isEquipped;
+  late bool _isAttuned;
+
+  bool get _isNew => widget.characterItem == null;
+
+  @override
+  void initState() {
+    super.initState();
+    final item = widget.characterItem?.item;
+    _nameController       = TextEditingController(text: item?.name ?? '');
+    _descController       = TextEditingController(text: item?.description ?? '');
+    _weightController     = TextEditingController(text: item != null ? '${item.weight}' : '0');
+    _valueController      = TextEditingController(text: item != null ? '${item.valueInCopper}' : '0');
+    _damageDiceController = TextEditingController(text: item?.damageDice ?? '');
+
+    _selectedCategory   = item?.category ?? ItemCategory.misc;
+    _selectedRarity     = item?.rarity ?? ItemRarity.common;
+    _requiresAttunement = item?.requiresAttunement ?? false;
+    _isEquipped         = widget.characterItem?.isEquipped ?? false;
+    _isAttuned          = widget.characterItem?.isAttuned ?? false;
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _descController.dispose();
+    _weightController.dispose();
+    _valueController.dispose();
+    _damageDiceController.dispose();
+    super.dispose();
+  }
+
+  void _onCategoryChanged(ItemCategory newCat) {
+    setState(() {
+      _selectedCategory = newCat;
+      if (!_equippableCategories.contains(newCat)) {
+        _isEquipped = false;
+      }
+    });
+  }
+
+  void _onSave() {
+    if (_nameController.text.trim().isEmpty) return;
+
+    final showEquipped = _equippableCategories.contains(_selectedCategory);
+
+    final updatedItem = _isNew
+        ? Item(
+            name: _nameController.text.trim(),
+            description: _descController.text.trim(),
+            isCustom: true,
+            category: _selectedCategory,
+            rarity: _selectedRarity,
+            weight: double.tryParse(_weightController.text) ?? 0,
+            valueInCopper: int.tryParse(_valueController.text) ?? 0,
+            damageDice: _selectedCategory == ItemCategory.weapon &&
+                    _damageDiceController.text.trim().isNotEmpty
+                ? _damageDiceController.text.trim()
+                : null,
+            requiresAttunement: _requiresAttunement,
+          )
+        : widget.characterItem!.item
+      ..name = _nameController.text.trim()
+      ..description = _descController.text.trim()
+      ..category = _selectedCategory
+      ..rarity = _selectedRarity
+      ..weight = double.tryParse(_weightController.text) ?? 0
+      ..valueInCopper = int.tryParse(_valueController.text) ?? 0
+      ..damageDice = _selectedCategory == ItemCategory.weapon &&
+              _damageDiceController.text.trim().isNotEmpty
+          ? _damageDiceController.text.trim()
+          : null
+      ..requiresAttunement = _requiresAttunement;
+
+    final updatedCi = _isNew
+        ? CharacterItem(
+            characterId: widget.characterId,
+            item: updatedItem,
+            quantity: 1,
+            isEquipped: showEquipped && _isEquipped,
+            isAttuned: _requiresAttunement && _isAttuned,
+          )
+        : widget.characterItem!
+      ..isEquipped = showEquipped && _isEquipped
+      ..isAttuned = _requiresAttunement && _isAttuned;
+
+    Navigator.pop(
+      context,
+      _ItemDialogResult(
+        item: updatedItem,
+        ci: updatedCi,
+        isNew: _isNew,
+        remove: false,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final showEquipped = _equippableCategories.contains(_selectedCategory);
+
+    return AlertDialog(
+      title: Text(
+        _isNew ? 'Gegenstand hinzufügen' : 'Gegenstand bearbeiten',
+        style: AppTextStyles.sectionTitle,
+      ),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              controller: _nameController,
+              style: AppTextStyles.body,
+              decoration: const InputDecoration(
+                labelText: 'Name',
+                border: OutlineInputBorder(),
+              ),
+              autofocus: _isNew,
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<ItemCategory>(
+              initialValue: _selectedCategory,
+              decoration: const InputDecoration(
+                labelText: 'Kategorie',
+                border: OutlineInputBorder(),
+              ),
+              items: ItemCategory.values
+                  .map((c) => DropdownMenuItem(
+                        value: c,
+                        child: Text(c.label, style: AppTextStyles.body),
+                      ))
+                  .toList(),
+              onChanged: (v) => _onCategoryChanged(v!),
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<ItemRarity>(
+              initialValue: _selectedRarity,
+              decoration: const InputDecoration(
+                labelText: 'Seltenheit',
+                border: OutlineInputBorder(),
+              ),
+              items: ItemRarity.values
+                  .map((r) => DropdownMenuItem(
+                        value: r,
+                        child: Text(r.label, style: AppTextStyles.body),
+                      ))
+                  .toList(),
+              onChanged: (v) => setState(() => _selectedRarity = v!),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _weightController,
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    style: AppTextStyles.body,
+                    decoration: const InputDecoration(
+                      labelText: 'Gewicht (lb)',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextField(
+                    controller: _valueController,
+                    keyboardType: TextInputType.number,
+                    style: AppTextStyles.body,
+                    decoration: const InputDecoration(
+                      labelText: 'Wert (KP)',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            if (_selectedCategory == ItemCategory.weapon) ...[
+              const SizedBox(height: 12),
+              TextField(
+                controller: _damageDiceController,
+                style: AppTextStyles.body,
+                decoration: const InputDecoration(
+                  labelText: 'Schadenswürfel (z.B. 1w8)',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+            if (showEquipped) ...[
+              const SizedBox(height: 4),
+              SwitchListTile(
+                value: _isEquipped,
+                activeThumbColor: widget.themeColor,
+                title: Text('Ausgerüstet', style: AppTextStyles.body),
+                contentPadding: EdgeInsets.zero,
+                onChanged: (v) => setState(() => _isEquipped = v),
+              ),
+            ],
+            SwitchListTile(
+              value: _requiresAttunement,
+              activeThumbColor: widget.themeColor,
+              title: Text('Erfordert Einstimmung', style: AppTextStyles.body),
+              contentPadding: EdgeInsets.zero,
+              onChanged: (v) => setState(() {
+                _requiresAttunement = v;
+                if (!v) _isAttuned = false;
+              }),
+            ),
+            if (_requiresAttunement)
+              SwitchListTile(
+                value: _isAttuned,
+                activeThumbColor: widget.themeColor,
+                title: Text('Eingestimmt', style: AppTextStyles.body),
+                contentPadding: EdgeInsets.zero,
+                onChanged: (v) => setState(() {
+                  if (v &&
+                      widget.currentAttuneCount >= 3 &&
+                      widget.characterItem?.isAttuned != true) {
+                    return;
+                  }
+                  _isAttuned = v;
+                }),
+              ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _descController,
+              style: AppTextStyles.body,
+              maxLines: 3,
+              textAlignVertical: TextAlignVertical.top,
+              decoration: const InputDecoration(
+                labelText: 'Beschreibung',
+                border: OutlineInputBorder(),
+                alignLabelWithHint: true,
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text('Abbrechen', style: AppTextStyles.body),
+        ),
+        SizedBox(
+          width: 10,
+        ),
+        FilledButton(
+          style: FilledButton.styleFrom(backgroundColor: widget.themeColor),
+          onPressed: _onSave,
+          child: Text('Speichern', style: AppTextStyles.body),
+        ),])
+      ],
+    );
+  }
+}
+
+// ── Haupt-Tab ─────────────────────────────────────────────────────────────────
 
 class InventoryTab extends StatefulWidget {
   final Character character;
@@ -34,8 +340,6 @@ class _InventoryTabState extends State<InventoryTab>
 
   List<CharacterItem> _items = [];
   bool _isLoading = true;
-
-  // Collapsed-State pro Kategorie – neue Kategorien starten aufgeklappt
   final Map<ItemCategory, bool> _categoryExpanded = {};
 
   @override
@@ -53,7 +357,6 @@ class _InventoryTabState extends State<InventoryTab>
       setState(() {
         _items = items;
         _isLoading = false;
-        // Neue Kategorien die noch keinen State haben → aufgeklappt
         for (final ci in items) {
           _categoryExpanded.putIfAbsent(ci.item.category, () => true);
         }
@@ -66,21 +369,49 @@ class _InventoryTabState extends State<InventoryTab>
     await _repository.updateItem(characterItem.item);
   }
 
-  // ── Gewicht ───────────────────────────────────────────────────────────────
-
   double get _totalWeight =>
       _items.fold(0.0, (sum, ci) => sum + ci.totalWeight);
 
   int get _attuneCount => _items.where((ci) => ci.isAttuned).length;
-
-  // ── Gruppierung ───────────────────────────────────────────────────────────
 
   Map<ItemCategory, List<CharacterItem>> get _grouped {
     final map = <ItemCategory, List<CharacterItem>>{};
     for (final ci in _items) {
       map.putIfAbsent(ci.item.category, () => []).add(ci);
     }
-    return map;
+    return {
+      for (final cat in ItemCategory.values)
+        if (map.containsKey(cat)) cat: map[cat]!,
+    };
+  }
+
+  Future<void> _showItemDialog({CharacterItem? characterItem}) async {
+    final result = await showDialog<_ItemDialogResult>(
+      context: context,
+      builder: (_) => _ItemDialog(
+        characterId: widget.character.id,
+        themeColor: widget.themeColor,
+        currentAttuneCount: _attuneCount,
+        characterItem: characterItem,
+      ),
+    );
+
+    if (result == null) return;
+
+    if (result.remove) {
+      await _repository.removeItemFromCharacter(result.ci);
+    } else if (result.isNew) {
+      await _repository.addItemToCharacter(result.ci);
+    } else {
+      await _saveItem(result.ci);
+    }
+
+    await _loadItems();
+  }
+
+  Future<void> _updateQuantity(CharacterItem ci, int newQuantity) async {
+    await _repository.updateQuantity(ci, newQuantity);
+    await _loadItems();
   }
 
   @override
@@ -131,16 +462,12 @@ class _InventoryTabState extends State<InventoryTab>
 
   Widget _buildList() {
     final grouped = _grouped;
-
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
       children: [
         _buildSummaryCard(),
         const SizedBox(height: 16),
-        ...grouped.entries.map((entry) => _buildCategorySection(
-              entry.key,
-              entry.value,
-            )),
+        ...grouped.entries.map((e) => _buildCategorySection(e.key, e.value)),
       ],
     );
   }
@@ -194,10 +521,9 @@ class _InventoryTabState extends State<InventoryTab>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Kategorie-Header – tippbar zum Auf-/Zuklappen
         InkWell(
-          onTap: () => setState(
-              () => _categoryExpanded[category] = !isExpanded),
+          onTap: () =>
+              setState(() => _categoryExpanded[category] = !isExpanded),
           borderRadius: BorderRadius.circular(6),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
@@ -215,9 +541,8 @@ class _InventoryTabState extends State<InventoryTab>
                 const SizedBox(width: 4),
                 Text(
                   '(${items.length})',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: Colors.grey[400],
-                  ),
+                  style: AppTextStyles.bodySmall
+                      .copyWith(color: Colors.grey[400]),
                 ),
                 const Spacer(),
                 Icon(
@@ -263,12 +588,12 @@ class _InventoryTabState extends State<InventoryTab>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 6,
+                      runSpacing: 4,
                       children: [
-                        Expanded(
-                          child: Text(item.name,
-                              style: AppTextStyles.cardTitle),
-                        ),
+                        Text(item.name, style: AppTextStyles.cardTitle),
                         if (ci.isEquipped)
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -279,13 +604,11 @@ class _InventoryTabState extends State<InventoryTab>
                             ),
                             child: Text(
                               'Ausgerüstet',
-                              style: AppTextStyles.labelXs.copyWith(
-                                color: widget.themeColor,
-                              ),
+                              style: AppTextStyles.labelXs
+                                  .copyWith(color: widget.themeColor),
                             ),
                           ),
-                        if (ci.isAttuned) ...[
-                          const SizedBox(width: 4),
+                        if (ci.isAttuned)
                           Container(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 6, vertical: 2),
@@ -295,12 +618,10 @@ class _InventoryTabState extends State<InventoryTab>
                             ),
                             child: Text(
                               'Eingestimmt',
-                              style: AppTextStyles.labelXs.copyWith(
-                                color: Colors.purple,
-                              ),
+                              style: AppTextStyles.labelXs
+                                  .copyWith(color: Colors.purple),
                             ),
                           ),
-                        ],
                       ],
                     ),
                     const SizedBox(height: 2),
@@ -308,378 +629,60 @@ class _InventoryTabState extends State<InventoryTab>
                       [
                         item.rarity.label,
                         if (item.weight > 0) '${item.weight} lb',
-                        if (ci.quantity > 1) '×${ci.quantity}',
+                        '×${ci.quantity}',
                       ].join(' · '),
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: Colors.grey[500],
-                      ),
+                      style: AppTextStyles.bodySmall
+                          .copyWith(color: Colors.grey[500]),
                     ),
                   ],
                 ),
               ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  GestureDetector(
-                    onTap: () => _updateQuantity(ci, ci.quantity - 1),
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(6),
+
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (ci.quantity > 1)
+                    GestureDetector(
+                      onTap: () => _updateQuantity(ci, ci.quantity - 1),
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: widget.themeColor.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Icon(Icons.remove, size: 25),
                       ),
-                      child: const Icon(Icons.remove, size: 16),
                     ),
-                  ),
+                    if (ci.quantity == 1)
+                     GestureDetector(
+                      onTap: () => _updateQuantity(ci, ci.quantity - 1),
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: widget.themeColor.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text('Entfernen', style: AppTextStyles.body.copyWith(color: Colors.black),),
+                      ),
+                    ),
                   const SizedBox(width: 4),
-                  GestureDetector(
-                    onTap: () => _updateQuantity(ci, ci.quantity + 1),
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: const Icon(Icons.add, size: 16),
+                  ],
+                ),
+                GestureDetector(
+                  onTap: () => _updateQuantity(ci, ci.quantity + 1),
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: widget.themeColor.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(6),
                     ),
+                    child: const Icon(Icons.add, size: 25),
                   ),
-                ],
-              ),
+                ),
             ],
           ),
         ),
       ),
     );
-  }
-
-  Future<void> _updateQuantity(CharacterItem ci, int newQuantity) async {
-    await _repository.updateQuantity(ci, newQuantity);
-    await _loadItems();
-  }
-
-  // ── Dialog ────────────────────────────────────────────────────────────────
-
-  Future<void> _showItemDialog({CharacterItem? characterItem}) async {
-    final isNew = characterItem == null;
-
-    final nameController = TextEditingController(
-        text: isNew ? '' : characterItem.item.name);
-    final descController = TextEditingController(
-        text: isNew ? '' : characterItem.item.description);
-    final weightController = TextEditingController(
-        text: isNew ? '0' : '${characterItem.item.weight}');
-    final valueController = TextEditingController(
-        text: isNew ? '0' : '${characterItem.item.valueInCopper}');
-    final damageDiceController = TextEditingController(
-        text: isNew ? '' : (characterItem.item.damageDice ?? ''));
-
-    DateTime? lastRemoveTap;
-
-    try {
-      final result = await showDialog<({
-        Item item,
-        CharacterItem ci,
-        bool isNew,
-        bool remove,
-      })>(
-        context: context,
-        builder: (dialogContext) {
-          var selectedCategory =
-              characterItem?.item.category ?? ItemCategory.misc;
-          var selectedRarity =
-              characterItem?.item.rarity ?? ItemRarity.common;
-          var requiresAttunement =
-              characterItem?.item.requiresAttunement ?? false;
-          var isEquipped = characterItem?.isEquipped ?? false;
-          var isAttuned = characterItem?.isAttuned ?? false;
-
-          return StatefulBuilder(
-            builder: (context, setDialogState) {
-              final showEquipped =
-                  _equippableCategories.contains(selectedCategory);
-
-              void onCategoryChanged(ItemCategory newCat) {
-                setDialogState(() {
-                  selectedCategory = newCat;
-                  if (!_equippableCategories.contains(newCat)) {
-                    isEquipped = false;
-                  }
-                });
-              }
-
-              return AlertDialog(
-                title: Text(
-                  isNew
-                      ? 'Gegenstand hinzufügen'
-                      : 'Gegenstand bearbeiten',
-                  style: AppTextStyles.sectionTitle,
-                ),
-                content: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextField(
-                        controller: nameController,
-                        style: AppTextStyles.body,
-                        decoration: const InputDecoration(
-                          labelText: 'Name',
-                          border: OutlineInputBorder(),
-                        ),
-                        autofocus: isNew,
-                      ),
-                      const SizedBox(height: 12),
-                      DropdownButtonFormField<ItemCategory>(
-                        initialValue: selectedCategory,
-                        decoration: const InputDecoration(
-                          labelText: 'Kategorie',
-                          border: OutlineInputBorder(),
-                        ),
-                        items: ItemCategory.values
-                            .map((c) => DropdownMenuItem(
-                                  value: c,
-                                  child: Text(c.label,
-                                      style: AppTextStyles.body),
-                                ))
-                            .toList(),
-                        onChanged: (v) => onCategoryChanged(v!),
-                      ),
-                      const SizedBox(height: 12),
-                      DropdownButtonFormField<ItemRarity>(
-                        initialValue: selectedRarity,
-                        decoration: const InputDecoration(
-                          labelText: 'Seltenheit',
-                          border: OutlineInputBorder(),
-                        ),
-                        items: ItemRarity.values
-                            .map((r) => DropdownMenuItem(
-                                  value: r,
-                                  child: Text(r.label,
-                                      style: AppTextStyles.body),
-                                ))
-                            .toList(),
-                        onChanged: (v) =>
-                            setDialogState(() => selectedRarity = v!),
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: weightController,
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                      decimal: true),
-                              style: AppTextStyles.body,
-                              decoration: const InputDecoration(
-                                labelText: 'Gewicht (lb)',
-                                border: OutlineInputBorder(),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: TextField(
-                              controller: valueController,
-                              keyboardType: TextInputType.number,
-                              style: AppTextStyles.body,
-                              decoration: const InputDecoration(
-                                labelText: 'Wert (KP)',
-                                border: OutlineInputBorder(),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      if (selectedCategory == ItemCategory.weapon) ...[
-                        TextField(
-                          controller: damageDiceController,
-                          style: AppTextStyles.body,
-                          decoration: const InputDecoration(
-                            labelText: 'Schadenswürfel (z.B. 1d8)',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                      ],
-                      if (showEquipped)
-                        SwitchListTile(
-                          value: isEquipped,
-                          activeThumbColor: widget.themeColor,
-                          title: Text('Ausgerüstet',
-                              style: AppTextStyles.body),
-                          contentPadding: EdgeInsets.zero,
-                          onChanged: (v) =>
-                              setDialogState(() => isEquipped = v),
-                        ),
-                      if (requiresAttunement)
-                        SwitchListTile(
-                          value: isAttuned,
-                          activeThumbColor: widget.themeColor,
-                          title: Text('Eingestimmt',
-                              style: AppTextStyles.body),
-                          contentPadding: EdgeInsets.zero,
-                          onChanged: (v) => setDialogState(() {
-                            if (v &&
-                                _attuneCount >= 3 &&
-                                characterItem?.isAttuned != true) return;
-                            isAttuned = v;
-                          }),
-                        ),
-                      const SizedBox(height: 12),
-                      // Beschreibung: Label oben links ausgerichtet
-                      TextField(
-                        controller: descController,
-                        style: AppTextStyles.body,
-                        maxLines: 3,
-                        textAlignVertical: TextAlignVertical.top,
-                        decoration: const InputDecoration(
-                          labelText: 'Beschreibung',
-                          border: OutlineInputBorder(),
-                          alignLabelWithHint: true,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                actions: [
-                  if (!isNew)
-                    StatefulBuilder(
-                      builder: (context, setRemoveState) {
-                        final isArmed = lastRemoveTap != null &&
-                            DateTime.now().difference(lastRemoveTap!) <
-                                const Duration(milliseconds: 800);
-                        return TextButton(
-                          onPressed: () {
-                            final now = DateTime.now();
-                            final isDoubleTap = lastRemoveTap != null &&
-                                now.difference(lastRemoveTap!) <
-                                    const Duration(milliseconds: 800);
-                            if (isDoubleTap) {
-                              Navigator.pop(
-                                context,
-                                (
-                                  item: characterItem.item,
-                                  ci: characterItem,
-                                  isNew: false,
-                                  remove: true,
-                                ),
-                              );
-                            } else {
-                              lastRemoveTap = now;
-                              setRemoveState(() {});
-                            }
-                          },
-                          child: Text(
-                            isArmed ? 'Bestätigen?' : 'Entfernen',
-                            style: AppTextStyles.body.copyWith(
-                              color: isArmed
-                                  ? Colors.orange
-                                  : Colors.red,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text('Abbrechen', style: AppTextStyles.body),
-                  ),
-                  FilledButton(
-                    style: FilledButton.styleFrom(
-                        backgroundColor: widget.themeColor),
-                    onPressed: () {
-                      if (nameController.text.trim().isEmpty) return;
-
-                      final showEquippedFinal =
-                          _equippableCategories.contains(selectedCategory);
-
-                      final updatedItem = isNew
-                          ? Item(
-                              name: nameController.text.trim(),
-                              description: descController.text.trim(),
-                              isCustom: true,
-                              category: selectedCategory,
-                              rarity: selectedRarity,
-                              weight: double.tryParse(
-                                      weightController.text) ??
-                                  0,
-                              valueInCopper:
-                                  int.tryParse(valueController.text) ??
-                                      0,
-                              damageDice: selectedCategory ==
-                                          ItemCategory.weapon &&
-                                      damageDiceController.text
-                                          .trim()
-                                          .isNotEmpty
-                                  ? damageDiceController.text.trim()
-                                  : null,
-                            )
-                          : characterItem.item
-                        ..name = nameController.text.trim()
-                        ..description = descController.text.trim()
-                        ..category = selectedCategory
-                        ..rarity = selectedRarity
-                        ..weight =
-                            double.tryParse(weightController.text) ?? 0
-                        ..valueInCopper =
-                            int.tryParse(valueController.text) ?? 0
-                        ..damageDice = selectedCategory ==
-                                    ItemCategory.weapon &&
-                                damageDiceController.text.trim().isNotEmpty
-                            ? damageDiceController.text.trim()
-                            : null;
-
-                      final updatedCi = isNew
-                          ? CharacterItem(
-                              characterId: widget.character.id,
-                              item: updatedItem,
-                              quantity: 1,
-                              isEquipped: showEquippedFinal && isEquipped,
-                              isAttuned: requiresAttunement && isAttuned,
-                            )
-                          : characterItem
-                        ..isEquipped = showEquippedFinal && isEquipped
-                        ..isAttuned = requiresAttunement && isAttuned;
-
-                      Navigator.pop(
-                        context,
-                        (
-                          item: updatedItem,
-                          ci: updatedCi,
-                          isNew: isNew,
-                          remove: false,
-                        ),
-                      );
-                    },
-                    child: Text('Speichern', style: AppTextStyles.body),
-                  ),
-                ],
-              );
-            },
-          );
-        },
-      );
-
-      // ── Async-Logik außerhalb des Dialogs ─────────────────────────────────
-      if (result == null) return;
-
-      if (result.remove) {
-        await _repository.removeItemFromCharacter(result.ci);
-      } else if (result.isNew) {
-        await _repository.addItemToCharacter(result.ci);
-      } else {
-        await _saveItem(result.ci);
-      }
-
-      await _loadItems();
-    } finally {
-      nameController.dispose();
-      descController.dispose();
-      weightController.dispose();
-      valueController.dispose();
-      damageDiceController.dispose();
-    }
   }
 }
