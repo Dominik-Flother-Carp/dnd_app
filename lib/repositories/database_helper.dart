@@ -38,7 +38,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _createTables,
       onUpgrade: _onUpgrade,
     );
@@ -71,7 +71,7 @@ Future<void> _createTables(Database db, int version) async {
       usedHitDice              INTEGER DEFAULT 0,
       armorClass               INTEGER DEFAULT 10,
       speed                    INTEGER DEFAULT 9,
-      wallerInCopper           INTEGER DEFAULT 0,
+      walletInCopper           INTEGER DEFAULT 0,
       notes                    TEXT,
       personalityTraits        TEXT,
       ideals                   TEXT,
@@ -195,6 +195,13 @@ Future<void> _createTables(Database db, int version) async {
 }
 
 Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-  // Migrationen werden am Ende der Entwicklung ergänzt
+  // Kein Migrationssystem – einfach alles löschen und neu anlegen.
+  // Bestehende Charaktere gehen dabei verloren.
+  final tables = ['character_items', 'character_abilities', 'character_spells',
+                  'items', 'abilities', 'spells', 'characters'];
+  for (final table in tables) {
+    await db.execute('DROP TABLE IF EXISTS $table');
+  }
+  await _createTables(db, newVersion);
 }
 }

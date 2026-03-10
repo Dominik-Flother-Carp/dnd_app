@@ -16,50 +16,50 @@ const _equippableCategories = {
 
 // ── Münz-Umrechnung ───────────────────────────────────────────────────────────
 // Interner Speicher: Kupfermünzen (int), verlustfrei
-// 1 PP = 1000 CP | 1 GP = 100 CP | 1 EP = 50 CP | 1 SP = 10 CP | 1 CP = 1 CP
+// 1 PM = 1000 KM | 1 GM = 100 KM | 1 EM = 50 KM | 1 SM = 10 KM | 1 KM = 1 KM
 
-const _cpPerPP = 1000;
-const _cpPerGP = 100;
-const _cpPerEP = 50;
-const _cpPerSP = 10;
-const _cpPerCP = 1;
+const _cpPerPM = 1000;
+const _cpPerGM = 100;
+const _cpPerEM = 50;
+const _cpPerSM = 10;
+const _cpPerKM = 1;
 
 int _coinToCopper(int amount, String coin) {
   switch (coin) {
-    case 'PP': return amount * _cpPerPP;
-    case 'GP': return amount * _cpPerGP;
-    case 'EP': return amount * _cpPerEP;
-    case 'SP': return amount * _cpPerSP;
-    default:   return amount * _cpPerCP;
+    case 'PM': return amount * _cpPerPM;
+    case 'GM': return amount * _cpPerGM;
+    case 'EM': return amount * _cpPerEM;
+    case 'SM': return amount * _cpPerSM;
+    default:   return amount * _cpPerKM;
   }
 }
 
-/// Zerlegt einen CP-Wert in die größtmöglichen Münzen (PP→GP→EP→SP→CP).
+/// Zerlegt einen KM-Wert in die größtmöglichen Münzen (PM→GM→EM→SM→KM).
 Map<String, int> _breakdownCopper(int cp) {
   var rem = cp;
-  final pp = rem ~/ _cpPerPP; rem -= pp * _cpPerPP;
-  final gp = rem ~/ _cpPerGP; rem -= gp * _cpPerGP;
-  final ep = rem ~/ _cpPerEP; rem -= ep * _cpPerEP;
-  final sp = rem ~/ _cpPerSP; rem -= sp * _cpPerSP;
-  return {'PP': pp, 'GP': gp, 'EP': ep, 'SP': sp, 'CP': rem};
+  final pp = rem ~/ _cpPerPM; rem -= pp * _cpPerPM;
+  final gp = rem ~/ _cpPerGM; rem -= gp * _cpPerGM;
+  final ep = rem ~/ _cpPerEM; rem -= ep * _cpPerEM;
+  final sp = rem ~/ _cpPerSM; rem -= sp * _cpPerSM;
+  return {'PM': pp, 'GM': gp, 'EM': ep, 'SM': sp, 'KM': rem};
 }
 
 /// Lesbare Münzkombination, lässt Null-Werte weg.
 String _formatWallet(int totalCp) {
-  if (totalCp <= 0) return '0 GP';
+  if (totalCp <= 0) return '0 GM';
   final b = _breakdownCopper(totalCp);
   final parts = <String>[];
-  for (final coin in ['PP', 'GP', 'EP', 'SP', 'CP']) {
+  for (final coin in ['PM', 'GM', 'EM', 'SM', 'KM']) {
     if (b[coin]! > 0) parts.add('${b[coin]} $coin');
   }
   return parts.join(' ');
 }
 
-/// GP-Wert mit zwei Nachkommastellen.
-String _formatGP(int totalCp) {
-  final gp = totalCp / _cpPerGP;
-  if (gp == gp.truncateToDouble()) return '${gp.toInt()} GP';
-  return '${gp.toStringAsFixed(2)} GP';
+/// GM-Wert mit zwei Nachkommastellen.
+String _formatGM(int totalCp) {
+  final gp = totalCp / _cpPerGM;
+  if (gp == gp.truncateToDouble()) return '${gp.toInt()} GM';
+  return '${gp.toStringAsFixed(2)} GM';
 }
 
 // ── Geldbeutel-Dialog ─────────────────────────────────────────────────────────
@@ -81,11 +81,11 @@ class _WalletDialog extends StatefulWidget {
 
 class _WalletDialogState extends State<_WalletDialog> {
   final _controller = TextEditingController();
-  String _selectedCoin = 'GP';
+  String _selectedCoin = 'GM';
   bool _isIncome = true; // true = Einnahme, false = Ausgabe
   String? _errorText;
 
-  static const _coins = ['PP', 'GP', 'EP', 'SP', 'CP'];
+  static const _coins = ['PM', 'GM', 'EM', 'SM', 'KM'];
 
   @override
   void dispose() {
@@ -137,7 +137,7 @@ class _WalletDialogState extends State<_WalletDialog> {
                           .copyWith(color: Colors.grey)),
                   const SizedBox(height: 4),
                   Text(
-                    _formatGP(widget.walletCp),
+                    _formatGM(widget.walletCp),
                     style: AppTextStyles.statMedium
                         .copyWith(color: widget.themeColor),
                   ),
@@ -782,7 +782,7 @@ class _InventoryTabState extends State<InventoryTab>
                     Icon(Icons.toll, color: const Color(0xFFB8860B), size: 20),
                     const SizedBox(height: 4),
                     Text(
-                      _formatGP(walletCp),
+                      _formatGM(walletCp),
                       style: AppTextStyles.statMedium
                           .copyWith(color: const Color(0xFFB8860B)),
                     ),
