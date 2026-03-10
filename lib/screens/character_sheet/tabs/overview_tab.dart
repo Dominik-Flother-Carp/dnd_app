@@ -362,8 +362,6 @@ class _OverviewTabState extends State<OverviewTab>
         ],
         const SizedBox(height: 16),
         _buildHitDiceCard(),
-        const SizedBox(height: 16),
-        _buildCurrencyCard(),
       ],
     );
   }
@@ -933,110 +931,6 @@ class _OverviewTabState extends State<OverviewTab>
         c.wisdom = value;
       case 'charisma':
         c.charisma = value;
-    }
-  }
-
-  // ── Währung ─────────────────────────────────────────────────────────────────
-
-  Widget _buildCurrencyCard() {
-    return CollapsibleCard(
-      title: 'Währung',
-      themeColor: widget.themeColor,
-      child: _buildCurrencyContent(),
-    );
-  }
-
-  Widget _buildCurrencyContent() {
-    return Column(
-      children: [
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            _buildCurrencyBox('PP', c.platinumPieces, 'platinum'),
-            _buildCurrencyBox('GP', c.goldPieces, 'gold'),
-            _buildCurrencyBox('EP', c.electrumPieces, 'electrum'),
-            _buildCurrencyBox('SP', c.silverPieces, 'silver'),
-            _buildCurrencyBox('KP', c.copperPieces, 'copper'),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCurrencyBox(String label, int amount, String key) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => _showNumberDialog(
-          _currencyLabel(key),
-          amount,
-          min: 0,
-          max: 9999999,
-          onSave: (v) => setState(() => _setCurrencyValue(key, v)),
-        ),
-        child: Container(
-          margin: const EdgeInsets.all(4),
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Colors.grey[300]!,
-              width: widget.editMode ? 1.5 : 1,
-            ),
-            borderRadius: BorderRadius.circular(8),
-            color: _currencyColor(key).withValues(alpha: 0.05),
-          ),
-          child: Column(
-            children: [
-              Text('$amount',
-                  style: AppTextStyles.statMedium
-                      .copyWith(color: _currencyColor(key))),
-              Text(label, style: AppTextStyles.labelXs),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _setCurrencyValue(String key, int value) {
-    switch (key) {
-      case 'platinum':
-        c.platinumPieces = value;
-      case 'gold':
-        c.goldPieces = value;
-      case 'electrum':
-        c.electrumPieces = value;
-      case 'silver':
-        c.silverPieces = value;
-      case 'copper':
-        c.copperPieces = value;
-    }
-  }
-
-  String _currencyLabel(String key) {
-    const labels = {
-      'platinum': 'Platinmünzen',
-      'gold': 'Goldmünzen',
-      'electrum': 'Elektrummünzen',
-      'silver': 'Silbermünzen',
-      'copper': 'Kupfermünzen',
-    };
-    return labels[key] ?? key;
-  }
-
-  Color _currencyColor(String key) {
-    switch (key) {
-      case 'platinum':
-        return Colors.blueGrey;
-      case 'gold':
-        return const Color(0xFFB8860B);
-      case 'electrum':
-        return Colors.teal;
-      case 'silver':
-        return Colors.grey;
-      case 'copper':
-        return const Color(0xFFB87333);
-      default:
-        return Colors.grey;
     }
   }
 

@@ -102,7 +102,7 @@ class _CharacterListScreenState extends State<CharacterListScreen> {
         'wisdom': true,
       }
       ..spellSlots = calculateSpellSlots('Magier', 5)
-      ..goldPieces = 35;
+      ..walletInCopper = 3500; // 35 GP in Kupfer
 
     await _repository.insertCharacter(character);
     await _loadCharacters();

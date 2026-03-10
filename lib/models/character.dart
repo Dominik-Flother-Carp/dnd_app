@@ -43,11 +43,7 @@ class Character {
   int _armorClass = 10;
   int _speed = 9;
 
-  int _goldPieces = 0;
-  int _silverPieces = 0;
-  int _copperPieces = 0;
-  int _electrumPieces = 0;
-  int _platinumPieces = 0;
+  int _walletInCopper = 0; // Geldbeutel, intern in Kupferstücken gespeichert
 
   int _deathSaveSuccesses = 0;
   int _deathSaveFailures = 0;
@@ -90,11 +86,7 @@ class Character {
     int temporaryHitPoints = 0,
     int armorClass = 10,
     int speed = 9,
-    int goldPieces = 0,
-    int silverPieces = 0,
-    int copperPieces = 0,
-    int electrumPieces = 0,
-    int platinumPieces = 0,
+    int walletInCopper = 0,
     int usedHitDice = 0,
     int deathSaveSuccesses = 0,
     int deathSaveFailures = 0,
@@ -124,11 +116,7 @@ class Character {
     _temporaryHitPoints = temporaryHitPoints.clamp(0, 9999);
     _armorClass = armorClass.clamp(1, 30);
     _speed = speed.clamp(0, 99);
-    _goldPieces = goldPieces.clamp(0, 9999999);
-    _silverPieces = silverPieces.clamp(0, 9999999);
-    _copperPieces = copperPieces.clamp(0, 9999999);
-    _electrumPieces = electrumPieces.clamp(0, 9999999);
-    _platinumPieces = platinumPieces.clamp(0, 9999999);
+    _walletInCopper = walletInCopper.clamp(0, 999999999);
     _deathSaveSuccesses = deathSaveSuccesses.clamp(0, 3);
     _deathSaveFailures = deathSaveFailures.clamp(0, 3);
     _usedHitDice = usedHitDice.clamp(0, _level);
@@ -194,21 +182,10 @@ class Character {
   int get speed => _speed;
   set speed(int value) => _speed = value.clamp(0, 99);
 
-  // Währung: nicht negativ (kein Schulden-System)
-  int get goldPieces => _goldPieces;
-  set goldPieces(int value) => _goldPieces = value.clamp(0, 9999999);
-
-  int get silverPieces => _silverPieces;
-  set silverPieces(int value) => _silverPieces = value.clamp(0, 9999999);
-
-  int get copperPieces => _copperPieces;
-  set copperPieces(int value) => _copperPieces = value.clamp(0, 9999999);
-
-  int get electrumPieces => _electrumPieces;
-  set electrumPieces(int value) => _electrumPieces = value.clamp(0, 9999999);
-
-  int get platinumPieces => _platinumPieces;
-  set platinumPieces(int value) => _platinumPieces = value.clamp(0, 9999999);
+  // Geldbeutel: intern in Kupferstücken, nie negativ
+  // Geldbeutel: intern in Kupferstücken, nie negativ
+  int get walletInCopper => _walletInCopper;
+  set walletInCopper(int value) => _walletInCopper = value.clamp(0, 999999999);
 
   int get usedHitDice => _usedHitDice;
   set usedHitDice(int value) => _usedHitDice = value.clamp(0, _level);
@@ -333,11 +310,7 @@ class Character {
       'hitDie': hitDie,
       'armorClass': armorClass,
       'speed': speed,
-      'goldPieces': goldPieces,
-      'silverPieces': silverPieces,
-      'copperPieces': copperPieces,
-      'electrumPieces': electrumPieces,
-      'platinumPieces': platinumPieces,
+      'walletInCopper': walletInCopper,
       'notes': notes,
       'personalityTraits': personalityTraits,
       'ideals': ideals,
@@ -380,11 +353,7 @@ class Character {
       hitDie: map['hitDie'] ?? 8,
       armorClass: map['armorClass'] ?? 10,
       speed: map['speed'] ?? 9,
-      goldPieces: map['goldPieces'] ?? 0,
-      silverPieces: map['silverPieces'] ?? 0,
-      copperPieces: map['copperPieces'] ?? 0,
-      electrumPieces: map['electrumPieces'] ?? 0,
-      platinumPieces: map['platinumPieces'] ?? 0,
+      walletInCopper: map['walletInCopper'] ?? 0,
       notes: map['notes'] ?? '',
       personalityTraits: map['personalityTraits'] ?? '',
       ideals: map['ideals'] ?? '',
