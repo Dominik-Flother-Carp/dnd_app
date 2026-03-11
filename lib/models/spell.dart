@@ -6,9 +6,9 @@ import 'package:dnd_app/models/enums.dart';
 enum SpellSchool {
   abjuration,    // Bannmagie
   conjuration,   // Beschwörung
-  divination,    // Divination
+  divination,    // Erkenntnis
   enchantment,   // Verzauberung
-  evocation,     // Evokation
+  evocation,     // Hervorrufung
   illusion,      // Illusion
   necromancy,    // Nekromantie
   transmutation, // Verwandlung
@@ -24,8 +24,6 @@ enum AttackRollType {
 class Spell {
   final String id;
   String name;
-  bool isCustom;       // true = Hausregel, false = offizieller Zauber
-  String creatorId;    // ID des Charakters der diesen Zauber erstellt hat
 
   // ── Zauber-Metadaten ──────────────────────────────────────────────────────
   SpellSchool school;
@@ -55,8 +53,6 @@ class Spell {
   Spell({
     String? id,
     required this.name,
-    this.isCustom = false,
-    this.creatorId = '',
     this.school = SpellSchool.evocation,
     int level = 0,
     this.castingTime = '1 Aktion',
@@ -110,8 +106,6 @@ class Spell {
     return {
       'id':                     id,
       'name':                   name,
-      'isCustom':               isCustom ? 1 : 0,
-      'creatorId':              creatorId,
       'school':                 school.name,
       'level':                  level,
       'castingTime':            castingTime,
@@ -136,8 +130,6 @@ class Spell {
     return Spell(
       id:                   map['id'],
       name:                 map['name'],
-      isCustom:             map['isCustom'] == 1,
-      creatorId:            map['creatorId'] ?? '',
       school:               SpellSchool.values.byName(map['school'] ?? 'evocation'),
       level:                map['level'] ?? 0,
       castingTime:          map['castingTime'] ?? '1 Aktion',

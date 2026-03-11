@@ -3,15 +3,16 @@
 import 'package:uuid/uuid.dart';
 import 'package:flutter/material.dart';
 
-// Kategorie des Gegenstands
+// ── Enums ─────────────────────────────────────────────────────────────────────
+
 enum ItemCategory {
-  weapon,    // Waffe
-  armor,     // Rüstung
-  shield,    // Schild
-  tool,      // Werkzeug
-  consumable, // Verbrauchsgegenstand (Tränke, Schriftrollen)
-  treasure,  // Schatz (Edelsteine, Kunstgegenstände)
-  misc,      // Sonstiges
+  weapon,
+  armor,
+  shield,
+  tool,
+  consumable,
+  treasure,
+  misc,
 }
 
 extension ItemCategoryExtension on ItemCategory {
@@ -40,14 +41,13 @@ extension ItemCategoryExtension on ItemCategory {
   }
 }
 
-// Seltenheit des Gegenstands (D&D 5e Standard)
 enum ItemRarity {
-  common,    // Gewöhnlich
-  uncommon,  // Ungewöhnlich
-  rare,      // Selten
-  veryRare,  // Sehr selten
-  legendary, // Legendär
-  artifact,  // Artefakt
+  common,
+  uncommon,
+  rare,
+  veryRare,
+  legendary,
+  artifact,
 }
 
 extension ItemRarityExtension on ItemRarity {
@@ -74,144 +74,381 @@ extension ItemRarityExtension on ItemRarity {
   }
 }
 
+// Waffeneigenschaften nach D&D 5e
+enum WeaponProperty {
+  finesse,      // Finesse – darf STR oder GES verwenden
+  versatile,    // Vielseitig – kann zwei- oder einhändig geführt werden
+  thrown,       // Wurfwaffe
+  ranged,       // Fernkampfwaffe
+  twoHanded,    // Zweihändig
+  light,        // Leicht – für Zwei-Waffen-Kampf
+  heavy,        // Schwer – kleine Wesen haben Nachteil
+  reach,        // Reichweite – +1,5 m Reichweite
+  loading,      // Nachladen – nur 1 Angriff pro Aktion
+  ammunition,   // Munition benötigt
+}
+
+extension WeaponPropertyExtension on WeaponProperty {
+  String get label {
+    switch (this) {
+      case WeaponProperty.finesse:    return 'Finesse';
+      case WeaponProperty.versatile:  return 'Vielseitig';
+      case WeaponProperty.thrown:     return 'Wurfwaffe';
+      case WeaponProperty.ranged:     return 'Fernkampf';
+      case WeaponProperty.twoHanded:  return 'Zweihändig';
+      case WeaponProperty.light:      return 'Leicht';
+      case WeaponProperty.heavy:      return 'Schwer';
+      case WeaponProperty.reach:      return 'Reichweite';
+      case WeaponProperty.loading:    return 'Nachladen';
+      case WeaponProperty.ammunition: return 'Munition';
+    }
+  }
+}
+
+enum WeaponCategory {
+  simple,  // Einfache Waffe
+  martial, // Kriegswaffe
+}
+
+extension WeaponCategoryExtension on WeaponCategory {
+  String get label {
+    switch (this) {
+      case WeaponCategory.simple:  return 'Einfache Waffe';
+      case WeaponCategory.martial: return 'Kriegswaffe';
+    }
+  }
+}
+
+enum ArmorType {
+  light,  // Leichte Rüstung  – max GES unbegrenzt
+  medium, // Mittlere Rüstung – max GES +2
+  heavy,  // Schwere Rüstung  – kein GES-Bonus
+}
+
+extension ArmorTypeExtension on ArmorType {
+  String get label {
+    switch (this) {
+      case ArmorType.light:  return 'Leichte Rüstung';
+      case ArmorType.medium: return 'Mittlere Rüstung';
+      case ArmorType.heavy:  return 'Schwere Rüstung';
+    }
+  }
+
+  // Standardmäßiger max GES-Bonus laut 5e-Regeln.
+  // -1 = unbegrenzt, 0 = kein Bonus, 2 = max +2
+  int get defaultMaxDexBonus {
+    switch (this) {
+      case ArmorType.light:  return -1;
+      case ArmorType.medium: return 2;
+      case ArmorType.heavy:  return 0;
+    }
+  }
+}
+
+// ── Basisklasse ───────────────────────────────────────────────────────────────
+
 class Item {
   final String id;
   String name;
   String description;
-  bool isCustom;
-  String creatorId;
 
-  // ── Kategorie & Seltenheit ────────────────────────────────────────────────
   ItemCategory category;
   ItemRarity rarity;
-  bool requiresAttunement; // Erfordert Einstimmung?
+  bool requiresAttunement;
+  bool isMagical;
 
-  // ── Gewicht & Menge ───────────────────────────────────────────────────────
-  double _weight = 0.0; // Gewicht in Pfund (D&D 5e Standard)
-  int _quantity = 1;
-
-  // ── Waffeneigenschaften (nur relevant wenn category == weapon) ────────────
-  String? damageDice;   // z.B. '1d8'
-  String? damageType;   // z.B. 'Hieb', 'Stich', 'Wucht'
-  bool isMagical;       // Magischer Gegenstand?
-  int _magicBonus = 0;  // +1, +2, +3 Bonus auf Angriff und Schaden
-
-  // ── Rüstungseigenschaften (nur relevant wenn category == armor) ───────────
-  int _armorClassBonus = 0; // Bonus auf Rüstungsklasse
-
-  // ── Wert ──────────────────────────────────────────────────────────────────
-  int _valueInCopper = 0; // Wert in Kupferstücken (kleinste Einheit in D&D)
+  double _weight = 0.0;
+  int _valueInCopper = 0;
+  int _magicBonus    = 0;
 
   Item({
     String? id,
     required this.name,
-    this.description = '',
-    this.isCustom = false,
-    this.creatorId = '',
-    this.category = ItemCategory.misc,
-    this.rarity = ItemRarity.common,
+    this.description       = '',
+    this.category          = ItemCategory.misc,
+    this.rarity            = ItemRarity.common,
     this.requiresAttunement = false,
-    double weight = 0.0,
-    int quantity = 1,
-    this.damageDice,
-    this.damageType,
-    this.isMagical = false,
-    int magicBonus = 0,
-    int armorClassBonus = 0,
-    int valueInCopper = 0,
+    this.isMagical         = false,
+    double weight          = 0.0,
+    int valueInCopper      = 0,
+    int magicBonus         = 0,
   }) : id = id ?? const Uuid().v4() {
-    _weight = weight.clamp(0.0, 9999.0);
-    _quantity = quantity.clamp(0, 9999);
-    _magicBonus = magicBonus.clamp(0, 3);
-    _armorClassBonus = armorClassBonus.clamp(0, 99);
+    _weight        = weight.clamp(0.0, 9999.0);
     _valueInCopper = valueInCopper.clamp(0, 99999999);
+    _magicBonus    = magicBonus.clamp(0, 3);
   }
 
   // ── Getter & Setter ───────────────────────────────────────────────────────
 
   double get weight => _weight;
-  set weight(double value) => _weight = value.clamp(0.0, 9999.0);
-
-  int get quantity => _quantity;
-  set quantity(int value) => _quantity = value.clamp(0, 9999);
-
-  // Magischer Bonus: 0 bis +3 (D&D 5e Maximum)
-  int get magicBonus => _magicBonus;
-  set magicBonus(int value) => _magicBonus = value.clamp(0, 3);
-
-  int get armorClassBonus => _armorClassBonus;
-  set armorClassBonus(int value) => _armorClassBonus = value.clamp(0, 99);
+  set weight(double v) => _weight = v.clamp(0.0, 9999.0);
 
   int get valueInCopper => _valueInCopper;
-  set valueInCopper(int value) => _valueInCopper = value.clamp(0, 99999999);
+  set valueInCopper(int v) => _valueInCopper = v.clamp(0, 99999999);
 
-  // ── Berechnete Getter ─────────────────────────────────────────────────────
+  int get magicBonus => _magicBonus;
+  set magicBonus(int v) => _magicBonus = v.clamp(0, 3);
 
-  // Gesamtgewicht = Gewicht × Menge
-  double get totalWeight => _weight * _quantity;
+  // Gewicht pro Einheit – Gesamtgewicht wird von CharacterItem berechnet
+  double get weightPerUnit => _weight;
 
-  // Wert in lesbarer Form umrechnen
-  // D&D Umrechnungskurs: 1 PP = 10 GP = 100 SP = 1000 CP
   String get valueDisplay {
     if (_valueInCopper == 0) return 'Wertlos';
-    int remaining = _valueInCopper;
-
-    final pp = remaining ~/ 1000; remaining %= 1000;
-    final gp = remaining ~/ 100;  remaining %= 100;
-    final sp = remaining ~/ 10;   remaining %= 10;
-    final cp = remaining;
-
+    int r = _valueInCopper;
+    final pp = r ~/ 1000; r %= 1000;
+    final gp = r ~/ 100;  r %= 100;
+    final sp = r ~/ 10;   r %= 10;
+    final cp = r;
     final parts = <String>[];
-    if (pp > 0) parts.add('$pp PP');
-    if (gp > 0) parts.add('$gp GP');
-    if (sp > 0) parts.add('$sp SP');
-    if (cp > 0) parts.add('$cp KP');
+    if (pp > 0) parts.add('$pp PM');
+    if (gp > 0) parts.add('$gp GM');
+    if (sp > 0) parts.add('$sp SM');
+    if (cp > 0) parts.add('$cp KM');
     return parts.join(', ');
   }
 
-  // ── Datenbank: Konvertierung ──────────────────────────────────────────────
+  // ── Datenbank ─────────────────────────────────────────────────────────────
+  //
+  // itemType ist die Diskriminante für fromMap – damit weiß die DB beim Laden
+  // welche Unterklasse zu instanziieren ist.
 
   Map<String, dynamic> toMap() {
     return {
       'id':                 id,
+      'itemType':           'base',
       'name':               name,
       'description':        description,
-      'isCustom':           isCustom ? 1 : 0,
-      'creatorId':          creatorId,
       'category':           category.name,
       'rarity':             rarity.name,
       'requiresAttunement': requiresAttunement ? 1 : 0,
-      'weight':             weight,
-      'quantity':           quantity,
-      'damageDice':         damageDice,
-      'damageType':         damageType,
       'isMagical':          isMagical ? 1 : 0,
-      'magicBonus':         magicBonus,
-      'armorClassBonus':    armorClassBonus,
+      'weight':             weight,
       'valueInCopper':      valueInCopper,
+      'magicBonus':         magicBonus,
+      // Unterklassen-Felder – in der Basisklasse leer
+      'damageDice':         null,
+      'damageType':         null,
+      'weaponProperties':   null,
+      'rangeNormal':        null,
+      'rangeMax':           null,
+      'versatileDice':      null,
+      'armorClassBonus':    null,
+      'minStrength':        null,
+      'maxDexBonusOverride': null,
+      'stealthDisadvantage': null,
     };
   }
 
   factory Item.fromMap(Map<String, dynamic> map) {
+    final type = map['itemType'] ?? 'base';
+    switch (type) {
+      case 'weapon': return WeaponItem.fromMap(map);
+      case 'armor':  return ArmorItem.fromMap(map);
+      case 'shield': return ShieldItem.fromMap(map);
+      default:       return _baseFromMap(map);
+    }
+  }
+
+  static Item _baseFromMap(Map<String, dynamic> map) {
     return Item(
       id:                 map['id'],
       name:               map['name'],
       description:        map['description'] ?? '',
-      isCustom:           map['isCustom'] == 1,
-      creatorId:          map['creatorId'] ?? '',
-      category:           ItemCategory.values.byName(
-                            map['category'] ?? 'misc'),
-      rarity:             ItemRarity.values.byName(
-                            map['rarity'] ?? 'common'),
+      category:           ItemCategory.values.byName(map['category'] ?? 'misc'),
+      rarity:             ItemRarity.values.byName(map['rarity'] ?? 'common'),
       requiresAttunement: map['requiresAttunement'] == 1,
-      weight:             (map['weight'] ?? 0.0).toDouble(),
-      quantity:           map['quantity'] ?? 1,
-      damageDice:         map['damageDice'],
-      damageType:         map['damageType'],
       isMagical:          map['isMagical'] == 1,
-      magicBonus:         map['magicBonus'] ?? 0,
-      armorClassBonus:    map['armorClassBonus'] ?? 0,
+      weight:             (map['weight'] ?? 0.0).toDouble(),
       valueInCopper:      map['valueInCopper'] ?? 0,
+      magicBonus:         map['magicBonus'] ?? 0,
+    );
+  }
+}
+
+// ── WeaponItem ────────────────────────────────────────────────────────────────
+
+class WeaponItem extends Item {
+  WeaponCategory weaponCategory;
+  String damageDice;           // z.B. '1d8'
+  String damageType;           // z.B. 'Hieb', 'Stich', 'Wucht'
+  List<WeaponProperty> properties;
+  int rangeNormal;             // Reichweite in Metern (Nahkampf: 1 oder 2)
+  int rangeMax;                // Maximale Reichweite (nur Fernkampf/Wurfwaffe)
+  String? versatileDice;       // Würfel für zweihändige Nutzung, z.B. '1d10'
+
+  WeaponItem({
+    super.id,
+    required super.name,
+    super.description,
+    super.rarity,
+    super.requiresAttunement,
+    super.isMagical,
+    super.weight,
+    super.valueInCopper,
+    super.magicBonus,
+    this.weaponCategory  = WeaponCategory.simple,
+    required this.damageDice,
+    required this.damageType,
+    this.properties  = const [],
+    this.rangeNormal = 1,
+    this.rangeMax    = 1,
+    this.versatileDice,
+  }) : super(category: ItemCategory.weapon);
+
+  @override
+  Map<String, dynamic> toMap() {
+    return {
+      ...super.toMap(),
+      'itemType':         'weapon',
+      'weaponCategory':   weaponCategory.name,
+      'damageDice':       damageDice,
+      'damageType':       damageType,
+      'weaponProperties': properties.map((p) => p.name).join(','),
+      'rangeNormal':      rangeNormal,
+      'rangeMax':         rangeMax,
+      'versatileDice':    versatileDice,
+    };
+  }
+
+  factory WeaponItem.fromMap(Map<String, dynamic> map) {
+    final rawProps = map['weaponProperties'] as String?;
+    final props = rawProps == null || rawProps.isEmpty
+        ? <WeaponProperty>[]
+        : rawProps
+            .split(',')
+            .map((s) => WeaponProperty.values.byName(s))
+            .toList();
+
+    return WeaponItem(
+      id:              map['id'],
+      name:            map['name'],
+      description:     map['description'] ?? '',
+      rarity:          ItemRarity.values.byName(map['rarity'] ?? 'common'),
+      requiresAttunement: map['requiresAttunement'] == 1,
+      isMagical:       map['isMagical'] == 1,
+      weight:          (map['weight'] ?? 0.0).toDouble(),
+      valueInCopper:   map['valueInCopper'] ?? 0,
+      magicBonus:      map['magicBonus'] ?? 0,
+      weaponCategory:  WeaponCategory.values.byName(map['weaponCategory'] ?? 'simple'),
+      damageDice:      map['damageDice'] ?? '1d4',
+      damageType:      map['damageType'] ?? 'Hieb',
+      properties:      props,
+      rangeNormal:     map['rangeNormal'] ?? 1,
+      rangeMax:        map['rangeMax'] ?? 1,
+      versatileDice:   map['versatileDice'],
+    );
+  }
+}
+
+// ── ArmorItem ─────────────────────────────────────────────────────────────────
+
+class ArmorItem extends Item {
+  int _armorClassBonus;
+  ArmorType armorType;
+  int minStrength;         // Mindest-STR um die Rüstung zu tragen (0 = keine)
+  int? maxDexBonusOverride; // null = vom armorType ableiten, sonst manueller Wert
+  bool stealthDisadvantage;
+
+  ArmorItem({
+    super.id,
+    required super.name,
+    super.description,
+    super.rarity,
+    super.requiresAttunement,
+    super.isMagical,
+    super.weight,
+    super.valueInCopper,
+    super.magicBonus,
+    int armorClassBonus      = 0,
+    this.armorType           = ArmorType.medium,
+    this.minStrength         = 0,
+    this.maxDexBonusOverride,
+    this.stealthDisadvantage = false,
+  })  : _armorClassBonus = armorClassBonus.clamp(0, 30),
+        super(category: ItemCategory.armor);
+
+  int get armorClassBonus => _armorClassBonus;
+  set armorClassBonus(int v) => _armorClassBonus = v.clamp(0, 30);
+
+  // Max GES-Bonus: entweder manuell überschrieben oder vom Rüstungstyp abgeleitet
+  int get maxDexBonus => maxDexBonusOverride ?? armorType.defaultMaxDexBonus;
+
+  @override
+  Map<String, dynamic> toMap() {
+    return {
+      ...super.toMap(),
+      'itemType':           'armor',
+      'armorClassBonus':    armorClassBonus,
+      'armorType':          armorType.name,
+      'minStrength':        minStrength,
+      'maxDexBonusOverride': maxDexBonusOverride,
+      'stealthDisadvantage': stealthDisadvantage ? 1 : 0,
+    };
+  }
+
+  factory ArmorItem.fromMap(Map<String, dynamic> map) {
+    return ArmorItem(
+      id:               map['id'],
+      name:             map['name'],
+      description:      map['description'] ?? '',
+      rarity:           ItemRarity.values.byName(map['rarity'] ?? 'common'),
+      requiresAttunement: map['requiresAttunement'] == 1,
+      isMagical:        map['isMagical'] == 1,
+      weight:           (map['weight'] ?? 0.0).toDouble(),
+      valueInCopper:    map['valueInCopper'] ?? 0,
+      magicBonus:       map['magicBonus'] ?? 0,
+      armorClassBonus:     map['armorClassBonus'] ?? 0,
+      armorType:           ArmorType.values.byName(map['armorType'] ?? 'medium'),
+      minStrength:         map['minStrength'] ?? 0,
+      maxDexBonusOverride: map['maxDexBonusOverride'] as int?,
+      stealthDisadvantage: map['stealthDisadvantage'] == 1,
+    );
+  }
+}
+
+// ── ShieldItem ────────────────────────────────────────────────────────────────
+
+class ShieldItem extends Item {
+  int _armorClassBonus;
+
+  ShieldItem({
+    super.id,
+    required super.name,
+    super.description,
+    super.rarity,
+    super.requiresAttunement,
+    super.isMagical,
+    super.weight,
+    super.valueInCopper,
+    super.magicBonus,
+    int armorClassBonus = 2, // Schilde geben standardmäßig +2 RK
+  })  : _armorClassBonus = armorClassBonus.clamp(0, 10),
+        super(category: ItemCategory.shield);
+
+  int get armorClassBonus => _armorClassBonus;
+  set armorClassBonus(int v) => _armorClassBonus = v.clamp(0, 10);
+
+  @override
+  Map<String, dynamic> toMap() {
+    return {
+      ...super.toMap(),
+      'itemType':        'shield',
+      'armorClassBonus': armorClassBonus,
+    };
+  }
+
+  factory ShieldItem.fromMap(Map<String, dynamic> map) {
+    return ShieldItem(
+      id:               map['id'],
+      name:             map['name'],
+      description:      map['description'] ?? '',
+      rarity:           ItemRarity.values.byName(map['rarity'] ?? 'common'),
+      requiresAttunement: map['requiresAttunement'] == 1,
+      isMagical:        map['isMagical'] == 1,
+      weight:           (map['weight'] ?? 0.0).toDouble(),
+      valueInCopper:    map['valueInCopper'] ?? 0,
+      magicBonus:       map['magicBonus'] ?? 0,
+      armorClassBonus:  map['armorClassBonus'] ?? 2,
     );
   }
 }

@@ -1,0 +1,53 @@
+[
+    {
+        "id": "item_gefuettert",
+        "itemType": "armor",
+        "name": "Gefütterte Rüstung",
+        "description": "Gefütterter bzw. wattierter Stoff aus verwobenen Schichten.",
+        "rarity": "common",
+        "requiresAttunement": false,
+        "isMagical": false,
+        "magicBonus": 0,
+        "weight": 8.0,
+        "valueInCopper": 5000,
+        "armorClassBonus": 11,
+        "armorType": "light",
+        "minStrength": 0,
+        "stealthDisadvantage": true,
+        "maxDexBonusOverride": null
+    },
+    {
+    "id": "item_lederruestung",
+    "itemType": "armor",
+    "name": "Lederrüstung",
+    "description": "Brust- und Schulterschutz dieser Rüstung sind aus versteiftem Leder gefertigt. Die übrigen Teile sind aus weichem und flexiblem Material.",
+    "rarity": "common",
+    "requiresAttunement": false,
+    "isMagical": false,
+    "magicBonus": 0,
+    "weight": 10.0,
+    "valueInCopper": 1000,
+    "armorClassBonus": 11,
+    "armorType": "medium",
+    "minStrength": 0,
+    "stealthDisadvantage": false,
+    "maxDexBonusOverride": null
+  },
+  {
+    "id": "item_lederruestung_b",
+    "itemType": "armor",
+    "name": "Beschlagene Lederrüstung",
+    "description": "Eine Lederrüstung die zusätzlich mit Nieten oder Stacheln verstärkt wurde.",
+    "rarity": "common",
+    "requiresAttunement": false,
+    "isMagical": false,
+    "magicBonus": 0,
+    "weight": 13.0,
+    "valueInCopper": 4500,
+    "armorClassBonus": 12,
+    "armorType": "medium",
+    "minStrength": 0,
+    "stealthDisadvantage": false,
+    "maxDexBonusOverride": null
+  }
+]

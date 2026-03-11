@@ -38,7 +38,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 4,
       onCreate: _createTables,
       onUpgrade: _onUpgrade,
     );
@@ -93,8 +93,6 @@ Future<void> _createTables(Database db, int version) async {
     CREATE TABLE spells (
       id                   TEXT PRIMARY KEY,
       name                 TEXT NOT NULL,
-      isCustom             INTEGER DEFAULT 0,
-      creatorId            TEXT,
       school               TEXT,
       level                INTEGER DEFAULT 0,
       castingTime          TEXT,
@@ -108,6 +106,7 @@ Future<void> _createTables(Database db, int version) async {
       materialComponent    TEXT,
       attackRollType       TEXT,
       savingThrowAttribute TEXT,
+      weaponCategory       TEXT,
       damageDice           TEXT,
       damageType           TEXT,
       effectDescription    TEXT,
@@ -120,8 +119,6 @@ Future<void> _createTables(Database db, int version) async {
     CREATE TABLE abilities (
       id                   TEXT PRIMARY KEY,
       name                 TEXT NOT NULL,
-      isCustom             INTEGER DEFAULT 0,
-      creatorId            TEXT,
       source               TEXT,
       actionType           TEXT,
       maxUses              INTEGER,
@@ -137,24 +134,29 @@ Future<void> _createTables(Database db, int version) async {
   // ── Gegenstände ──────────────────────────────────────────────────────────
   await db.execute('''
     CREATE TABLE items (
-      id                 TEXT PRIMARY KEY,
-      name               TEXT NOT NULL,
-      description        TEXT,
-      isCustom           INTEGER DEFAULT 0,
-      creatorId          TEXT,
-      category           TEXT,
-      rarity             TEXT,
-      requiresAttunement INTEGER DEFAULT 0,
-      isAttuned          INTEGER DEFAULT 0,
-      weight             REAL DEFAULT 0,
-      quantity           INTEGER DEFAULT 1,
-      isEquipped         INTEGER DEFAULT 0,
-      damageDice         TEXT,
-      damageType         TEXT,
-      isMagical          INTEGER DEFAULT 0,
-      magicBonus         INTEGER DEFAULT 0,
-      armorClassBonus    INTEGER DEFAULT 0,
-      valueInCopper      INTEGER DEFAULT 0
+      id                   TEXT PRIMARY KEY,
+      itemType             TEXT NOT NULL DEFAULT 'base',
+      name                 TEXT NOT NULL,
+      description          TEXT,
+      category             TEXT,
+      rarity               TEXT,
+      requiresAttunement   INTEGER DEFAULT 0,
+      isMagical            INTEGER DEFAULT 0,
+      magicBonus           INTEGER DEFAULT 0,
+      weight               REAL DEFAULT 0,
+      valueInCopper        INTEGER DEFAULT 0,
+      weaponCategory       TEXT,
+      damageDice           TEXT,
+      damageType           TEXT,
+      weaponProperties     TEXT,
+      rangeNormal          INTEGER DEFAULT 1,
+      rangeMax             INTEGER DEFAULT 1,
+      versatileDice        TEXT,
+      armorClassBonus      INTEGER DEFAULT 0,
+      armorType            TEXT,
+      minStrength          INTEGER DEFAULT 0,
+      maxDexBonusOverride  INTEGER,
+      stealthDisadvantage  INTEGER DEFAULT 0
     )
   ''');
 
@@ -190,6 +192,19 @@ Future<void> _createTables(Database db, int version) async {
       PRIMARY KEY (characterId, itemId),
       FOREIGN KEY (characterId) REFERENCES characters(id) ON DELETE CASCADE,
       FOREIGN KEY (itemId)      REFERENCES items(id)      ON DELETE CASCADE
+    )
+  ''');
+
+  await db.execute('''
+    CREATE TABLE character_quick_items (
+      id            TEXT PRIMARY KEY,
+      characterId   TEXT NOT NULL,
+      name          TEXT NOT NULL,
+      notes         TEXT,
+      quantity      INTEGER DEFAULT 1,
+      weight        REAL DEFAULT 0,
+      valueInCopper INTEGER DEFAULT 0,
+      FOREIGN KEY (characterId) REFERENCES characters(id) ON DELETE CASCADE
     )
   ''');
 }

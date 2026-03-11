@@ -1,0 +1,15 @@
+[
+    {
+        "id": "item_schild",
+        "itemType": "shield",
+        "name": "Schild",
+        "description": "Ein hölzerner oder metallener Schild, der am Arm getragen wird.",
+        "rarity": "common",
+        "requiresAttunement": false,
+        "isMagical": false,
+        "magicBonus": 0,
+        "weight": 6.0,
+        "valueInCopper": 1000,
+        "armorClassBonus": 2
+    }
+]

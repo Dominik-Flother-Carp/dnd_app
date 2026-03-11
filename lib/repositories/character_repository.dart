@@ -57,11 +57,7 @@ class CharacterRepository {
   Future<void> deleteCharacter(String id) async {
     final db = await _dbHelper.database;
 
-    // Schritt 1: Custom Zauber löschen die dieser Charakter erstellt hat
-    // und die kein anderer Charakter kennt
-    await _deleteOrphanedCustomContent(db, id);
-
-    // Schritt 2: Charakter löschen
+    // Schritt 1: Charakter löschen
     // ON DELETE CASCADE räumt automatisch character_spells,
     // character_abilities und character_items auf
     await db.delete(
@@ -69,57 +65,6 @@ class CharacterRepository {
       where: 'id = ?',
       whereArgs: [id],
     );
-  }
-
-  // Löscht custom content dessen Ersteller gelöscht wird
-  // und der keinem anderen Charakter mehr zugewiesen ist
-  Future<void> _deleteOrphanedCustomContent(Database db, String creatorId) async {
-
-    // Alle custom Zauber dieses Erstellers finden
-    final customSpells = await db.query(
-      'spells',
-      where: 'creatorId = ? AND isCustom = 1',
-      whereArgs: [creatorId],
-    );
-
-    for (final spell in customSpells) {
-      final spellId = spell['id'];
-
-      // Prüfen ob noch ein anderer Charakter diesen Zauber kennt
-      final otherOwners = await db.query(
-        'character_spells',
-        where: 'spellId = ? AND characterId != ?',
-        whereArgs: [spellId, creatorId],
-        limit: 1,
-      );
-
-      // Keine anderen Besitzer → Zauber löschen
-      if (otherOwners.isEmpty) {
-        await db.delete('spells', where: 'id = ?', whereArgs: [spellId]);
-      }
-    }
-
-    // Dasselbe für custom Fähigkeiten
-    final customAbilities = await db.query(
-      'abilities',
-      where: 'creatorId = ? AND isCustom = 1',
-      whereArgs: [creatorId],
-    );
-
-    for (final ability in customAbilities) {
-      final abilityId = ability['id'];
-
-      final otherOwners = await db.query(
-        'character_abilities',
-        where: 'abilityId = ? AND characterId != ?',
-        whereArgs: [abilityId, creatorId],
-        limit: 1,
-      );
-
-      if (otherOwners.isEmpty) {
-        await db.delete('abilities', where: 'id = ?', whereArgs: [abilityId]);
-      }
-    }
   }
 
   // ── Zauber-Verknüpfungen ───────────────────────────────────────────────────

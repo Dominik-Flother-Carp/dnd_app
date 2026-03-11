@@ -16,50 +16,50 @@ const _equippableCategories = {
 
 // ── Münz-Umrechnung ───────────────────────────────────────────────────────────
 // Interner Speicher: Kupfermünzen (int), verlustfrei
-// 1 PM = 1000 KM | 1 GM = 100 KM | 1 EM = 50 KM | 1 SM = 10 KM | 1 KM = 1 KM
+// 1 PP = 1000 CP | 1 GP = 100 CP | 1 EP = 50 CP | 1 SP = 10 CP | 1 CP = 1 CP
 
-const _cpPerPM = 1000;
-const _cpPerGM = 100;
-const _cpPerEM = 50;
-const _cpPerSM = 10;
-const _cpPerKM = 1;
+const _cpPerPP = 1000;
+const _cpPerGP = 100;
+const _cpPerEP = 50;
+const _cpPerSP = 10;
+const _cpPerCP = 1;
 
 int _coinToCopper(int amount, String coin) {
   switch (coin) {
-    case 'PM': return amount * _cpPerPM;
-    case 'GM': return amount * _cpPerGM;
-    case 'EM': return amount * _cpPerEM;
-    case 'SM': return amount * _cpPerSM;
-    default:   return amount * _cpPerKM;
+    case 'PP': return amount * _cpPerPP;
+    case 'GP': return amount * _cpPerGP;
+    case 'EP': return amount * _cpPerEP;
+    case 'SP': return amount * _cpPerSP;
+    default:   return amount * _cpPerCP;
   }
 }
 
-/// Zerlegt einen KM-Wert in die größtmöglichen Münzen (PM→GM→EM→SM→KM).
+/// Zerlegt einen CP-Wert in die größtmöglichen Münzen (PP→GP→EP→SP→CP).
 Map<String, int> _breakdownCopper(int cp) {
   var rem = cp;
-  final pp = rem ~/ _cpPerPM; rem -= pp * _cpPerPM;
-  final gp = rem ~/ _cpPerGM; rem -= gp * _cpPerGM;
-  final ep = rem ~/ _cpPerEM; rem -= ep * _cpPerEM;
-  final sp = rem ~/ _cpPerSM; rem -= sp * _cpPerSM;
-  return {'PM': pp, 'GM': gp, 'EM': ep, 'SM': sp, 'KM': rem};
+  final pp = rem ~/ _cpPerPP; rem -= pp * _cpPerPP;
+  final gp = rem ~/ _cpPerGP; rem -= gp * _cpPerGP;
+  final ep = rem ~/ _cpPerEP; rem -= ep * _cpPerEP;
+  final sp = rem ~/ _cpPerSP; rem -= sp * _cpPerSP;
+  return {'PP': pp, 'GP': gp, 'EP': ep, 'SP': sp, 'CP': rem};
 }
 
 /// Lesbare Münzkombination, lässt Null-Werte weg.
 String _formatWallet(int totalCp) {
-  if (totalCp <= 0) return '0 GM';
+  if (totalCp <= 0) return '0 GP';
   final b = _breakdownCopper(totalCp);
   final parts = <String>[];
-  for (final coin in ['PM', 'GM', 'EM', 'SM', 'KM']) {
+  for (final coin in ['PP', 'GP', 'EP', 'SP', 'CP']) {
     if (b[coin]! > 0) parts.add('${b[coin]} $coin');
   }
   return parts.join(' ');
 }
 
-/// GM-Wert mit zwei Nachkommastellen.
-String _formatGM(int totalCp) {
-  final gp = totalCp / _cpPerGM;
-  if (gp == gp.truncateToDouble()) return '${gp.toInt()} GM';
-  return '${gp.toStringAsFixed(2)} GM';
+/// GP-Wert mit zwei Nachkommastellen.
+String _formatGP(int totalCp) {
+  final gp = totalCp / _cpPerGP;
+  if (gp == gp.truncateToDouble()) return '${gp.toInt()} GP';
+  return '${gp.toStringAsFixed(2)} GP';
 }
 
 // ── Geldbeutel-Dialog ─────────────────────────────────────────────────────────
@@ -81,11 +81,11 @@ class _WalletDialog extends StatefulWidget {
 
 class _WalletDialogState extends State<_WalletDialog> {
   final _controller = TextEditingController();
-  String _selectedCoin = 'GM';
+  String _selectedCoin = 'GP';
   bool _isIncome = true; // true = Einnahme, false = Ausgabe
   String? _errorText;
 
-  static const _coins = ['PM', 'GM', 'EM', 'SM', 'KM'];
+  static const _coins = ['PP', 'GP', 'EP', 'SP', 'CP'];
 
   @override
   void dispose() {
@@ -137,7 +137,7 @@ class _WalletDialogState extends State<_WalletDialog> {
                           .copyWith(color: Colors.grey)),
                   const SizedBox(height: 4),
                   Text(
-                    _formatGM(widget.walletCp),
+                    _formatGP(widget.walletCp),
                     style: AppTextStyles.statMedium
                         .copyWith(color: widget.themeColor),
                   ),
@@ -730,23 +730,28 @@ class _InventoryTabState extends State<InventoryTab>
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.backpack_outlined, size: 64, color: Colors.grey[300]),
-          const SizedBox(height: 16),
-          Text(
-            'Kein Inventar',
-            style: AppTextStyles.sectionTitle.copyWith(color: Colors.grey[400]),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Tippe auf + um einen Gegenstand hinzuzufügen.',
-            style: AppTextStyles.bodySmall.copyWith(color: Colors.grey),
-          ),
-        ],
-      ),
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+      children: [
+        _buildSummaryCard(),
+        const SizedBox(height: 32),
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.backpack_outlined, size: 64, color: Colors.grey[300]),
+            const SizedBox(height: 16),
+            Text(
+              'Kein Inventar',
+              style: AppTextStyles.sectionTitle.copyWith(color: Colors.grey[400]),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Tippe auf + um einen Gegenstand hinzuzufügen.',
+              style: AppTextStyles.bodySmall.copyWith(color: Colors.grey),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -782,7 +787,7 @@ class _InventoryTabState extends State<InventoryTab>
                     Icon(Icons.toll, color: const Color(0xFFB8860B), size: 20),
                     const SizedBox(height: 4),
                     Text(
-                      _formatGM(walletCp),
+                      _formatGP(walletCp),
                       style: AppTextStyles.statMedium
                           .copyWith(color: const Color(0xFFB8860B)),
                     ),
@@ -963,10 +968,10 @@ class _InventoryTabState extends State<InventoryTab>
                       child: Container(
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          color: Colors.grey[100],
+                          color: widget.themeColor,
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: const Icon(Icons.remove, size: 16),
+                        child: const Icon(Icons.remove, size: 25, color: Colors.white,),
                       ),
                     ),
                     if (ci.quantity == 1)
@@ -978,7 +983,7 @@ class _InventoryTabState extends State<InventoryTab>
                           color: widget.themeColor,
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: Text('Entfernen', style: AppTextStyles.body.copyWith(color: Colors.white),),
+                        child: Text('Entfernen', style: AppTextStyles.body.copyWith(fontWeight: FontWeight.bold ,color: Colors.white),),
                       ),
                     ),
                   const SizedBox(width: 4),
@@ -989,10 +994,10 @@ class _InventoryTabState extends State<InventoryTab>
                   child: Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      color: Colors.grey[100],
+                      color: widget.themeColor,
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    child: const Icon(Icons.add, size: 16),
+                    child: const Icon(Icons.add, size: 25, color: Colors.white),
                   ),
                 ),
             ],

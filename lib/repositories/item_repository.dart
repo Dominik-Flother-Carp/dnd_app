@@ -65,22 +65,6 @@ class ItemRepository {
       where: 'characterId = ? AND itemId = ?',
       whereArgs: [characterItem.characterId, characterItem.item.id],
     );
-    // Item nur löschen wenn es kein Standardobjekt ist und
-    // keinem anderen Charakter gehört
-    if (characterItem.item.isCustom) {
-      final remaining = await db.query(
-        'character_items',
-        where: 'itemId = ?',
-        whereArgs: [characterItem.item.id],
-      );
-      if (remaining.isEmpty) {
-        await db.delete(
-          'items',
-          where: 'id = ?',
-          whereArgs: [characterItem.item.id],
-        );
-      }
-    }
   }
 
   // ── Menge aktualisieren, bei 0 entfernen ─────────────────────────────────
