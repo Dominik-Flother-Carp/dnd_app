@@ -11,6 +11,7 @@ enum ItemCategory {
   shield,
   tool,
   consumable,
+  gear,
   treasure,
   misc,
 }
@@ -24,6 +25,7 @@ extension ItemCategoryExtension on ItemCategory {
       case ItemCategory.tool:       return 'Werkzeug';
       case ItemCategory.consumable: return 'Verbrauchsgegenstände';
       case ItemCategory.treasure:   return 'Schätze';
+      case ItemCategory.gear:       return 'Ausrüstung';
       case ItemCategory.misc:       return 'Sonstiges';
     }
   }
@@ -36,6 +38,7 @@ extension ItemCategoryExtension on ItemCategory {
       case ItemCategory.tool:       return Icons.handyman;
       case ItemCategory.consumable: return Icons.local_pharmacy;
       case ItemCategory.treasure:   return Icons.diamond;
+      case ItemCategory.gear:       return Icons.backpack_outlined;
       case ItemCategory.misc:       return Icons.category;
     }
   }

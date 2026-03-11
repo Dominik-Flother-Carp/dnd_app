@@ -200,6 +200,7 @@ Future<void> _createTables(Database db, int version) async {
       id            TEXT PRIMARY KEY,
       characterId   TEXT NOT NULL,
       name          TEXT NOT NULL,
+      category      TEXT DEFAULT 'misc',
       notes         TEXT,
       quantity      INTEGER DEFAULT 1,
       weight        REAL DEFAULT 0,

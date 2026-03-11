@@ -1,0 +1,28 @@
+[
+    {
+        "id": "item_ration",
+        "itemType": "base",
+        "name": "Ration",
+        "description": "Dieser Proviant reicht für eine Person für einen Tag und umfasst Trockenfleisch, Trockenfrüchte, Zwieback und Nüsse.",
+        "category": "consumable",
+        "rarity": "common",
+        "requiresAttunement": false,
+        "isMagical": false,
+        "magicBonus": 0,
+        "weight": 2.0,
+        "valueInCopper": 50
+    },
+    {
+        "id": "item_heiltrank",
+        "itemType": "base",
+        "name": "Heiltrank",
+        "description": "Ein Wesen, das diesen roten Trank trinkt, regeneriert 2W4+2 Trefferpunkte. Das Trinken oder Verabreichen des Tranks kostet eine Aktion.",
+        "category": "consumable",
+        "rarity": "common",
+        "requiresAttunement": false,
+        "isMagical": false,
+        "magicBonus": 0,
+        "weight": 0.5,
+        "valueInCopper": 5000
+    }
+]

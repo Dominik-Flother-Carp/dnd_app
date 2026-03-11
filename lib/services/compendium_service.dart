@@ -32,6 +32,7 @@ class CompendiumService {
     'assets/json/compendium_items/armors/shields.json',
     'assets/json/compendium_items/tools.json',
     'assets/json/compendium_items/consumables.json',
+    'assets/json/compendium_items/gear.json',
   ];
 
   static const _spellPaths = [
@@ -64,7 +65,13 @@ class CompendiumService {
           for (final key in ['requiresAttunement', 'isMagical', 'stealthDisadvantage']) {
             if (m[key] is bool) m[key] = (m[key] as bool) ? 1 : 0;
           }
-          items.add(Item.fromMap(m));
+          final item = Item.fromMap(m);
+          // treasure und misc sind QuickItem-Kategorien und
+          // gehören nicht ins Kompendium
+          if (item.category != ItemCategory.treasure &&
+              item.category != ItemCategory.misc) {
+            items.add(item);
+          }
         }
       } catch (e) {
         // Datei noch nicht vorhanden (z.B. tools.json, consumables.json)

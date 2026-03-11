@@ -1,0 +1,28 @@
+[
+    {
+        "id": "item_diebeswerkzeug",
+        "itemType": "base",
+        "name": "Diebeswerkzeug",
+        "description": "Dieser Werkzeugsatz enthält eine kleine Feile, Dietriche, einen kleinen Spiegel mit Metallgriff, eine schmale Schere und eine Zange. Bist du im Umgang mit diesem Werkzeug geübt, kannst du deinen Übungsbonus zu allen Attributswürfen hinzuaddieren, die du ablegst, um Fallen zu entschärfen oder Schlösser zu öffnen.",
+        "category": "tool",
+        "rarity": "common",
+        "requiresAttunement": false,
+        "isMagical": false,
+        "magicBonus": 0,
+        "weight": 1.0,
+        "valueInCopper": 2500
+    },
+    {
+        "id": "item_verkleidung",
+        "itemType": "base",
+        "name": "Verkleidungsausrüstung",
+        "description": " Dieser Beutel enthält Schminke und kleine Requisiten, mit denen du dich verkleiden kannst. Bist du im Umgang mit dieser Ausrüstung geübt, kannst du deinen Übungsbonus zu allen Attributswürfen addieren, die du zum Verkleiden ablegst.",
+        "category": "tool",
+        "rarity": "common",
+        "requiresAttunement": false,
+        "isMagical": false,
+        "magicBonus": 0,
+        "weight": 3.0,
+        "valueInCopper": 2500
+    }
+]

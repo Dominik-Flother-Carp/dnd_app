@@ -51,14 +51,8 @@ class _CompendiumScreenState extends State<CompendiumScreen>
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
-            Tab(
-              icon: Icon(Icons.backpack_outlined, color: Color(0xFFF5DEB3)),
-              text: 'Gegenstände',
-            ),
-            Tab(
-              icon: Icon(Icons.auto_fix_high, color: Color(0xFFF5DEB3)),
-              text: 'Zauber',
-            ),
+            Tab(icon: Icon(Icons.backpack_outlined), text: 'Gegenstände'),
+            Tab(icon: Icon(Icons.auto_fix_high), text: 'Zauber'),
           ],
         ),
       ),
@@ -114,7 +108,7 @@ class _ItemsTabState extends State<_ItemsTab> {
       );
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -158,19 +152,25 @@ class _ItemsTabState extends State<_ItemsTab> {
                         _filter();
                       }),
                     ),
-                    ...ItemCategory.values.map(
-                      (cat) => _CategoryChip(
-                        label: cat.label,
-                        icon: cat.icon,
-                        selected: _selectedCategory == cat,
-                        onTap: () => setState(() {
-                          _selectedCategory = _selectedCategory == cat
-                              ? null
-                              : cat;
-                          _filter();
-                        }),
-                      ),
-                    ),
+                    ...ItemCategory.values
+                        .where(
+                          (cat) =>
+                              cat != ItemCategory.treasure &&
+                              cat != ItemCategory.misc,
+                        )
+                        .map(
+                          (cat) => _CategoryChip(
+                            label: cat.label,
+                            icon: cat.icon,
+                            selected: _selectedCategory == cat,
+                            onTap: () => setState(() {
+                              _selectedCategory = _selectedCategory == cat
+                                  ? null
+                                  : cat;
+                              _filter();
+                            }),
+                          ),
+                        ),
                   ],
                 ),
               ),
@@ -392,11 +392,11 @@ class _SpellTile extends StatelessWidget {
       case SpellSchool.conjuration:
         return 'Beschwörung';
       case SpellSchool.divination:
-        return 'Erkenntnis';
+        return 'Divination';
       case SpellSchool.enchantment:
         return 'Verzauberung';
       case SpellSchool.evocation:
-        return 'Hervorrufung';
+        return 'Evokation';
       case SpellSchool.illusion:
         return 'Illusion';
       case SpellSchool.necromancy:
