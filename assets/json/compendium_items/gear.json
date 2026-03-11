@@ -13,6 +13,19 @@
         "valueInCopper": 1000
     },
     {
+        "id": "item_brechstange",
+        "itemType": "base",
+        "name": "Brechstange",
+        "description": "Diese Laterne strahlt in einem Kegel von 18 Metern helles Licht und über weitere 18 Meter dämmriges Licht aus. Sie brennt mit einer Flasche Öl (0,5 Liter) sechs Stunden lang.",
+        "category": "gear",
+        "rarity": "common",
+        "requiresAttunement": false,
+        "isMagical": false,
+        "magicBonus": 0,
+        "weight": 2.0,
+        "valueInCopper": 1000
+    },
+    {
         "id": "item_fackel",
         "itemType": "base",
         "name": "Fackel",
@@ -36,6 +49,19 @@
         "isMagical": false,
         "magicBonus": 0,
         "weight": 3.0,
+        "valueInCopper": 5000
+    },
+    {
+        "id": "item_heiligesSymbol",
+        "itemType": "base",
+        "name": "Heiliges Symbol",
+        "description": " Ein heiliges Symbol repräsentiert eine Gottheit oder ein Pantheon von Göttern. Es könnte auf ein Amulett geprägt, aber auch auf einen Schild graviert sein oder sich als Einlegearbeit auf diesem befinden. Auch eine kleine Schatulle mit einem winzigen Fragment einer heiligen Reliquie kann als heiliges Symbol dienen. Anhang B 'Götter des Multiversums' führt das verbreitetste Symbol jeder Gottheit auf. Ein Kleriker oder Paladin kann das heilige Symbol als Zauberfokus verwenden, so wie es in Kapitel 10 'Zauber wirken' beschrieben wird. Um das heilige Symbol auf diese Weise nutzen zu können, muss man es sichtbar in einer Hand halten oder es muss auf einem Schild angebracht sein.",
+        "category": "gear",
+        "rarity": "common",
+        "requiresAttunement": false,
+        "isMagical": false,
+        "magicBonus": 0,
+        "weight": 1.0,
         "valueInCopper": 5000
     },
     {
@@ -76,6 +102,19 @@
         "magicBonus": 0,
         "weight": 1.0,
         "valueInCopper": 10
+    },
+    {
+        "id": "item_reisegeschirr",
+        "itemType": "base",
+        "name": "Reisegeschirr",
+        "description": " Diese Blechdose enthält einen Becher und einfaches Besteck. Die Blechdose ist zusammengesteckt, sodass eine Seite als Pfanne und die andere als Teller oder flache Schale verwendet werden kann.",
+        "category": "gear",
+        "rarity": "common",
+        "requiresAttunement": false,
+        "isMagical": false,
+        "magicBonus": 0,
+        "weight": 1.0,
+        "valueInCopper": 20
     },
     {
         "id": "item_schloss",

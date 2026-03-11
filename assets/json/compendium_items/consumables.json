@@ -7,7 +7,7 @@
         "category": "consumable",
         "rarity": "common",
         "requiresAttunement": false,
-        "isMagical": false,
+        "isMagical": true,
         "magicBonus": 0,
         "weight": 2.0,
         "valueInCopper": 50

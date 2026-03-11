@@ -4,8 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:dnd_app/models/character.dart';
 import 'package:dnd_app/models/item.dart';
 import 'package:dnd_app/models/character_items.dart';
+import 'package:dnd_app/models/quick_item.dart';
 import 'package:dnd_app/repositories/item_repository.dart';
+import 'package:dnd_app/repositories/quick_item_repository.dart';
 import 'package:dnd_app/repositories/character_repository.dart';
+import 'package:dnd_app/services/compendium_service.dart';
+import 'package:dnd_app/screens/compendium/compendium_detail_sheet.dart';
 import 'package:dnd_app/theme/app_text_styles.dart';
 
 const _equippableCategories = {
@@ -15,51 +19,45 @@ const _equippableCategories = {
 };
 
 // ── Münz-Umrechnung ───────────────────────────────────────────────────────────
-// Interner Speicher: Kupfermünzen (int), verlustfrei
-// 1 PP = 1000 CP | 1 GP = 100 CP | 1 EP = 50 CP | 1 SP = 10 CP | 1 CP = 1 CP
 
 const _cpPerPP = 1000;
 const _cpPerGP = 100;
 const _cpPerEP = 50;
 const _cpPerSP = 10;
-const _cpPerCP = 1;
 
 int _coinToCopper(int amount, String coin) {
   switch (coin) {
     case 'PP': return amount * _cpPerPP;
-    case 'GP': return amount * _cpPerGP;
-    case 'EP': return amount * _cpPerEP;
-    case 'SP': return amount * _cpPerSP;
-    default:   return amount * _cpPerCP;
+    case 'GM': return amount * _cpPerGP;
+    case 'EM': return amount * _cpPerEP;
+    case 'SM': return amount * _cpPerSP;
+    default:   return amount;
   }
 }
 
-/// Zerlegt einen CP-Wert in die größtmöglichen Münzen (PP→GP→EP→SP→CP).
 Map<String, int> _breakdownCopper(int cp) {
   var rem = cp;
   final pp = rem ~/ _cpPerPP; rem -= pp * _cpPerPP;
   final gp = rem ~/ _cpPerGP; rem -= gp * _cpPerGP;
   final ep = rem ~/ _cpPerEP; rem -= ep * _cpPerEP;
   final sp = rem ~/ _cpPerSP; rem -= sp * _cpPerSP;
-  return {'PP': pp, 'GP': gp, 'EP': ep, 'SP': sp, 'CP': rem};
+  return {'PP': pp, 'GM': gp, 'EM': ep, 'SM': sp, 'KM': rem};
 }
 
-/// Lesbare Münzkombination, lässt Null-Werte weg.
 String _formatWallet(int totalCp) {
-  if (totalCp <= 0) return '0 GP';
+  if (totalCp <= 0) return '0 GM';
   final b = _breakdownCopper(totalCp);
   final parts = <String>[];
-  for (final coin in ['PP', 'GP', 'EP', 'SP', 'CP']) {
+  for (final coin in ['PP', 'GM', 'EM', 'SM', 'KM']) {
     if (b[coin]! > 0) parts.add('${b[coin]} $coin');
   }
   return parts.join(' ');
 }
 
-/// GP-Wert mit zwei Nachkommastellen.
 String _formatGP(int totalCp) {
   final gp = totalCp / _cpPerGP;
-  if (gp == gp.truncateToDouble()) return '${gp.toInt()} GP';
-  return '${gp.toStringAsFixed(2)} GP';
+  if (gp == gp.truncateToDouble()) return '${gp.toInt()} GM';
+  return '${gp.toStringAsFixed(2)} GM';
 }
 
 // ── Geldbeutel-Dialog ─────────────────────────────────────────────────────────
@@ -80,366 +78,215 @@ class _WalletDialog extends StatefulWidget {
 }
 
 class _WalletDialogState extends State<_WalletDialog> {
-  final _controller = TextEditingController();
-  String _selectedCoin = 'GP';
-  bool _isIncome = true; // true = Einnahme, false = Ausgabe
-  String? _errorText;
+  late final TextEditingController _ppCtrl;
+  late final TextEditingController _gpCtrl;
+  late final TextEditingController _epCtrl;
+  late final TextEditingController _spCtrl;
+  late final TextEditingController _cpCtrl;
 
-  static const _coins = ['PP', 'GP', 'EP', 'SP', 'CP'];
+  bool _isAdding = true;
+
+  @override
+  void initState() {
+    super.initState();
+    final b = _breakdownCopper(widget.walletCp);
+    _ppCtrl = TextEditingController(text: b['PP']!.toString());
+    _gpCtrl = TextEditingController(text: b['GM']!.toString());
+    _epCtrl = TextEditingController(text: b['EM']!.toString());
+    _spCtrl = TextEditingController(text: b['SM']!.toString());
+    _cpCtrl = TextEditingController(text: b['KM']!.toString());
+  }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _ppCtrl.dispose();
+    _gpCtrl.dispose();
+    _epCtrl.dispose();
+    _spCtrl.dispose();
+    _cpCtrl.dispose();
     super.dispose();
   }
 
-  void _onConfirm() {
-    final amount = int.tryParse(_controller.text.trim());
-    if (amount == null || amount <= 0) {
-      setState(() => _errorText = 'Bitte eine gültige Zahl eingeben.');
-      return;
-    }
-    final delta = _coinToCopper(amount, _selectedCoin);
-    final newCp = _isIncome
-        ? widget.walletCp + delta
-        : widget.walletCp - delta;
+  int get _enteredCp =>
+      _coinToCopper(int.tryParse(_ppCtrl.text) ?? 0, 'PP') +
+      _coinToCopper(int.tryParse(_gpCtrl.text) ?? 0, 'GM') +
+      _coinToCopper(int.tryParse(_epCtrl.text) ?? 0, 'EM') +
+      _coinToCopper(int.tryParse(_spCtrl.text) ?? 0, 'SM') +
+      (int.tryParse(_cpCtrl.text) ?? 0);
 
-    if (newCp < 0) {
-      setState(() => _errorText =
-          'Nicht genug Geld! Verfügbar: ${_formatWallet(widget.walletCp)}');
-      return;
-    }
-    Navigator.pop(context, _WalletDialogResult(newCp));
+  void _onSave() {
+    final delta  = _enteredCp;
+    final newVal = _isAdding
+        ? widget.walletCp + delta
+        : (widget.walletCp - delta).clamp(0, 999999999);
+    Navigator.pop(context, _WalletDialogResult(newVal));
+  }
+
+  Widget _coinField(String label, TextEditingController ctrl) {
+    return Expanded(
+      child: TextField(
+        controller: ctrl,
+        keyboardType: TextInputType.number,
+        textAlign: TextAlign.center,
+        style: AppTextStyles.body,
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(),
+          isDense: true,
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text('Geldbeutel', style: AppTextStyles.sectionTitle),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Aktueller Kontostand
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: widget.themeColor.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(8),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: SegmentedButton<bool>(
+                  segments: const [
+                    ButtonSegment(value: true,  label: Text('Hinzufügen')),
+                    ButtonSegment(value: false, label: Text('Ausgeben')),
+                  ],
+                  selected: {_isAdding},
+                  onSelectionChanged: (s) =>
+                      setState(() => _isAdding = s.first),
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStateProperty.resolveWith((states) {
+                      if (states.contains(WidgetState.selected)) {
+                        return widget.themeColor;
+                      }
+                      return null;
+                    }),
+                  ),
+                ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Kontostand',
-                      style: AppTextStyles.labelXs
-                          .copyWith(color: Colors.grey)),
-                  const SizedBox(height: 4),
-                  Text(
-                    _formatGP(widget.walletCp),
-                    style: AppTextStyles.statMedium
-                        .copyWith(color: widget.themeColor),
-                  ),
-                  Text(
-                    _formatWallet(widget.walletCp),
-                    style: AppTextStyles.bodySmall
-                        .copyWith(color: Colors.grey[600]),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            // Einnahme / Ausgabe Toggle
-            Row(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => setState(() {
-                      _isIncome = true;
-                      _errorText = null;
-                    }),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      decoration: BoxDecoration(
-                        color: _isIncome
-                            ? Colors.green.withValues(alpha: 0.15)
-                            : Colors.grey[100],
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: _isIncome
-                              ? Colors.green
-                              : Colors.transparent,
-                        ),
-                      ),
-                      child: Center(
-                        child: Text('Einnahme',
-                            style: AppTextStyles.body.copyWith(
-                              color: _isIncome
-                                  ? Colors.green
-                                  : Colors.grey,
-                              fontWeight: _isIncome
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                            )),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => setState(() {
-                      _isIncome = false;
-                      _errorText = null;
-                    }),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      decoration: BoxDecoration(
-                        color: !_isIncome
-                            ? Colors.red.withValues(alpha: 0.15)
-                            : Colors.grey[100],
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: !_isIncome
-                              ? Colors.red
-                              : Colors.transparent,
-                        ),
-                      ),
-                      child: Center(
-                        child: Text('Ausgabe',
-                            style: AppTextStyles.body.copyWith(
-                              color: !_isIncome
-                                  ? Colors.red
-                                  : Colors.grey,
-                              fontWeight: !_isIncome
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                            )),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            // Betrag + Münzsorte
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    keyboardType: TextInputType.number,
-                    autofocus: true,
-                    style: AppTextStyles.body,
-                    onChanged: (_) =>
-                        setState(() => _errorText = null),
-                    decoration: InputDecoration(
-                      labelText: 'Betrag',
-                      border: const OutlineInputBorder(),
-                      errorText: _errorText,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                SizedBox(
-                  width: 90,
-                  child: DropdownButtonFormField<String>(
-                    initialValue: _selectedCoin,
-                    decoration: const InputDecoration(
-                      labelText: 'Sorte',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: _coins
-                        .map((c) => DropdownMenuItem(
-                              value: c,
-                              child: Text(c, style: AppTextStyles.body),
-                            ))
-                        .toList(),
-                    onChanged: (v) => setState(() {
-                      _selectedCoin = v!;
-                      _errorText = null;
-                    }),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              _coinField('PP', _ppCtrl),
+              const SizedBox(width: 8),
+              _coinField('GM', _gpCtrl),
+              const SizedBox(width: 8),
+              _coinField('EM', _epCtrl),
+              const SizedBox(width: 8),
+              _coinField('SM', _spCtrl),
+              const SizedBox(width: 8),
+              _coinField('KM', _cpCtrl),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Aktuell: ${_formatWallet(widget.walletCp)}',
+            style: AppTextStyles.bodySmall.copyWith(color: Colors.grey[500]),
+          ),
+        ],
       ),
       actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text('Abbrechen', style: AppTextStyles.body),
-        ),
-        FilledButton(
-          onPressed: _onConfirm,
-          style: FilledButton.styleFrom(
-            backgroundColor: _isIncome ? Colors.green : Colors.red,
-          ),
-          child: Text(
-            _isIncome ? 'Einnahme' : 'Ausgabe',
-            style: AppTextStyles.body.copyWith(color: Colors.white),
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Abbrechen', style: AppTextStyles.body),
+            ),
+            const SizedBox(width: 10),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                  backgroundColor: widget.themeColor),
+              onPressed: _onSave,
+              child: Text('OK', style: AppTextStyles.body),
+            ),
+          ],
         ),
       ],
     );
   }
 }
 
-// ── Rückgabewert des Dialogs ──────────────────────────────────────────────────
+// ── Schnellitem-Dialog ────────────────────────────────────────────────────────
 
-class _ItemDialogResult {
-  final Item item;
-  final CharacterItem ci;
-  final bool isNew;
-  final bool remove;
-
-  const _ItemDialogResult({
-    required this.item,
-    required this.ci,
-    required this.isNew,
-    required this.remove,
-  });
-}
-
-// ── Dialog-Widget ─────────────────────────────────────────────────────────────
-
-class _ItemDialog extends StatefulWidget {
-  final CharacterItem? characterItem;
+class _QuickItemDialog extends StatefulWidget {
   final String characterId;
   final Color themeColor;
-  final int currentAttuneCount;
+  final QuickItem? existing;
 
-  const _ItemDialog({
+  const _QuickItemDialog({
     required this.characterId,
     required this.themeColor,
-    required this.currentAttuneCount,
-    this.characterItem,
+    this.existing,
   });
 
   @override
-  State<_ItemDialog> createState() => _ItemDialogState();
+  State<_QuickItemDialog> createState() => _QuickItemDialogState();
 }
 
-class _ItemDialogState extends State<_ItemDialog> {
-  late final TextEditingController _nameController;
-  late final TextEditingController _descController;
-  late final TextEditingController _weightController;
-  late final TextEditingController _valueController;
-  late final TextEditingController _damageDiceController;
+class _QuickItemDialogState extends State<_QuickItemDialog> {
+  late final TextEditingController _nameCtrl;
+  late final TextEditingController _notesCtrl;
+  late final TextEditingController _quantityCtrl;
+  late final TextEditingController _weightCtrl;
+  late final TextEditingController _valueCtrl;
+  late ItemCategory _category;
 
-  late ItemCategory _selectedCategory;
-  late ItemRarity _selectedRarity;
-  late bool _requiresAttunement;
-  late bool _isEquipped;
-  late bool _isAttuned;
+  bool get _isNew => widget.existing == null;
 
-  bool get _isNew => widget.characterItem == null;
+  static const _allowedCategories = [
+    ItemCategory.treasure,
+    ItemCategory.misc,
+  ];
 
   @override
   void initState() {
     super.initState();
-    final item = widget.characterItem?.item;
-    _nameController       = TextEditingController(text: item?.name ?? '');
-    _descController       = TextEditingController(text: item?.description ?? '');
-    _weightController     = TextEditingController(text: item != null ? '${item.weight}' : '0');
-    _valueController      = TextEditingController(text: item != null ? '${item.valueInCopper}' : '0');
-    _damageDiceController = TextEditingController(text: item is WeaponItem ? (item).damageDice : '');
-
-    _selectedCategory   = item?.category ?? ItemCategory.misc;
-    _selectedRarity     = item?.rarity ?? ItemRarity.common;
-    _requiresAttunement = item?.requiresAttunement ?? false;
-    _isEquipped         = widget.characterItem?.isEquipped ?? false;
-    _isAttuned          = widget.characterItem?.isAttuned ?? false;
+    final q = widget.existing;
+    _nameCtrl     = TextEditingController(text: q?.name ?? '');
+    _notesCtrl    = TextEditingController(text: q?.notes ?? '');
+    _quantityCtrl = TextEditingController(text: '${q?.quantity ?? 1}');
+    _weightCtrl   = TextEditingController(
+        text: q != null ? '${q.weight}' : '0');
+    _valueCtrl    = TextEditingController(
+        text: q != null ? '${q.valueInCopper}' : '0');
+    _category = q?.category ?? ItemCategory.misc;
   }
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _descController.dispose();
-    _weightController.dispose();
-    _valueController.dispose();
-    _damageDiceController.dispose();
+    _nameCtrl.dispose();
+    _notesCtrl.dispose();
+    _quantityCtrl.dispose();
+    _weightCtrl.dispose();
+    _valueCtrl.dispose();
     super.dispose();
   }
 
-  void _onCategoryChanged(ItemCategory newCat) {
-    setState(() {
-      _selectedCategory = newCat;
-      if (!_equippableCategories.contains(newCat)) {
-        _isEquipped = false;
-      }
-    });
-  }
-
   void _onSave() {
-    if (_nameController.text.trim().isEmpty) return;
-
-    final showEquipped = _equippableCategories.contains(_selectedCategory);
-
-    final updatedItem = _isNew
-        ? (_selectedCategory == ItemCategory.weapon
-            ? WeaponItem(
-                name: _nameController.text.trim(),
-                description: _descController.text.trim(),
-                rarity: _selectedRarity,
-                weight: double.tryParse(_weightController.text) ?? 0,
-                valueInCopper: int.tryParse(_valueController.text) ?? 0,
-                requiresAttunement: _requiresAttunement,
-                damageDice: _damageDiceController.text.trim().isNotEmpty
-                    ? _damageDiceController.text.trim() : '1W4',
-                damageType: 'Hieb',
-              )
-            : Item(
-                name: _nameController.text.trim(),
-                description: _descController.text.trim(),
-                category: _selectedCategory,
-                rarity: _selectedRarity,
-                weight: double.tryParse(_weightController.text) ?? 0,
-                valueInCopper: int.tryParse(_valueController.text) ?? 0,
-                requiresAttunement: _requiresAttunement,
-              ))
-        : widget.characterItem!.item
-      ..name = _nameController.text.trim()
-      ..description = _descController.text.trim()
-      ..category = _selectedCategory
-      ..rarity = _selectedRarity
-      ..weight = double.tryParse(_weightController.text) ?? 0
-      ..valueInCopper = int.tryParse(_valueController.text) ?? 0
-      ..requiresAttunement = _requiresAttunement;
-
-    final updatedCi = _isNew
-        ? CharacterItem(
-            characterId: widget.characterId,
-            item: updatedItem,
-            quantity: 1,
-            isEquipped: showEquipped && _isEquipped,
-            isAttuned: _requiresAttunement && _isAttuned,
-          )
-        : widget.characterItem!
-      ..isEquipped = showEquipped && _isEquipped
-      ..isAttuned = _requiresAttunement && _isAttuned;
-
-    Navigator.pop(
-      context,
-      _ItemDialogResult(
-        item: updatedItem,
-        ci: updatedCi,
-        isNew: _isNew,
-        remove: false,
-      ),
+    if (_nameCtrl.text.trim().isEmpty) return;
+    final q = QuickItem(
+      id:            widget.existing?.id,
+      characterId:   widget.characterId,
+      name:          _nameCtrl.text.trim(),
+      category:      _category,
+      notes:         _notesCtrl.text.trim(),
+      quantity:      int.tryParse(_quantityCtrl.text) ?? 1,
+      weight:        double.tryParse(_weightCtrl.text) ?? 0,
+      valueInCopper: int.tryParse(_valueCtrl.text) ?? 0,
     );
+    Navigator.pop(context, q);
   }
 
   @override
   Widget build(BuildContext context) {
-    final showEquipped = _equippableCategories.contains(_selectedCategory);
-
     return AlertDialog(
       title: Text(
-        _isNew ? 'Gegenstand hinzufügen' : 'Gegenstand bearbeiten',
+        _isNew ? 'Schnellitem hinzufügen' : 'Schnellitem bearbeiten',
         style: AppTextStyles.sectionTitle,
       ),
       content: SingleChildScrollView(
@@ -448,52 +295,49 @@ class _ItemDialogState extends State<_ItemDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
-              controller: _nameController,
+              controller: _nameCtrl,
               style: AppTextStyles.body,
+              autofocus: _isNew,
               decoration: const InputDecoration(
                 labelText: 'Name',
                 border: OutlineInputBorder(),
               ),
-              autofocus: _isNew,
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<ItemCategory>(
-              initialValue: _selectedCategory,
+              initialValue: _category,
               decoration: const InputDecoration(
                 labelText: 'Kategorie',
                 border: OutlineInputBorder(),
               ),
-              items: ItemCategory.values
+              items: _allowedCategories
                   .map((c) => DropdownMenuItem(
                         value: c,
                         child: Text(c.label, style: AppTextStyles.body),
                       ))
                   .toList(),
-              onChanged: (v) => _onCategoryChanged(v!),
-            ),
-            const SizedBox(height: 12),
-            DropdownButtonFormField<ItemRarity>(
-              initialValue: _selectedRarity,
-              decoration: const InputDecoration(
-                labelText: 'Seltenheit',
-                border: OutlineInputBorder(),
-              ),
-              items: ItemRarity.values
-                  .map((r) => DropdownMenuItem(
-                        value: r,
-                        child: Text(r.label, style: AppTextStyles.body),
-                      ))
-                  .toList(),
-              onChanged: (v) => setState(() => _selectedRarity = v!),
+              onChanged: (v) => setState(() => _category = v!),
             ),
             const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
                   child: TextField(
-                    controller: _weightController,
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
+                    controller: _quantityCtrl,
+                    keyboardType: TextInputType.number,
+                    style: AppTextStyles.body,
+                    decoration: const InputDecoration(
+                      labelText: 'Menge',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextField(
+                    controller: _weightCtrl,
+                    keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true),
                     style: AppTextStyles.body,
                     decoration: const InputDecoration(
                       labelText: 'Gewicht (lb)',
@@ -504,71 +348,25 @@ class _ItemDialogState extends State<_ItemDialog> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: TextField(
-                    controller: _valueController,
+                    controller: _valueCtrl,
                     keyboardType: TextInputType.number,
                     style: AppTextStyles.body,
                     decoration: const InputDecoration(
-                      labelText: 'Wert (KP)',
+                      labelText: 'Wert (KM)',
                       border: OutlineInputBorder(),
                     ),
                   ),
                 ),
               ],
             ),
-            if (_selectedCategory == ItemCategory.weapon) ...[
-              const SizedBox(height: 12),
-              TextField(
-                controller: _damageDiceController,
-                style: AppTextStyles.body,
-                decoration: const InputDecoration(
-                  labelText: 'Schadenswürfel (z.B. 1w8)',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ],
-            if (showEquipped) ...[
-              const SizedBox(height: 4),
-              SwitchListTile(
-                value: _isEquipped,
-                activeThumbColor: widget.themeColor,
-                title: Text('Ausgerüstet', style: AppTextStyles.body),
-                contentPadding: EdgeInsets.zero,
-                onChanged: (v) => setState(() => _isEquipped = v),
-              ),
-            ],
-            SwitchListTile(
-              value: _requiresAttunement,
-              activeThumbColor: widget.themeColor,
-              title: Text('Erfordert Einstimmung', style: AppTextStyles.body),
-              contentPadding: EdgeInsets.zero,
-              onChanged: (v) => setState(() {
-                _requiresAttunement = v;
-                if (!v) _isAttuned = false;
-              }),
-            ),
-            if (_requiresAttunement)
-              SwitchListTile(
-                value: _isAttuned,
-                activeThumbColor: widget.themeColor,
-                title: Text('Eingestimmt', style: AppTextStyles.body),
-                contentPadding: EdgeInsets.zero,
-                onChanged: (v) => setState(() {
-                  if (v &&
-                      widget.currentAttuneCount >= 3 &&
-                      widget.characterItem?.isAttuned != true) {
-                    return;
-                  }
-                  _isAttuned = v;
-                }),
-              ),
             const SizedBox(height: 12),
             TextField(
-              controller: _descController,
+              controller: _notesCtrl,
               style: AppTextStyles.body,
-              maxLines: 3,
+              maxLines: 2,
               textAlignVertical: TextAlignVertical.top,
               decoration: const InputDecoration(
-                labelText: 'Beschreibung',
+                labelText: 'Notizen',
                 border: OutlineInputBorder(),
                 alignLabelWithHint: true,
               ),
@@ -579,24 +377,229 @@ class _ItemDialogState extends State<_ItemDialog> {
       actions: [
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text('Abbrechen', style: AppTextStyles.body),
+          children: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Abbrechen', style: AppTextStyles.body),
+            ),
+            const SizedBox(width: 10),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                  backgroundColor: widget.themeColor),
+              onPressed: _onSave,
+              child: Text('Speichern', style: AppTextStyles.body),
+            ),
+          ],
         ),
-        SizedBox(
-          width: 10,
-        ),
-        FilledButton(
-          style: FilledButton.styleFrom(backgroundColor: widget.themeColor),
-          onPressed: _onSave,
-          child: Text('Speichern', style: AppTextStyles.body),
-        ),])
       ],
     );
   }
 }
 
-// ── Haupt-Tab ─────────────────────────────────────────────────────────────────
+// ── Kompendium-Picker (Bottom Sheet) ──────────────────────────────────────────
+
+class _CompendiumPickerSheet extends StatefulWidget {
+  final Color themeColor;
+
+  const _CompendiumPickerSheet({required this.themeColor});
+
+  @override
+  State<_CompendiumPickerSheet> createState() =>
+      _CompendiumPickerSheetState();
+}
+
+class _CompendiumPickerSheetState extends State<_CompendiumPickerSheet> {
+  final _searchCtrl = TextEditingController();
+  final _service    = CompendiumService();
+
+  List<Item> _results    = [];
+  bool       _loading    = true;
+  ItemCategory? _filterCategory;
+
+  static const _pickerCategories = [
+    ItemCategory.weapon,
+    ItemCategory.armor,
+    ItemCategory.shield,
+    ItemCategory.tool,
+    ItemCategory.gear,
+    ItemCategory.consumable,
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+    _searchCtrl.addListener(_onSearch);
+  }
+
+  @override
+  void dispose() {
+    _searchCtrl.removeListener(_onSearch);
+    _searchCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _load() async {
+    await _service.load();
+    _onSearch();
+  }
+
+  void _onSearch() {
+    final results = _service.searchItems(
+      _searchCtrl.text,
+      category: _filterCategory,
+    );
+    if (mounted) {
+      setState(() {
+        _results = results;
+        _loading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      expand: false,
+      initialChildSize: 0.85,
+      minChildSize: 0.5,
+      maxChildSize: 0.95,
+      builder: (context, scrollCtrl) {
+        return Column(
+          children: [
+            Container(
+              width: 36,
+              height: 4,
+              margin: const EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: Text('Kompendium', style: AppTextStyles.sectionTitle),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: TextField(
+                controller: _searchCtrl,
+                autofocus: true,
+                style: AppTextStyles.body,
+                decoration: InputDecoration(
+                  hintText: 'Gegenstand suchen…',
+                  prefixIcon: const Icon(Icons.search),
+                  suffixIcon: _searchCtrl.text.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: _searchCtrl.clear,
+                        )
+                      : null,
+                  border: const OutlineInputBorder(),
+                  isDense: true,
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 36,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                children: [
+                  _filterChip(null, 'Alle'),
+                  ..._pickerCategories.map((c) => _filterChip(c, c.label)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Divider(height: 1),
+            Expanded(
+              child: _loading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _results.isEmpty
+                      ? Center(
+                          child: Text(
+                            'Keine Gegenstände gefunden',
+                            style: AppTextStyles.bodySmall
+                                .copyWith(color: Colors.grey),
+                          ),
+                        )
+                      : ListView.separated(
+                          controller: scrollCtrl,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          itemCount: _results.length,
+                          separatorBuilder: (_, _) =>
+                              const SizedBox(height: 4),
+                          itemBuilder: (_, i) =>
+                              _buildResultTile(_results[i]),
+                        ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _filterChip(ItemCategory? cat, String label) {
+    final selected = _filterCategory == cat;
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: FilterChip(
+        label: Text(label, style: AppTextStyles.bodySmall),
+        selected: selected,
+        selectedColor: widget.themeColor.withValues(alpha: 0.15),
+        checkmarkColor: widget.themeColor,
+        onSelected: (_) => setState(() {
+          _filterCategory = selected ? null : cat;
+          _onSearch();
+        }),
+      ),
+    );
+  }
+
+  Widget _buildResultTile(Item item) {
+    return Card(
+      margin: EdgeInsets.zero,
+      child: ListTile(
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        leading: Icon(item.category.icon,
+            color: Colors.grey[600], size: 20),
+        title: Text(item.name, style: AppTextStyles.cardTitle),
+        subtitle: Text(
+          [
+            item.category.label,
+            if (item is WeaponItem) item.damageDice,
+            if (item is ArmorItem)  'RK ${item.armorClassBonus}',
+            item.valueDisplay,
+          ].join(' · '),
+          style:
+              AppTextStyles.bodySmall.copyWith(color: Colors.grey[500]),
+        ),
+        trailing: const Icon(Icons.add_circle_outline, size: 22),
+        onTap: () => Navigator.pop(context, item),
+      ),
+    );
+  }
+}
+
+// ── Unified Inventory Entry ───────────────────────────────────────────────────
+
+sealed class _InventoryEntry {}
+
+class _CiEntry extends _InventoryEntry {
+  final CharacterItem ci;
+  _CiEntry(this.ci);
+}
+
+class _QiEntry extends _InventoryEntry {
+  final QuickItem qi;
+  _QiEntry(this.qi);
+}
+
+// ── Inventar-Tab ──────────────────────────────────────────────────────────────
 
 class InventoryTab extends StatefulWidget {
   final Character character;
@@ -614,10 +617,14 @@ class InventoryTab extends StatefulWidget {
 
 class _InventoryTabState extends State<InventoryTab>
     with AutomaticKeepAliveClientMixin {
-  final ItemRepository _repository = ItemRepository();
+  final _itemRepo  = ItemRepository();
+  final _quickRepo = QuickItemRepository();
+  final _charRepo  = CharacterRepository();
 
-  List<CharacterItem> _items = [];
+  List<CharacterItem> _items      = [];
+  List<QuickItem>     _quickItems = [];
   bool _isLoading = true;
+
   final Map<ItemCategory, bool> _categoryExpanded = {};
 
   @override
@@ -626,105 +633,199 @@ class _InventoryTabState extends State<InventoryTab>
   @override
   void initState() {
     super.initState();
-    _loadItems();
+    _load();
   }
 
-  Future<void> _loadItems() async {
-    final items = await _repository.getItemsForCharacter(widget.character.id);
-    if (mounted) {
-      setState(() {
-        _items = items;
-        _isLoading = false;
-        for (final ci in items) {
-          _categoryExpanded.putIfAbsent(ci.item.category, () => true);
-        }
-      });
-    }
+  Future<void> _load() async {
+    final items  = await _itemRepo.getItemsForCharacter(widget.character.id);
+    final qItems = await _quickRepo.getQuickItemsForCharacter(widget.character.id);
+    if (!mounted) return;
+    setState(() {
+      _items      = items;
+      _quickItems = qItems;
+      _isLoading  = false;
+      for (final ci in items) {
+        _categoryExpanded.putIfAbsent(ci.item.category, () => true);
+      }
+      for (final qi in qItems) {
+        _categoryExpanded.putIfAbsent(qi.category, () => true);
+      }
+    });
   }
 
-  Future<void> _saveItem(CharacterItem characterItem) async {
-    await _repository.updateCharacterItem(characterItem);
-    await _repository.updateItem(characterItem.item);
-  }
+  // ── Berechnungen ─────────────────────────────────────────────────────────
 
-  double get _totalWeight =>
-      _items.fold(0.0, (sum, ci) => sum + ci.totalWeight);
+  double get _totalWeight {
+    final fromItems = _items.fold(0.0, (s, ci) => s + ci.totalWeight);
+    final fromQuick =
+        _quickItems.fold(0.0, (s, qi) => s + qi.weight * qi.quantity);
+    return fromItems + fromQuick;
+  }
 
   int get _attuneCount => _items.where((ci) => ci.isAttuned).length;
 
-  Map<ItemCategory, List<CharacterItem>> get _grouped {
-    final map = <ItemCategory, List<CharacterItem>>{};
+  bool get _isEmpty => _items.isEmpty && _quickItems.isEmpty;
+
+  Map<ItemCategory, List<_InventoryEntry>> get _grouped {
+    final map = <ItemCategory, List<_InventoryEntry>>{};
     for (final ci in _items) {
-      map.putIfAbsent(ci.item.category, () => []).add(ci);
+      map.putIfAbsent(ci.item.category, () => []).add(_CiEntry(ci));
     }
+    for (final qi in _quickItems) {
+      map.putIfAbsent(qi.category, () => []).add(_QiEntry(qi));
+    }
+    // Reihenfolge laut Enum
     return {
       for (final cat in ItemCategory.values)
         if (map.containsKey(cat)) cat: map[cat]!,
     };
   }
 
+  // ── Aktionen ─────────────────────────────────────────────────────────────
+
   Future<void> _showWalletDialog() async {
     final result = await showDialog<_WalletDialogResult>(
       context: context,
       builder: (_) => _WalletDialog(
-        walletCp: widget.character.walletInCopper,
+        walletCp:   widget.character.walletInCopper,
         themeColor: widget.themeColor,
       ),
     );
     if (result == null || !mounted) return;
     setState(() => widget.character.walletInCopper = result.newWalletCp);
-    final repo = CharacterRepository();
-    await repo.updateCharacter(widget.character);
+    await _charRepo.updateCharacter(widget.character);
   }
 
-
-  Future<void> _showItemDialog({CharacterItem? characterItem}) async {
-    final result = await showDialog<_ItemDialogResult>(
+  Future<void> _showAddMenu() async {
+    await showModalBottomSheet(
       context: context,
-      builder: (_) => _ItemDialog(
-        characterId: widget.character.id,
-        themeColor: widget.themeColor,
-        currentAttuneCount: _attuneCount,
-        characterItem: characterItem,
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.menu_book_outlined),
+              title: Text('Aus Kompendium', style: AppTextStyles.body),
+              onTap: () {
+                Navigator.pop(context);
+                _showCompendiumPicker();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.add_box_outlined),
+              title: Text('Schnellitem', style: AppTextStyles.body),
+              subtitle: Text(
+                'Schatz oder sonstiger Gegenstand',
+                style: AppTextStyles.bodySmall
+                    .copyWith(color: Colors.grey),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                _showQuickItemDialog();
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
       ),
     );
+  }
 
-    if (result == null) return;
+  Future<void> _showCompendiumPicker() async {
+    final item = await showModalBottomSheet<Item>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) =>
+          _CompendiumPickerSheet(themeColor: widget.themeColor),
+    );
+    if (item == null || !mounted) return;
+    final ci = CharacterItem(
+      characterId: widget.character.id,
+      item:        item,
+      quantity:    1,
+      isEquipped:  false,
+      isAttuned:   false,
+    );
+    await _itemRepo.addItemToCharacter(ci);
+    await _load();
+  }
 
-    if (result.remove) {
-      await _repository.removeItemFromCharacter(result.ci);
-    } else if (result.isNew) {
-      await _repository.addItemToCharacter(result.ci);
+  Future<void> _showQuickItemDialog({QuickItem? existing}) async {
+    final result = await showDialog<QuickItem>(
+      context: context,
+      builder: (_) => _QuickItemDialog(
+        characterId: widget.character.id,
+        themeColor:  widget.themeColor,
+        existing:    existing,
+      ),
+    );
+    if (result == null || !mounted) return;
+    if (existing == null) {
+      await _quickRepo.insertQuickItem(result);
     } else {
-      await _saveItem(result.ci);
+      await _quickRepo.updateQuickItem(result);
     }
-
-    await _loadItems();
+    await _load();
   }
 
-  Future<void> _updateQuantity(CharacterItem ci, int newQuantity) async {
-    await _repository.updateQuantity(ci, newQuantity);
-    await _loadItems();
+  Future<void> _updateCiQuantity(CharacterItem ci, int newQty) async {
+    if (newQty <= 0) {
+      await _itemRepo.removeItemFromCharacter(ci);
+    } else {
+      await _itemRepo.updateQuantity(ci, newQty);
+    }
+    await _load();
   }
+
+  Future<void> _updateQiQuantity(QuickItem qi, int newQty) async {
+    if (newQty <= 0) {
+      await _quickRepo.deleteQuickItem(qi.id);
+    } else {
+      await _quickRepo.updateQuickItem(QuickItem(
+        id:            qi.id,
+        characterId:   qi.characterId,
+        name:          qi.name,
+        category:      qi.category,
+        notes:         qi.notes,
+        quantity:      newQty,
+        weight:        qi.weight,
+        valueInCopper: qi.valueInCopper,
+      ));
+    }
+    await _load();
+  }
+
+  Future<void> _toggleEquipped(CharacterItem ci) async {
+    ci.isEquipped = !ci.isEquipped;
+    await _itemRepo.updateCharacterItem(ci);
+    await _load();
+  }
+
+  Future<void> _toggleAttuned(CharacterItem ci) async {
+    if (!ci.isAttuned && _attuneCount >= 3) return;
+    ci.isAttuned = !ci.isAttuned;
+    await _itemRepo.updateCharacterItem(ci);
+    await _load();
+  }
+
+  // ── Build ─────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
-
     return Stack(
       children: [
-        _items.isEmpty ? _buildEmptyState() : _buildList(),
+        _isEmpty ? _buildEmptyState() : _buildList(),
         Positioned(
           bottom: 16,
           right: 16,
           child: FloatingActionButton(
             backgroundColor: widget.themeColor,
             foregroundColor: const Color(0xFFF5DEB3),
-            onPressed: () => _showItemDialog(),
+            onPressed: _showAddMenu,
             child: const Icon(Icons.add),
           ),
         ),
@@ -737,7 +838,7 @@ class _InventoryTabState extends State<InventoryTab>
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
       children: [
         _buildSummaryCard(),
-        const SizedBox(height: 32),
+        const SizedBox(height: 48),
         Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -745,12 +846,14 @@ class _InventoryTabState extends State<InventoryTab>
             const SizedBox(height: 16),
             Text(
               'Kein Inventar',
-              style: AppTextStyles.sectionTitle.copyWith(color: Colors.grey[400]),
+              style: AppTextStyles.sectionTitle
+                  .copyWith(color: Colors.grey[400]),
             ),
             const SizedBox(height: 8),
             Text(
               'Tippe auf + um einen Gegenstand hinzuzufügen.',
               style: AppTextStyles.bodySmall.copyWith(color: Colors.grey),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
@@ -765,7 +868,8 @@ class _InventoryTabState extends State<InventoryTab>
       children: [
         _buildSummaryCard(),
         const SizedBox(height: 16),
-        ...grouped.entries.map((e) => _buildCategorySection(e.key, e.value)),
+        ...grouped.entries
+            .map((e) => _buildCategorySection(e.key, e.value)),
       ],
     );
   }
@@ -787,7 +891,8 @@ class _InventoryTabState extends State<InventoryTab>
               child: Expanded(
                 child: Column(
                   children: [
-                    Icon(Icons.toll, color: const Color(0xFFB8860B), size: 20),
+                    const Icon(Icons.toll,
+                        color: Color(0xFFB8860B), size: 20),
                     const SizedBox(height: 4),
                     Text(
                       _formatGP(walletCp),
@@ -839,18 +944,18 @@ class _InventoryTabState extends State<InventoryTab>
   }
 
   Widget _buildCategorySection(
-      ItemCategory category, List<CharacterItem> items) {
+      ItemCategory category, List<_InventoryEntry> entries) {
     final isExpanded = _categoryExpanded[category] ?? true;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         InkWell(
-          onTap: () =>
-              setState(() => _categoryExpanded[category] = !isExpanded),
+          onTap: () => setState(
+              () => _categoryExpanded[category] = !isExpanded),
           borderRadius: BorderRadius.circular(6),
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
+            padding:
+                const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
             child: Row(
               children: [
                 Icon(category.icon, size: 16, color: Colors.grey[600]),
@@ -864,7 +969,7 @@ class _InventoryTabState extends State<InventoryTab>
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  '(${items.length})',
+                  '(${entries.length})',
                   style: AppTextStyles.bodySmall
                       .copyWith(color: Colors.grey[400]),
                 ),
@@ -879,22 +984,28 @@ class _InventoryTabState extends State<InventoryTab>
           ),
         ),
         if (isExpanded) ...[
-          ...items.map((ci) => _buildItemTile(ci)),
+          ...entries.map((e) => switch (e) {
+                _CiEntry(:final ci) => _buildCiTile(ci),
+                _QiEntry(:final qi) => _buildQiTile(qi),
+              }),
           const SizedBox(height: 8),
         ],
       ],
     );
   }
 
-  Widget _buildItemTile(CharacterItem ci) {
-    final item = ci.item;
-    final rarityColor = item.rarity.color;
+  // ── CharacterItem-Kachel ─────────────────────────────────────────────────
+
+  Widget _buildCiTile(CharacterItem ci) {
+    final item  = ci.item;
+    final color = item.isMagical ? Colors.purple[300]! : Colors.grey[300]!;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: () => _showItemDialog(characterItem: ci),
+        onTap: () => showItemDetailSheet(context, item),
+        onLongPress: () => _showCiOptions(ci),
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Row(
@@ -903,7 +1014,7 @@ class _InventoryTabState extends State<InventoryTab>
                 width: 4,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: rarityColor,
+                  color: color,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -919,94 +1030,221 @@ class _InventoryTabState extends State<InventoryTab>
                       children: [
                         Text(item.name, style: AppTextStyles.cardTitle),
                         if (ci.isEquipped)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: widget.themeColor.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              'Ausgerüstet',
-                              style: AppTextStyles.labelXs
-                                  .copyWith(color: widget.themeColor),
-                            ),
-                          ),
+                          _badge('Ausgerüstet', widget.themeColor),
                         if (ci.isAttuned)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: Colors.purple.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              'Eingestimmt',
-                              style: AppTextStyles.labelXs
-                                  .copyWith(color: Colors.purple),
-                            ),
-                          ),
+                          _badge('Eingestimmt', Colors.purple),
                       ],
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      [
-                        item.rarity.label,
-                        if (item.weight > 0) '${item.weight} lb',
-                        if (ci.quantity > 1) '×${ci.quantity}',
-                      ].join(' · '),
+                      _ciSubtitle(ci),
                       style: AppTextStyles.bodySmall
                           .copyWith(color: Colors.grey[500]),
                     ),
                   ],
                 ),
               ),
-
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (ci.quantity > 1)
-                    GestureDetector(
-                      onTap: () => _updateQuantity(ci, ci.quantity - 1),
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[100],
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: const Icon(Icons.remove, size: 16),
-                      ),
-                    ),
-                    if (ci.quantity == 1)
-                     GestureDetector(
-                      onTap: () => _updateQuantity(ci, ci.quantity - 1),
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: widget.themeColor,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text('Entfernen', style: AppTextStyles.body.copyWith(color: Colors.white),),
-                      ),
-                    ),
-                  const SizedBox(width: 4),
-                  ],
-                ),
-                GestureDetector(
-                  onTap: () => _updateQuantity(ci, ci.quantity + 1),
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: const Icon(Icons.add, size: 16),
-                  ),
-                ),
+              _quantityControls(
+                qty:        ci.quantity,
+                onMinus:    () => _updateCiQuantity(ci, ci.quantity - 1),
+                onPlus:     () => _updateCiQuantity(ci, ci.quantity + 1),
+                themeColor: widget.themeColor,
+              ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  String _ciSubtitle(CharacterItem ci) {
+    final item  = ci.item;
+    final parts = <String>[];
+    if (item is WeaponItem) parts.add(item.damageDice);
+    if (item is ArmorItem)  parts.add('RK ${item.armorClassBonus}');
+    if (item.weight > 0)    parts.add('${item.weight} lb');
+    parts.add(item.valueDisplay);
+    return parts.join(' · ');
+  }
+
+  Future<void> _showCiOptions(CharacterItem ci) async {
+    final isEquippable =
+        _equippableCategories.contains(ci.item.category);
+    await showModalBottomSheet(
+      context: context,
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (isEquippable)
+              ListTile(
+                leading: Icon(ci.isEquipped
+                    ? Icons.remove_circle_outline
+                    : Icons.check_circle_outline),
+                title: Text(
+                  ci.isEquipped ? 'Ablegen' : 'Ausrüsten',
+                  style: AppTextStyles.body,
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _toggleEquipped(ci);
+                },
+              ),
+            if (ci.item.requiresAttunement)
+              ListTile(
+                leading: Icon(
+                  ci.isAttuned ? Icons.stars : Icons.star_outline,
+                  color: Colors.purple,
+                ),
+                title: Text(
+                  ci.isAttuned
+                      ? 'Einstimmung lösen'
+                      : 'Einzustimmen',
+                  style: AppTextStyles.body,
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _toggleAttuned(ci);
+                },
+              ),
+            ListTile(
+              leading: const Icon(Icons.delete_outline, color: Colors.red),
+              title: Text(
+                'Entfernen',
+                style: AppTextStyles.body.copyWith(color: Colors.red),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                _updateCiQuantity(ci, 0);
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ── QuickItem-Kachel ─────────────────────────────────────────────────────
+
+  Widget _buildQiTile(QuickItem qi) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => _showQuickItemDialog(existing: qi),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              Container(
+                width: 4,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(qi.name, style: AppTextStyles.cardTitle),
+                    const SizedBox(height: 2),
+                    Text(
+                      _qiSubtitle(qi),
+                      style: AppTextStyles.bodySmall
+                          .copyWith(color: Colors.grey[500]),
+                    ),
+                  ],
+                ),
+              ),
+              _quantityControls(
+                qty:        qi.quantity,
+                onMinus:    () => _updateQiQuantity(qi, qi.quantity - 1),
+                onPlus:     () => _updateQiQuantity(qi, qi.quantity + 1),
+                themeColor: widget.themeColor,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _qiSubtitle(QuickItem qi) {
+    final parts = <String>[];
+    if (qi.notes.isNotEmpty) parts.add(qi.notes);
+    if (qi.weight > 0) parts.add('${qi.weight} lb');
+    if (qi.valueInCopper > 0) {
+      final gp = qi.valueInCopper / 100.0;
+      parts.add(gp == gp.truncateToDouble()
+          ? '${gp.toInt()} GM'
+          : '${gp.toStringAsFixed(2)} GM');
+    }
+    return parts.isEmpty ? 'Schnellitem' : parts.join(' · ');
+  }
+
+  // ── Shared Widgets ────────────────────────────────────────────────────────
+
+  Widget _badge(String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        label,
+        style: AppTextStyles.labelXs.copyWith(color: color),
+      ),
+    );
+  }
+
+  Widget _quantityControls({
+    required int qty,
+    required VoidCallback onMinus,
+    required VoidCallback onPlus,
+    required Color themeColor,
+  }) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        GestureDetector(
+          onTap: onMinus,
+          child: Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: qty <= 1 ? themeColor : Colors.grey[100],
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: qty <= 1
+                ? Text(
+                    'Entf.',
+                    style: AppTextStyles.labelXs
+                        .copyWith(color: Colors.white),
+                  )
+                : const Icon(Icons.remove, size: 16),
+          ),
+        ),
+        if (qty > 1) ...[
+          const SizedBox(width: 4),
+          Text('$qty', style: AppTextStyles.body),
+        ],
+        const SizedBox(width: 4),
+        GestureDetector(
+          onTap: onPlus,
+          child: Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: const Icon(Icons.add, size: 16),
+          ),
+        ),
+      ],
     );
   }
 }
