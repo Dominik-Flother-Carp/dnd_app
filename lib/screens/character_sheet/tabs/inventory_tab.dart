@@ -346,7 +346,7 @@ class _ItemDialogState extends State<_ItemDialog> {
     _descController       = TextEditingController(text: item?.description ?? '');
     _weightController     = TextEditingController(text: item != null ? '${item.weight}' : '0');
     _valueController      = TextEditingController(text: item != null ? '${item.valueInCopper}' : '0');
-    _damageDiceController = TextEditingController(text: item?.damageDice ?? '');
+    _damageDiceController = TextEditingController(text: item is WeaponItem ? (item).damageDice : '');
 
     _selectedCategory   = item?.category ?? ItemCategory.misc;
     _selectedRarity     = item?.rarity ?? ItemRarity.common;
@@ -380,20 +380,27 @@ class _ItemDialogState extends State<_ItemDialog> {
     final showEquipped = _equippableCategories.contains(_selectedCategory);
 
     final updatedItem = _isNew
-        ? Item(
-            name: _nameController.text.trim(),
-            description: _descController.text.trim(),
-            isCustom: true,
-            category: _selectedCategory,
-            rarity: _selectedRarity,
-            weight: double.tryParse(_weightController.text) ?? 0,
-            valueInCopper: int.tryParse(_valueController.text) ?? 0,
-            damageDice: _selectedCategory == ItemCategory.weapon &&
-                    _damageDiceController.text.trim().isNotEmpty
-                ? _damageDiceController.text.trim()
-                : null,
-            requiresAttunement: _requiresAttunement,
-          )
+        ? (_selectedCategory == ItemCategory.weapon
+            ? WeaponItem(
+                name: _nameController.text.trim(),
+                description: _descController.text.trim(),
+                rarity: _selectedRarity,
+                weight: double.tryParse(_weightController.text) ?? 0,
+                valueInCopper: int.tryParse(_valueController.text) ?? 0,
+                requiresAttunement: _requiresAttunement,
+                damageDice: _damageDiceController.text.trim().isNotEmpty
+                    ? _damageDiceController.text.trim() : '1W4',
+                damageType: 'Hieb',
+              )
+            : Item(
+                name: _nameController.text.trim(),
+                description: _descController.text.trim(),
+                category: _selectedCategory,
+                rarity: _selectedRarity,
+                weight: double.tryParse(_weightController.text) ?? 0,
+                valueInCopper: int.tryParse(_valueController.text) ?? 0,
+                requiresAttunement: _requiresAttunement,
+              ))
         : widget.characterItem!.item
       ..name = _nameController.text.trim()
       ..description = _descController.text.trim()
@@ -401,10 +408,6 @@ class _ItemDialogState extends State<_ItemDialog> {
       ..rarity = _selectedRarity
       ..weight = double.tryParse(_weightController.text) ?? 0
       ..valueInCopper = int.tryParse(_valueController.text) ?? 0
-      ..damageDice = _selectedCategory == ItemCategory.weapon &&
-              _damageDiceController.text.trim().isNotEmpty
-          ? _damageDiceController.text.trim()
-          : null
       ..requiresAttunement = _requiresAttunement;
 
     final updatedCi = _isNew
@@ -968,10 +971,10 @@ class _InventoryTabState extends State<InventoryTab>
                       child: Container(
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          color: widget.themeColor,
+                          color: Colors.grey[100],
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: const Icon(Icons.remove, size: 25, color: Colors.white,),
+                        child: const Icon(Icons.remove, size: 16),
                       ),
                     ),
                     if (ci.quantity == 1)
@@ -983,7 +986,7 @@ class _InventoryTabState extends State<InventoryTab>
                           color: widget.themeColor,
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: Text('Entfernen', style: AppTextStyles.body.copyWith(fontWeight: FontWeight.bold ,color: Colors.white),),
+                        child: Text('Entfernen', style: AppTextStyles.body.copyWith(color: Colors.white),),
                       ),
                     ),
                   const SizedBox(width: 4),
@@ -994,10 +997,10 @@ class _InventoryTabState extends State<InventoryTab>
                   child: Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      color: widget.themeColor,
+                      color: Colors.grey[100],
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    child: const Icon(Icons.add, size: 25, color: Colors.white),
+                    child: const Icon(Icons.add, size: 16),
                   ),
                 ),
             ],

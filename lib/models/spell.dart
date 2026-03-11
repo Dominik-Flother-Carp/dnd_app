@@ -93,7 +93,7 @@ class Spell {
   String get componentsDisplay {
     final parts = <String>[];
     if (componentVerbal) parts.add('V');
-    if (componentSomatic) parts.add('S');
+    if (componentSomatic) parts.add('G');
     if (componentMaterial) {
       parts.add(materialComponent.isNotEmpty ? 'M ($materialComponent)' : 'M');
     }

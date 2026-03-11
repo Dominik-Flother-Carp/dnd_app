@@ -10,7 +10,7 @@
         "isMagical": false,
         "magicBonus": 0,
         "weight": 2,
-        "valueInCopper": 200,
+        "valueInCopper": 500,
         "damageDice": "1W4",
         "damageType": "Hieb",
         "weaponProperties": [
@@ -32,7 +32,7 @@
         "isMagical": false,
         "magicBonus": 0,
         "weight": 1,
-        "valueInCopper": 100,
+        "valueInCopper": 200,
         "damageDice": "1W4",
         "damageType": "Stich",
         "weaponProperties": [
@@ -55,7 +55,7 @@
         "isMagical": false,
         "magicBonus": 0,
         "weight": 4.0,
-        "valueInCopper": 40,
+        "valueInCopper": 20,
         "damageDice": "1W6",
         "damageType": "Wucht",
         "weaponProperties": [

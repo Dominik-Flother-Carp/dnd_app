@@ -194,17 +194,11 @@ class Item {
 
   String get valueDisplay {
     if (_valueInCopper == 0) return 'Wertlos';
-    int r = _valueInCopper;
-    final pp = r ~/ 1000; r %= 1000;
-    final gp = r ~/ 100;  r %= 100;
-    final sp = r ~/ 10;   r %= 10;
-    final cp = r;
-    final parts = <String>[];
-    if (pp > 0) parts.add('$pp PM');
-    if (gp > 0) parts.add('$gp GM');
-    if (sp > 0) parts.add('$sp SM');
-    if (cp > 0) parts.add('$cp KM');
-    return parts.join(', ');
+    final gm = _valueInCopper / 100.0;
+    if (gm == gm.truncateToDouble()) {
+      return '${gm.toInt()} GM';
+    }
+    return '${gm.toStringAsFixed(2)} GM';
   }
 
   // ── Datenbank ─────────────────────────────────────────────────────────────
@@ -401,7 +395,7 @@ class ArmorItem extends Item {
       armorType:           ArmorType.values.byName(map['armorType'] ?? 'medium'),
       minStrength:         map['minStrength'] ?? 0,
       maxDexBonusOverride: map['maxDexBonusOverride'] as int?,
-      stealthDisadvantage: map['stealthDisadvantage'] == 1,
+      stealthDisadvantage: map['stealthDisadvantage'] == 1 || map['stealthDisadvantage'] == true,
     );
   }
 }
