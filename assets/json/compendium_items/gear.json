@@ -16,14 +16,14 @@
         "id": "item_brechstange",
         "itemType": "base",
         "name": "Brechstange",
-        "description": "Diese Laterne strahlt in einem Kegel von 18 Metern helles Licht und über weitere 18 Meter dämmriges Licht aus. Sie brennt mit einer Flasche Öl (0,5 Liter) sechs Stunden lang.",
+        "description": "Verwendest du eine Brechstange als Hebel, bist du im Vorteil bei entsprechenden Stärkewürfen.",
         "category": "gear",
         "rarity": "common",
         "requiresAttunement": false,
         "isMagical": false,
         "magicBonus": 0,
-        "weight": 2.0,
-        "valueInCopper": 1000
+        "weight": 5.0,
+        "valueInCopper": 2000
     },
     {
         "id": "item_fackel",
@@ -55,7 +55,7 @@
         "id": "item_heiligesSymbol",
         "itemType": "base",
         "name": "Heiliges Symbol",
-        "description": " Ein heiliges Symbol repräsentiert eine Gottheit oder ein Pantheon von Göttern. Es könnte auf ein Amulett geprägt, aber auch auf einen Schild graviert sein oder sich als Einlegearbeit auf diesem befinden. Auch eine kleine Schatulle mit einem winzigen Fragment einer heiligen Reliquie kann als heiliges Symbol dienen. Anhang B 'Götter des Multiversums' führt das verbreitetste Symbol jeder Gottheit auf. Ein Kleriker oder Paladin kann das heilige Symbol als Zauberfokus verwenden, so wie es in Kapitel 10 'Zauber wirken' beschrieben wird. Um das heilige Symbol auf diese Weise nutzen zu können, muss man es sichtbar in einer Hand halten oder es muss auf einem Schild angebracht sein.",
+        "description": "Ein heiliges Symbol repräsentiert eine Gottheit oder ein Pantheon von Göttern. Es könnte auf ein Amulett geprägt, aber auch auf einen Schild graviert sein oder sich als Einlegearbeit auf diesem befinden. Auch eine kleine Schatulle mit einem winzigen Fragment einer heiligen Reliquie kann als heiliges Symbol dienen. Anhang B 'Götter des Multiversums' führt das verbreitetste Symbol jeder Gottheit auf. Ein Kleriker oder Paladin kann das heilige Symbol als Zauberfokus verwenden, so wie es in Kapitel 10 'Zauber wirken' beschrieben wird. Um das heilige Symbol auf diese Weise nutzen zu können, muss man es sichtbar in einer Hand halten oder es muss auf einem Schild angebracht sein.",
         "category": "gear",
         "rarity": "common",
         "requiresAttunement": false,
@@ -78,6 +78,32 @@
         "valueInCopper": 1
     },
     {
+        "id": "item_kleidung_edel",
+        "itemType": "base",
+        "name": "Kleidung, edel",
+        "description": "Du erhältst zu diesem Schloss auch einen Schlüssel. Eine Kreatur, die im Umgang mit Diebeswerkzeug geübt ist, kann dieses Schloss mit einem erfolgreichen SG-15-Geschicklichkeitswurf knacken.",
+        "category": "gear",
+        "rarity": "common",
+        "requiresAttunement": false,
+        "isMagical": false,
+        "magicBonus": 0,
+        "weight": 1.0,
+        "valueInCopper": 1000
+    },
+    {
+        "id": "item_kleidung_common",
+        "itemType": "base",
+        "name": "Kleidung, gewöhnlich",
+        "description": "Du erhältst zu diesem Schloss auch einen Schlüssel. Eine Kreatur, die im Umgang mit Diebeswerkzeug geübt ist, kann dieses Schloss mit einem erfolgreichen SG-15-Geschicklichkeitswurf knacken.",
+        "category": "gear",
+        "rarity": "common",
+        "requiresAttunement": false,
+        "isMagical": false,
+        "magicBonus": 0,
+        "weight": 1.0,
+        "valueInCopper": 1000
+    },
+    {
         "id": "item_koecher",
         "itemType": "base",
         "name": "Köcher",
@@ -89,6 +115,19 @@
         "magicBonus": 0,
         "weight": 1.0,
         "valueInCopper": 1000
+    },
+    {
+        "id": "item_materialBeutel",
+        "itemType": "base",
+        "name": "Materialkomponentenbeutel",
+        "description": "Ein Materialkomponentenbeutel ist eine kleine, wasserdichte Ledergürteltasche. In ihm befinden sich in separaten Fächern all jene Materialien und anderen speziellen Gegenstände, die du zum Wirken deiner Zauber benötigst. Komponenten, die in der Beschreibung des Zaubers mit Kosten aufgeführt sind, sind nicht im Beutel enthalten.",
+        "category": "gear",
+        "rarity": "common",
+        "requiresAttunement": false,
+        "isMagical": false,
+        "magicBonus": 0,
+        "weight": 2.0,
+        "valueInCopper": 2500
     },
     {
         "id": "item_oel",
@@ -107,7 +146,7 @@
         "id": "item_reisegeschirr",
         "itemType": "base",
         "name": "Reisegeschirr",
-        "description": " Diese Blechdose enthält einen Becher und einfaches Besteck. Die Blechdose ist zusammengesteckt, sodass eine Seite als Pfanne und die andere als Teller oder flache Schale verwendet werden kann.",
+        "description": "Diese Blechdose enthält einen Becher und einfaches Besteck. Die Blechdose ist zusammengesteckt, sodass eine Seite als Pfanne und die andere als Teller oder flache Schale verwendet werden kann.",
         "category": "gear",
         "rarity": "common",
         "requiresAttunement": false,
@@ -115,6 +154,19 @@
         "magicBonus": 0,
         "weight": 1.0,
         "valueInCopper": 20
+    },
+    {
+        "id": "item_schaufel",
+        "itemType": "base",
+        "name": "Schaufel",
+        "description": "Eine Eisenschaufel mit hölzernem Stil und Griff.",
+        "category": "gear",
+        "rarity": "common",
+        "requiresAttunement": false,
+        "isMagical": false,
+        "magicBonus": 0,
+        "weight": 5.0,
+        "valueInCopper": 2000
     },
     {
         "id": "item_schloss",
@@ -156,6 +208,32 @@
         "valueInCopper": 1000
     },
     {
+        "id": "item_siegelring",
+        "itemType": "base",
+        "name": "Siegelring",
+        "description": "Ein Ring aus Edelmetall, der sein Familienwappen trägt.",
+        "category": "gear",
+        "rarity": "common",
+        "requiresAttunement": false,
+        "isMagical": false,
+        "magicBonus": 0,
+        "weight": 0.0,
+        "valueInCopper": 5000
+    },
+    {
+        "id": "item_trinkschlauch",
+        "itemType": "base",
+        "name": "Trinkschlauch",
+        "description": "Fasst bis zu 2 Liter Flüssigkeit",
+        "category": "gear",
+        "rarity": "common",
+        "requiresAttunement": false,
+        "isMagical": false,
+        "magicBonus": 0,
+        "weight": 0.0,
+        "valueInCopper": 20
+    },
+    {
         "id": "item_weihwasser",
         "itemType": "base",
         "name": "Weihwasser",
@@ -167,6 +245,19 @@
         "magicBonus": 0,
         "weight": 1.0,
         "valueInCopper": 25000
+    },
+    {
+        "id": "item_zauberbuch",
+        "itemType": "base",
+        "name": "Zauberbuch",
+        "description": "Unverzichtbar für Magier ist das Zauberbuch aus ledergebundenen 100 leeren Pergamentseiten.",
+        "category": "gear",
+        "rarity": "common",
+        "requiresAttunement": false,
+        "isMagical": false,
+        "magicBonus": 0,
+        "weight": 3.0,
+        "valueInCopper": 5000
     },
     {
         "id": "item_zunder",
