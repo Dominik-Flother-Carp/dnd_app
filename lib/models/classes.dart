@@ -20,6 +20,64 @@ class CharacterClass {
   });
 }
 
+
+// ── Unterklassen-Modell ───────────────────────────────────────────────────────
+
+class CharacterSubclass {
+  final String name;
+  final String className;      // Name der Elternklasse
+  final int unlocksAtLevel;    // Ab welcher Stufe wählbar
+
+  const CharacterSubclass({
+    required this.name,
+    required this.className,
+    required this.unlocksAtLevel,
+  });
+}
+
+const List<CharacterSubclass> characterSubclasses = [
+  // ── Kämpfer ────────────────────────────────────────────────────────────────
+  CharacterSubclass(name: 'Champion',          className: 'Kämpfer',  unlocksAtLevel: 3),
+  CharacterSubclass(name: 'Kampfmeister',      className: 'Kämpfer',  unlocksAtLevel: 3),
+  CharacterSubclass(name: 'Mystischer Ritter', className: 'Kämpfer',  unlocksAtLevel: 3),
+
+  // ── Kleriker ───────────────────────────────────────────────────────────────
+  CharacterSubclass(name: 'Domäne des Krieges', className: 'Kleriker', unlocksAtLevel: 1),
+  CharacterSubclass(name: 'Domäne des Lebens',  className: 'Kleriker', unlocksAtLevel: 1),
+  CharacterSubclass(name: 'Domäne des Lichts',  className: 'Kleriker', unlocksAtLevel: 1),
+  CharacterSubclass(name: 'Domäne der List',    className: 'Kleriker', unlocksAtLevel: 1),
+  CharacterSubclass(name: 'Domäne der Natur',   className: 'Kleriker', unlocksAtLevel: 1),
+  CharacterSubclass(name: 'Domäne des Sturms',  className: 'Kleriker', unlocksAtLevel: 1),
+  CharacterSubclass(name: 'Domäne des Wissens', className: 'Kleriker', unlocksAtLevel: 1),
+
+  // ── Magier ─────────────────────────────────────────────────────────────────
+  CharacterSubclass(name: 'Schule der Bannmagie',    className: 'Magier', unlocksAtLevel: 2),
+  CharacterSubclass(name: 'Schule der Beschwörung',  className: 'Magier', unlocksAtLevel: 2),
+  CharacterSubclass(name: 'Schule der Erkenntnis',   className: 'Magier', unlocksAtLevel: 2),
+  CharacterSubclass(name: 'Schule der Hervorrufung', className: 'Magier', unlocksAtLevel: 2),
+  CharacterSubclass(name: 'Schule der Illusion',     className: 'Magier', unlocksAtLevel: 2),
+  CharacterSubclass(name: 'Schule der Nekromantie',  className: 'Magier', unlocksAtLevel: 2),
+  CharacterSubclass(name: 'Schule der Verwandlung',  className: 'Magier', unlocksAtLevel: 2),
+  CharacterSubclass(name: 'Schule der Verzauberung', className: 'Magier', unlocksAtLevel: 2),
+
+  // ── Paladin ────────────────────────────────────────────────────────────────
+  CharacterSubclass(name: 'Schwur der Alten',   className: 'Paladin', unlocksAtLevel: 3),
+  CharacterSubclass(name: 'Schwur der Hingabe', className: 'Paladin', unlocksAtLevel: 3),
+  CharacterSubclass(name: 'Schwur der Rache',   className: 'Paladin', unlocksAtLevel: 3),
+
+  // ── Schurke ────────────────────────────────────────────────────────────────
+  CharacterSubclass(name: 'Arkaner Betrüger', className: 'Schurke', unlocksAtLevel: 3),
+  CharacterSubclass(name: 'Assassine',        className: 'Schurke', unlocksAtLevel: 3),
+  CharacterSubclass(name: 'Dieb',             className: 'Schurke', unlocksAtLevel: 3),
+];
+
+/// Gibt alle verfügbaren Unterklassen für eine Klasse bei gegebenem Level zurück.
+List<CharacterSubclass> availableSubclasses(String className, int level) {
+  return characterSubclasses
+      .where((s) => s.className == className && s.unlocksAtLevel <= level)
+      .toList();
+}
+
 const List<CharacterClass> characterClasses = [
   CharacterClass(
     name: 'Barbar',

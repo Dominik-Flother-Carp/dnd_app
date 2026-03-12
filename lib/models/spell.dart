@@ -6,9 +6,9 @@ import 'package:dnd_app/models/enums.dart';
 enum SpellSchool {
   abjuration,    // Bannmagie
   conjuration,   // Beschwörung
-  divination,    // Erkenntnis
+  divination,    // Divination
   enchantment,   // Verzauberung
-  evocation,     // Hervorrufung
+  evocation,     // Evokation
   illusion,      // Illusion
   necromancy,    // Nekromantie
   transmutation, // Verwandlung
@@ -24,7 +24,6 @@ enum AttackRollType {
 class Spell {
   final String id;
   String name;
-
   // ── Zauber-Metadaten ──────────────────────────────────────────────────────
   SpellSchool school;
   int _level = 0;      // 0 = Zaubertrick, 1–9 = Zaubergrad
@@ -49,6 +48,7 @@ class Spell {
   // ── Beschreibung ──────────────────────────────────────────────────────────
   String effectDescription;  // Hauptbeschreibung des Effekts
   String? atHigherLevels;    // Optionale Skalierung auf höheren Graden
+  List<String> classes;      // Klassenname(n) die diesen Zauber nutzen können
 
   Spell({
     String? id,
@@ -70,7 +70,9 @@ class Spell {
     this.damageType,
     required this.effectDescription,
     this.atHigherLevels,
-  })  : id = id ?? const Uuid().v4() {
+    List<String>? classes,
+  })  : classes = classes ?? [],
+        id = id ?? const Uuid().v4() {
     _level = level.clamp(0, 9);
   }
 
@@ -93,7 +95,7 @@ class Spell {
   String get componentsDisplay {
     final parts = <String>[];
     if (componentVerbal) parts.add('V');
-    if (componentSomatic) parts.add('G');
+    if (componentSomatic) parts.add('S');
     if (componentMaterial) {
       parts.add(materialComponent.isNotEmpty ? 'M ($materialComponent)' : 'M');
     }
@@ -123,6 +125,7 @@ class Spell {
       'damageType':             damageType,
       'effectDescription':      effectDescription,
       'atHigherLevels':         atHigherLevels,
+      'classes':                classes.join(','),
     };
   }
 
@@ -149,6 +152,9 @@ class Spell {
       damageType:           map['damageType'],
       effectDescription:    map['effectDescription'] ?? '',
       atHigherLevels:       map['atHigherLevels'],
+      classes:              (map['classes'] as String? ?? '').isEmpty
+                              ? []
+                              : (map['classes'] as String).split(','),
     );
   }
 }

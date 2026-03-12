@@ -825,63 +825,77 @@ class _InventoryTabState extends State<InventoryTab>
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
-    return Stack(
+    return Column(
       children: [
-        _isEmpty ? _buildEmptyState() : _buildList(),
-        Positioned(
-          bottom: 16,
-          right: 16,
-          child: FloatingActionButton(
-            backgroundColor: widget.themeColor,
-            foregroundColor: const Color(0xFFF5DEB3),
-            onPressed: _showAddMenu,
-            child: const Icon(Icons.add),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+          child: _buildSummaryCard(),
+        ),
+        Expanded(
+          child: Stack(
+            children: [
+              CustomScrollView(
+                primary: false,
+                physics: const ClampingScrollPhysics(),
+                slivers: [
+                  if (_isEmpty)
+                    SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: _buildScrollableEmpty(),
+                    )
+                  else
+                    SliverPadding(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
+                      sliver: SliverList(
+                        delegate: SliverChildListDelegate([
+                          ..._grouped.entries
+                              .map((e) => _buildCategorySection(e.key, e.value)),
+                        ]),
+                      ),
+                    ),
+                ],
+              ),
+              Positioned(
+                bottom: 16,
+                right: 16,
+                child: FloatingActionButton(
+                  backgroundColor: widget.themeColor,
+                  foregroundColor: const Color(0xFFF5DEB3),
+                  onPressed: _showAddMenu,
+                  child: const Icon(Icons.add),
+                ),
+              ),
+            ],
           ),
         ),
       ],
     );
   }
 
-  Widget _buildEmptyState() {
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
-      children: [
-        _buildSummaryCard(),
-        const SizedBox(height: 48),
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.backpack_outlined, size: 64, color: Colors.grey[300]),
-            const SizedBox(height: 16),
-            Text(
-              'Kein Inventar',
-              style: AppTextStyles.sectionTitle
-                  .copyWith(color: Colors.grey[400]),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Tippe auf + um einen Gegenstand hinzuzufügen.',
-              style: AppTextStyles.bodySmall.copyWith(color: Colors.grey),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ],
+  Widget _buildScrollableEmpty() {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.backpack_outlined, size: 64, color: Colors.grey[300]),
+          const SizedBox(height: 16),
+          Text(
+            'Kein Inventar',
+            style: AppTextStyles.sectionTitle
+                .copyWith(color: Colors.grey[400]),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Tippe auf + um einen Gegenstand hinzuzufügen.',
+            style: AppTextStyles.bodySmall.copyWith(color: Colors.grey),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildList() {
-    final grouped = _grouped;
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
-      children: [
-        _buildSummaryCard(),
-        const SizedBox(height: 16),
-        ...grouped.entries
-            .map((e) => _buildCategorySection(e.key, e.value)),
-      ],
-    );
-  }
+
 
   Widget _buildSummaryCard() {
     final walletCp = widget.character.walletInCopper;
@@ -895,9 +909,9 @@ class _InventoryTabState extends State<InventoryTab>
               value: '${_totalWeight.toStringAsFixed(1)} lb',
               icon: Icons.scale,
             ),
-            GestureDetector(
-              onTap: _showWalletDialog,
-              child: Expanded(
+            Expanded(
+              child: GestureDetector(
+                onTap: _showWalletDialog,
                 child: Column(
                   children: [
                     const Icon(Icons.toll,

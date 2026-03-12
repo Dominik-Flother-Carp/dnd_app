@@ -107,27 +107,27 @@
         "id": "item_kleidung_edel",
         "itemType": "base",
         "name": "Kleidung, edel",
-        "description": "Du erhältst zu diesem Schloss auch einen Schlüssel. Eine Kreatur, die im Umgang mit Diebeswerkzeug geübt ist, kann dieses Schloss mit einem erfolgreichen SG-15-Geschicklichkeitswurf knacken.",
+        "description": "Feine Gewänder aus edlen Stoffen wie Seide oder besticktem Leinen. Solche Kleidung ist typisch für Adlige, reiche Kaufleute und hohe Geistliche. Sie verleiht dem Träger ein gepflegtes, respekteinflößendes Auftreten in gesellschaftlichen Kreisen.",
         "category": "gear",
         "rarity": "common",
         "requiresAttunement": false,
         "isMagical": false,
         "magicBonus": 0,
-        "weight": 1.0,
-        "valueInCopper": 1000
+        "weight": 6.0,
+        "valueInCopper": 1500
     },
     {
         "id": "item_kleidung_common",
         "itemType": "base",
         "name": "Kleidung, gewöhnlich",
-        "description": "Du erhältst zu diesem Schloss auch einen Schlüssel. Eine Kreatur, die im Umgang mit Diebeswerkzeug geübt ist, kann dieses Schloss mit einem erfolgreichen SG-15-Geschicklichkeitswurf knacken.",
+        "description": "Schlichte, zweckmäßige Kleidung aus robustem Wollstoff oder Leinen. Sie ist auf Haltbarkeit ausgelegt und wird von Handwerkern, Bauern und einfachen Stadtbewohnern getragen.",
         "category": "gear",
         "rarity": "common",
         "requiresAttunement": false,
         "isMagical": false,
         "magicBonus": 0,
-        "weight": 1.0,
-        "valueInCopper": 1000
+        "weight": 3.0,
+        "valueInCopper": 5000
     },
     {
         "id": "item_kletterhaken",
@@ -348,7 +348,7 @@
         "isMagical": false,
         "magicBonus": 0,
         "weight": 1.0,
-        "valueInCopper": 25000
+        "valueInCopper": 2500
     },
     {
         "id": "item_zauberbuch",

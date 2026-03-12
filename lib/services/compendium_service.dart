@@ -32,7 +32,6 @@ class CompendiumService {
     'assets/json/compendium_items/armors/shields.json',
     'assets/json/compendium_items/tools.json',
     'assets/json/compendium_items/consumables.json',
-    'assets/json/compendium_items/gear.json',
   ];
 
   static const _spellPaths = [
@@ -89,6 +88,10 @@ class CompendiumService {
                              'componentSomatic', 'componentMaterial']) {
             if (m[key] is bool) m[key] = (m[key] as bool) ? 1 : 0;
           }
+          // classes kommt aus JSON als List<dynamic>, fromMap erwartet String
+          if (m['classes'] is List) {
+            m['classes'] = (m['classes'] as List).join(',');
+          }
           spells.add(Spell.fromMap(m));
         }
       } catch (e) {
@@ -121,11 +124,15 @@ class CompendiumService {
     }).toList();
   }
 
-  List<Spell> searchSpells(String query) {
+  List<Spell> searchSpells(String query, {String? className}) {
     final q = query.toLowerCase().trim();
-    if (q.isEmpty) return _spells;
-    return _spells.where((spell) =>
-        spell.name.toLowerCase().contains(q) ||
-        spell.effectDescription.toLowerCase().contains(q)).toList();
+    return _spells.where((spell) {
+      final matchesQuery = q.isEmpty ||
+          spell.name.toLowerCase().contains(q) ||
+          spell.effectDescription.toLowerCase().contains(q);
+      final matchesClass = className == null ||
+          spell.classes.contains(className);
+      return matchesQuery && matchesClass;
+    }).toList();
   }
 }

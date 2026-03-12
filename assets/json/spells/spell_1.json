@@ -1,110 +1,130 @@
 [
-    {
-        "id": "spell_befehl",
-        "name": "Befehl",
-        "school": "enchantment",
-        "level": 1,
-        "castingTime": "1 Aktion",
-        "range": "18 m",
-        "duration": "Eine Runde",
-        "concentration": false,
-        "ritual": false,
-        "componentVerbal": true,
-        "componentSomatic": false,
-        "componentMaterial": false,
-        "materialComponent": null,
-        "attackRollType": "none",
-        "savingThrowAttribute": "wisdom",
-        "damageDice": null,
-        "damageType": null,
-        "effectDescription": "Du gibst einer Kreatur in Reichweite, die du sehen kannst, einen ein Wort langen Befehl. Das Ziel muss einen Weisheitsrettungswurf bestehen oder den Befehl im nächsten Zug ausführen. Der Zauber hat keine Wirkung, falls das Ziel untot ist, deine Sprache nicht versteht oder dein Befehl ihm direkt Schaden zufügen würde.\n\nFlieh: Das Ziel nutzt seinen Zug, um sich so schnell wie möglich von dir wegzubewegen.\nHalt: Das Ziel bewegt sich nicht und führt keinerlei Aktionen aus.\nHinlegen: Das Ziel legt sich hin und erhält somit den Liegend-Zustand.\nKomm: Das Ziel bewegt sich auf dem kürzesten Weg in deine Richtung und beendet seinen Zug, sobald es sich auf 1,5 Meter genähert hat.\nLoslassen: Das Ziel lässt fallen, was es gerade hält, und beendet seinen Zug.",
-        "atHigherLevels": "Für jeden Grad über dem 1. kann eine zusätzliche Kreatur betroffen sein. Die Kreaturen müssen sich innerhalb von neun Metern voneinander befinden."
-    },
-    {
-        "id": "spell_donnerwoge",
-        "name": "Donnerwoge",
-        "school": "evocation",
-        "level": 1,
-        "castingTime": "1 Aktion",
-        "range": "Selbst (Würfel von 4,5 Metern)",
-        "duration": "Sofort",
-        "concentration": false,
-        "ritual": false,
-        "componentVerbal": true,
-        "componentSomatic": true,
-        "componentMaterial": false,
-        "materialComponent": null,
-        "attackRollType": "none",
-        "savingThrowAttribute": "constitution",
-        "damageDice": "2W8",
-        "damageType": "Schall",
-        "effectDescription": "Eine Woge donnernder Energie bricht aus dir heraus. Alle Kreaturen in einem Würfel von 4,5 Metern, der von dir ausgeht, müssen einen Konstitutionsrettungswurf ausführen. Bei einem gescheiterten Rettungswurf erleidet eine Kreatur 2W8 Schallschaden und wird drei Meter von dir weggestoßen. Bei einem erfolgreichen Rettungswurf erleidet die Kreatur halb so viel Schaden (abgerundet) und wird nicht weggestoßen.\n\nAußerdem werden ungesicherte Objekte, die sich vollständig im Wirkungsbereich befinden, durch den Effekt des Zaubers automatisch drei Meter von dir weggestoßen. Der Zauber bewirkt einen donnernden Knall, der 90 Meter weit zu hören ist.",
-        "atHigherLevels": "Wirkst du diesen Zauber, indem du einen Zauberplatz des 2. Grades oder höher nutzt, erhöht sich der Schaden für jeden Grad über dem 1. um 1W8."
-    },
-    {
-        "id": "spell_heilendesWort",
-        "name": "Heilendes Wort",
-        "school": "evocation",
-        "level": 1,
-        "castingTime": "1 Bonusaktion",
-        "range": "18 m",
-        "duration": "Sofort",
-        "concentration": false,
-        "ritual": false,
-        "componentVerbal": true,
-        "componentSomatic": false,
-        "componentMaterial": false,
-        "materialComponent": null,
-        "attackRollType": "none",
-        "savingThrowAttribute": "none",
-        "damageDice": null,
-        "damageType": null,
-        "effectDescription": "Eine Kreatur deiner Wahl, die du innerhalb der Reichweite sehen kannst, gewinnt Trefferpunkte in Höhe von 1W4 + dein Zauberwirken-Attributsmodifikator zurück. Dieser Zauber wirkt nicht auf Untote oder Konstrukte.",
-        "atHigherLevels": "Wenn du diesen Spruch mit einem Zauberplatz des 2. oder eines höheren Grades wirkst, steigt die Anzahl der zurückgewonnen Trefferpunkte für jeden Grad über den 1. hinaus um 1W4."
-    },
-    {
-        "id": "spell_heiligtum",
-        "name": "Heiligtum",
-        "school": "abjuration",
-        "level": 1,
-        "castingTime": "1 Bonusaktion",
-        "range": "9 m",
-        "duration": "1 Minute",
-        "concentration": false,
-        "ritual": false,
-        "componentVerbal": true,
-        "componentSomatic": true,
-        "componentMaterial": true,
-        "materialComponent": "Eine kleiner silberner Spiegel",
-        "attackRollType": "none",
-        "savingThrowAttribute": "none",
-        "damageDice": null,
-        "damageType": null,
-        "effectDescription": "Du schützt eine Kreatur in Reichweite vor Angriffen. Während der Wirkungsdauer muss jede Kreatur, die bei einem Angriff oder schädlichen Zauber die geschützte Kreatur als Ziel hat, zuerst einen Weisheitsrettungswurf bestehen. Scheitert der Rettungswurf, muss die Kreatur ein neues Ziel wählen, oder sie verliert den Angriff oder Zauber. Dieser Zauber schützt die geschützte Kreatur nicht vor Flächeneffekten wie der Explosion eines Feuerballs.\n\nGreift die geschützte Kreatur eine feindliche Kreatur an, wirkt sie einen schädlichen Zauber auf diese oder fügt sie ihr anderweitig Schaden zu, endet dieser Zauber.",
-        "atHigherLevels": null
-    },
-    {
-        "id": "spell_lenkendesGeschoss",
-        "name": "Lenkendes Geschoss",
-        "school": "evocation",
-        "level": 1,
-        "castingTime": "1 Aktion",
-        "range": "36 m",
-        "duration": "Sofort",
-        "concentration": false,
-        "ritual": false,
-        "componentVerbal": true,
-        "componentSomatic": true,
-        "componentMaterial": false,
-        "materialComponent": null,
-        "attackRollType": "ranged",
-        "savingThrowAttribute": "none",
-        "damageDice": "4W6",
-        "damageType": "Gleißend",
-        "effectDescription": "Ein Lichtblitz schießt auf eine Kreatur deiner Wahl in Reichweite zu. Führe einen Fernkampf-Zauberangriff gegen das Ziel aus. Bei Erfolg erleidet das Ziel 4W6 gleißenden Schaden. Der nächste Angriffswurf gegen das Ziel vor Ende deines nächsten Zuges ist ein Wurf mit Vorteil, dank des mystischen dämmrigen Lichts, das bis dahin auf dem Ziel glitzert.",
-        "atHigherLevels": "Wirkst du diesen Zauber, indem du einen Zauberplatz 2. Grades oder höher nutzt, steigt der Schaden für jeden Grad über dem 1. um 1W6. "
-    },
-    {
+  {
+    "id": "spell_befehl",
+    "name": "Befehl",
+    "school": "enchantment",
+    "level": 1,
+    "castingTime": "1 Aktion",
+    "range": "18 m",
+    "duration": "Eine Runde",
+    "concentration": false,
+    "ritual": false,
+    "componentVerbal": true,
+    "componentSomatic": false,
+    "componentMaterial": false,
+    "materialComponent": null,
+    "attackRollType": "none",
+    "savingThrowAttribute": "wisdom",
+    "damageDice": null,
+    "damageType": null,
+    "effectDescription": "Du gibst einer Kreatur in Reichweite, die du sehen kannst, einen ein Wort langen Befehl. Das Ziel muss einen Weisheitsrettungswurf bestehen oder den Befehl im nächsten Zug ausführen. Der Zauber hat keine Wirkung, falls das Ziel untot ist, deine Sprache nicht versteht oder dein Befehl ihm direkt Schaden zufügen würde.\n\nFlieh: Das Ziel nutzt seinen Zug, um sich so schnell wie möglich von dir wegzubewegen.\nHalt: Das Ziel bewegt sich nicht und führt keinerlei Aktionen aus.\nHinlegen: Das Ziel legt sich hin und erhält somit den Liegend-Zustand.\nKomm: Das Ziel bewegt sich auf dem kürzesten Weg in deine Richtung und beendet seinen Zug, sobald es sich auf 1,5 Meter genähert hat.\nLoslassen: Das Ziel lässt fallen, was es gerade hält, und beendet seinen Zug.",
+    "atHigherLevels": "Für jeden Grad über dem 1. kann eine zusätzliche Kreatur betroffen sein. Die Kreaturen müssen sich innerhalb von neun Metern voneinander befinden.",
+    "classes": [
+      "Kleriker",
+      "Paladin"
+    ]
+  },
+  {
+    "id": "spell_donnerwoge",
+    "name": "Donnerwoge",
+    "school": "evocation",
+    "level": 1,
+    "castingTime": "1 Aktion",
+    "range": "Selbst (Würfel von 4,5 Metern)",
+    "duration": "Sofort",
+    "concentration": false,
+    "ritual": false,
+    "componentVerbal": true,
+    "componentSomatic": true,
+    "componentMaterial": false,
+    "materialComponent": null,
+    "attackRollType": "none",
+    "savingThrowAttribute": "constitution",
+    "damageDice": "2W8",
+    "damageType": "Schall",
+    "effectDescription": "Eine Woge donnernder Energie bricht aus dir heraus. Alle Kreaturen in einem Würfel von 4,5 Metern, der von dir ausgeht, müssen einen Konstitutionsrettungswurf ausführen. Bei einem gescheiterten Rettungswurf erleidet eine Kreatur 2W8 Schallschaden und wird drei Meter von dir weggestoßen. Bei einem erfolgreichen Rettungswurf erleidet die Kreatur halb so viel Schaden (abgerundet) und wird nicht weggestoßen.\n\nAußerdem werden ungesicherte Objekte, die sich vollständig im Wirkungsbereich befinden, durch den Effekt des Zaubers automatisch drei Meter von dir weggestoßen. Der Zauber bewirkt einen donnernden Knall, der 90 Meter weit zu hören ist.",
+    "atHigherLevels": "Wirkst du diesen Zauber, indem du einen Zauberplatz des 2. Grades oder höher nutzt, erhöht sich der Schaden für jeden Grad über dem 1. um 1W8.",
+    "classes": [
+      "Barde",
+      "Druide",
+      "Zauberer"
+    ]
+  },
+  {
+    "id": "spell_heilendesWort",
+    "name": "Heilendes Wort",
+    "school": "conjuration",
+    "level": 1,
+    "castingTime": "1 Bonusaktion",
+    "range": "18 m",
+    "duration": "Sofort",
+    "concentration": false,
+    "ritual": false,
+    "componentVerbal": true,
+    "componentSomatic": false,
+    "componentMaterial": false,
+    "materialComponent": null,
+    "attackRollType": "none",
+    "savingThrowAttribute": "none",
+    "damageDice": null,
+    "damageType": null,
+    "effectDescription": "Eine Kreatur deiner Wahl, die du innerhalb der Reichweite sehen kannst, gewinnt Trefferpunkte in Höhe von 1W4 + dein Zauberwirken-Attributsmodifikator zurück. Dieser Zauber wirkt nicht auf Untote oder Konstrukte.",
+    "atHigherLevels": "Wenn du diesen Spruch mit einem Zauberplatz des 2. oder eines höheren Grades wirkst, steigt die Anzahl der zurückgewonnen Trefferpunkte für jeden Grad über den 1. hinaus um 1W4.",
+    "classes": [
+      "Barde",
+      "Druide",
+      "Kleriker"
+    ]
+  },
+  {
+    "id": "spell_heiligtum",
+    "name": "Heiligtum",
+    "school": "abjuration",
+    "level": 1,
+    "castingTime": "1 Bonusaktion",
+    "range": "9 m",
+    "duration": "1 Minute",
+    "concentration": false,
+    "ritual": false,
+    "componentVerbal": true,
+    "componentSomatic": true,
+    "componentMaterial": true,
+    "materialComponent": "Eine kleiner silberner Spiegel",
+    "attackRollType": "none",
+    "savingThrowAttribute": "none",
+    "damageDice": null,
+    "damageType": null,
+    "effectDescription": "Du schützt eine Kreatur in Reichweite vor Angriffen. Während der Wirkungsdauer muss jede Kreatur, die bei einem Angriff oder schädlichen Zauber die geschützte Kreatur als Ziel hat, zuerst einen Weisheitsrettungswurf bestehen. Scheitert der Rettungswurf, muss die Kreatur ein neues Ziel wählen, oder sie verliert den Angriff oder Zauber. Dieser Zauber schützt die geschützte Kreatur nicht vor Flächeneffekten wie der Explosion eines Feuerballs.\n\nGreift die geschützte Kreatur eine feindliche Kreatur an, wirkt sie einen schädlichen Zauber auf diese oder fügt sie ihr anderweitig Schaden zu, endet dieser Zauber.",
+    "atHigherLevels": null,
+    "classes": [
+      "Kleriker"
+    ]
+  },
+  {
+    "id": "spell_lenkendesGeschoss",
+    "name": "Lenkendes Geschoss",
+    "school": "evocation",
+    "level": 1,
+    "castingTime": "1 Aktion",
+    "range": "36 m",
+    "duration": "Sofort",
+    "concentration": false,
+    "ritual": false,
+    "componentVerbal": true,
+    "componentSomatic": true,
+    "componentMaterial": false,
+    "materialComponent": null,
+    "attackRollType": "ranged",
+    "savingThrowAttribute": "dexterity",
+    "damageDice": "4W6",
+    "damageType": "Gleißend",
+    "effectDescription": "Ein Lichtblitz schießt auf eine Kreatur deiner Wahl in Reichweite zu. Führe einen Fernkampf-Zauberangriff gegen das Ziel aus. Bei Erfolg erleidet das Ziel 4W6 gleißenden Schaden. Der nächste Angriffswurf gegen das Ziel vor Ende deines nächsten Zuges ist ein Wurf mit Vorteil, dank des mystischen dämmrigen Lichts, das bis dahin auf dem Ziel glitzert.",
+    "atHigherLevels": "Wirkst du diesen Zauber, indem du einen Zauberplatz 2. Grades oder höher nutzt, steigt der Schaden für jeden Grad über dem 1. um 1W6. ",
+    "classes": [
+      "Waldläufer"
+    ]
+  },
+  {
     "id": "spell_magieEntdecken",
     "name": "Magie entdecken",
     "school": "divination",
@@ -123,7 +143,16 @@
     "damageDice": null,
     "damageType": null,
     "effectDescription": "Während der Wirkungsdauer nimmst du die Gegenwart von Magie innerhalb von neun Metern wahr. Wenn du auf diese Weise Magie wahrnimmst, kannst du deine Aktion nutzen, um schwache Auren um sichtbare magische Kreaturen oder Objekte sowie ihre magische Schule zu erkennen, falls vorhanden.\n\nDieser Zauber durchdringt die meisten Barrieren, wird aber durch 30 Zentimeter Stein, 2,5 Zentimeter gewöhnliches Metall, dünnes Bleiblech sowie durch einen Meter Holz oder Erde blockiert.",
-    "atHigherLevels": null
+    "atHigherLevels": null,
+    "classes": [
+      "Barde",
+      "Druide",
+      "Kleriker",
+      "Magier",
+      "Paladin",
+      "Waldläufer",
+      "Zauberer"
+    ]
   },
   {
     "id": "spell_magierruestung",
@@ -144,7 +173,10 @@
     "damageDice": null,
     "damageType": null,
     "effectDescription": "Du berührst eine willige Kreatur, die keine Rüstung trägt. Sie wird dann von einer schützenden magischen Energie umgeben, bis der Zauber endet. Die Basis-Rüstungsklasse des Ziels beträgt 13 + sein Geschicklichkeitsmodifikator. Der Zauber endet vorzeitig, wenn das Ziel eine Rüstung anlegt oder du den Zauber als Aktion beendest.",
-    "atHigherLevels": null
+    "atHigherLevels": null,
+    "classes": [
+      "Magier"
+    ]
   },
   {
     "id": "spell_magischesGeschoss",
@@ -165,7 +197,11 @@
     "damageDice": "1W4+1",
     "damageType": "Energie",
     "effectDescription": "Du erschaffst drei leuchtende Wurfpfeile aus magischer Energie. Jeder Pfeil trifft eine Kreatur deiner Wahl in Reichweite, die du sehen kannst. Ein Pfeil fügt seinem Ziel 1W4+1 Energieschaden zu. Die Wurfpfeile treffen alle gleichzeitig und du kannst bestimmen, ob sie dieselbe oder verschiedene Kreaturen treffen.",
-    "atHigherLevels": "Wirkst du diesen Zauber mit einem Zauberplatz des 2. oder eines höheren Grades, wird pro Grad über dem 1. ein weiterer Pfeil erschaffen."
+    "atHigherLevels": "Wirkst du diesen Zauber mit einem Zauberplatz des 2. oder eines höheren Grades, wird pro Grad über dem 1. ein weiterer Pfeil erschaffen.",
+    "classes": [
+      "Magier",
+      "Zauberer"
+    ]
   },
   {
     "id": "spell_schild",
@@ -186,7 +222,11 @@
     "damageDice": null,
     "damageType": null,
     "effectDescription": "Eine unsichtbare Barriere aus magischer Energie erscheint und schützt dich. Bis zum Beginn deines nächsten Zuges hast du einen Bonus von +5 auf deine RK (auch gegen den auslösenden Angriff), und du erleidest keinen Schaden durch Magisches Geschoss.",
-    "atHigherLevels": null
+    "atHigherLevels": null,
+    "classes": [
+      "Magier",
+      "Zauberer"
+    ]
   },
   {
     "id": "spell_schildDesGlaubens",
@@ -207,7 +247,11 @@
     "damageDice": null,
     "damageType": null,
     "effectDescription": "Ein schimmerndes Feld erscheint, umgibt eine Kreatur deiner Wahl in Reichweite und gewährt ihr für die Wirkungsdauer einen Bonus von +2 auf ihre Rüstungsklasse.",
-    "atHigherLevels": null
+    "atHigherLevels": null,
+    "classes": [
+      "Kleriker",
+      "Paladin"
+    ]
   },
   {
     "id": "spell_schlaf",
@@ -228,7 +272,12 @@
     "damageDice": null,
     "damageType": null,
     "effectDescription": "Dieser Zauber versetzt Kreaturen in einen magischen Schlaf. Würfle 5W8. Die Summe gibt an, auf wie viele Trefferpunkte an Kreaturen dieser Zauber wirken kann. Kreaturen im Umkreis von sechs Metern um einen Punkt deiner Wahl innerhalb der Reichweite sind in aufsteigender Reihenfolge ihrer aktuellen Trefferpunkte betroffen (bewusstlose Kreaturen werden ignoriert).\n\nBeginnend mit der Kreatur mit den niedrigsten aktuellen Trefferpunkten verliert jede Kreatur, auf die der Zauber wirkt, das Bewusstsein, bis die Wirkungsdauer endet, der Schlafende Schaden erleidet oder jemand eine Aktion ausführt, um den Schlafenden aufzuwecken. Subtrahiere die Trefferpunkte jeder Kreatur von der Summe, bevor du zur Kreatur mit den nächstniedrigsten Trefferpunkten übergehst. Die Trefferpunkte einer Kreatur müssen kleiner oder gleich der verbleibenden Summe sein, damit der Zauber auf die Kreatur wirkt.\n\nDer Zauber wirkt nicht auf Untote und Kreaturen, die nicht bezaubert werden können.",
-    "atHigherLevels": "Wirkst du diesen Zauber, indem du einen Zauberplatz des 2. Grades oder höher nutzt, würfelst du für jeden Grad über dem 1. zusätzlich 2W8."
+    "atHigherLevels": "Wirkst du diesen Zauber, indem du einen Zauberplatz des 2. Grades oder höher nutzt, würfelst du für jeden Grad über dem 1. zusätzlich 2W8.",
+    "classes": [
+      "Barde",
+      "Magier",
+      "Zauberer"
+    ]
   },
   {
     "id": "spell_schutzGutUndBoese",
@@ -249,7 +298,12 @@
     "damageDice": null,
     "damageType": null,
     "effectDescription": "Bis der Zauber endet, ist eine willige Kreatur, die du berührst, vor bestimmten Typen von Kreaturen geschützt: Aberrationen, Feenwesen, Himmlische, Unholde und Untote. Der Schutz gewährt mehrere Vorteile. Angriffswürfe von Kreaturen dieses Typs sind bei Angriffen auf das Ziel im Nachteil. Das Ziel kann auch nicht von ihnen bezaubert, verängstigt oder besessen sein. Ist das Ziel bereits von einer solchen Kreatur bezaubert, verängstigt oder besessen, ist das Ziel bei jedem neuen Rettungswurf gegen den entsprechenden Effekt im Vorteil.",
-    "atHigherLevels": null
+    "atHigherLevels": null,
+    "classes": [
+      "Kleriker",
+      "Druide",
+      "Paladin"
+    ]
   },
   {
     "id": "spell_segnen",
@@ -270,7 +324,11 @@
     "damageDice": null,
     "damageType": null,
     "effectDescription": "Du segnest bis zu drei Kreaturen deiner Wahl innerhalb der Reichweite. Wenn ein Ziel während der Wirkungsdauer einen Angriffs- oder Rettungswurf ausführt, darf es einen W4 würfeln und das Würfelergebnis zu seinem Angriffs- oder Rettungswurf addieren.",
-    "atHigherLevels": "Wirkst du diesen Zauber, indem du einen Zauberplatz 2. Grades oder höher nutzt, kannst du für jeden Grad über dem 1. eine zusätzliche Kreatur als Ziel wählen."
+    "atHigherLevels": "Wirkst du diesen Zauber, indem du einen Zauberplatz 2. Grades oder höher nutzt, kannst du für jeden Grad über dem 1. eine zusätzliche Kreatur als Ziel wählen.",
+    "classes": [
+      "Kleriker",
+      "Paladin"
+    ]
   },
   {
     "id": "spell_sprachenVerstehen",
@@ -291,7 +349,13 @@
     "damageDice": null,
     "damageType": null,
     "effectDescription": "Für die Wirkungsdauer verstehst du die wörtliche Bedeutung jeder gesprochenen Sprache, die du hörst. Außerdem verstehst du jede Schriftsprache, die du liest, sofern du die Oberfläche berührst, auf der die Worte geschrieben stehen. Eine Seite Text zu lesen dauert etwa eine Minute.\n\nDieser Zauber entschlüsselt weder Geheimbotschaften in Texten noch Glyphen wie Arkane Siegel, die nicht Teil der geschriebenen Sprache sind.",
-    "atHigherLevels": null
+    "atHigherLevels": null,
+    "classes": [
+      "Barde",
+      "Magier",
+      "Hexenmeister",
+      "Zauberer"
+    ]
   },
   {
     "id": "spell_strahlDerUebelkeit",
@@ -312,7 +376,10 @@
     "damageDice": "2W8",
     "damageType": "Gift",
     "effectDescription": "Ein Strahl widerlicher grünlicher Energie schießt auf eine Kreatur in Reichweite zu. Führe einen Fernkampf-Zauberangriff gegen das Ziel aus. Triffst du, erleidet das Ziel 2W8 Giftschaden und muss einen Konstitutionsrettungswurf ablegen. Schlägt der Rettungswurf fehl, ist es bis zum Ende deines nächsten Zugs zusätzlich vergiftet.",
-    "atHigherLevels": "Wirkst du diesen Zauber mit einem Zauberplatz des zweiten oder eines höheren Grades, steigt der Schaden für jeden Grad über dem 1. um 1W8."
+    "atHigherLevels": "Wirkst du diesen Zauber mit einem Zauberplatz des zweiten oder eines höheren Grades, steigt der Schaden für jeden Grad über dem 1. um 1W8.",
+    "classes": [
+      "Hexenmeister"
+    ]
   },
   {
     "id": "spell_wundenHeilen",
@@ -333,6 +400,13 @@
     "damageDice": null,
     "damageType": null,
     "effectDescription": "Eine Kreatur, die du berührst, gewinnt Trefferpunkte in Höhe von 1W8 + dein Zauberwirken-Attributsmodifikator zurück. Dieser Zauber wirkt nicht auf Untote oder Konstrukte.",
-    "atHigherLevels": "Wirkst du diesen Zauber, indem du einen Zauberplatz 2. Grades oder höher nutzt, steigt die Heilung für jeden Grad über dem 1. um 1W8."
+    "atHigherLevels": " Wirkst du diesen Zauber, indem du einen Zauberplatz 2. Grades oder höher nutzt, steigt die Heilung für jeden Grad über dem 1. um 1W8.",
+    "classes": [
+      "Barde",
+      "Druide",
+      "Kleriker",
+      "Paladin",
+      "Waldläufer"
+    ]
   }
 ]

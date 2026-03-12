@@ -27,7 +27,7 @@ class BasicInfoStepState extends State<BasicInfoStep> {
   final _formKey = GlobalKey<FormState>();
 
   late TextEditingController _nameController;
-  late TextEditingController _subclassController;
+  String? _selectedSubclass;  // Nur für Klassen mit unlocksAtLevel == 1 (z.B. Kleriker)
 
   CharacterClass? _selectedClass;
   Race? _selectedRace;
@@ -52,9 +52,9 @@ class BasicInfoStepState extends State<BasicInfoStep> {
     _nameController = TextEditingController(
       text: widget.character.name == 'Unbenannt' ? '' : widget.character.name,
     );
-    _subclassController = TextEditingController(
-      text: widget.character.subclass,
-    );
+    _selectedSubclass = widget.character.subclass.isEmpty
+        ? null
+        : widget.character.subclass;
     _selectedClass = characterClasses
         .where((c) => c.name == widget.character.characterClass)
         .firstOrNull;
@@ -72,7 +72,6 @@ class BasicInfoStepState extends State<BasicInfoStep> {
   @override
   void dispose() {
     _nameController.dispose();
-    _subclassController.dispose();
     super.dispose();
   }
 
@@ -80,7 +79,7 @@ class BasicInfoStepState extends State<BasicInfoStep> {
 
   void applyTo(Character character) {
     character.name      = _nameController.text.trim();
-    character.subclass  = _subclassController.text.trim();
+    character.subclass  = _selectedSubclass ?? '';
     character.alignment = _selectedAlignment ?? '';
 
     // Alle Rassen- und Hintergrundfertigkeiten zurücksetzen
@@ -168,11 +167,7 @@ class BasicInfoStepState extends State<BasicInfoStep> {
           ),
           Text('Klasse', style: AppTextStyles.sectionTitle),
           _buildClassDropdown(),
-          _buildTextField(
-            controller: _subclassController,
-            label: 'Unterklasse',
-            hint: 'z.B. Champion, Hervorrufung',
-          ),
+          _buildSubclassDropdown(),
           Text('Rasse', style: AppTextStyles.sectionTitle),
           _buildRaceDropdown(),
           Text('Hintergrund', style: AppTextStyles.sectionTitle),
@@ -203,6 +198,32 @@ class BasicInfoStepState extends State<BasicInfoStep> {
     );
   }
 
+  /// Zeigt Unterklassen-Dropdown nur wenn die gewählte Klasse
+  /// direkt ab Level 1 eine Unterklasse freigibt (z.B. Kleriker).
+  Widget _buildSubclassDropdown() {
+    if (_selectedClass == null) return const SizedBox.shrink();
+    final subs = availableSubclasses(_selectedClass!.name, 1);
+    if (subs.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: DropdownButtonFormField<String>(
+        initialValue: _selectedSubclass,
+        decoration: const InputDecoration(
+          labelText: 'Unterklasse *',
+          border: OutlineInputBorder(),
+        ),
+        hint: Text('Unterklasse wählen', style: AppTextStyles.body),
+        items: subs.map((s) => DropdownMenuItem(
+          value: s.name,
+          child: Text(s.name, style: AppTextStyles.body),
+        )).toList(),
+        onChanged: (v) => setState(() => _selectedSubclass = v),
+        validator: (_) => _selectedSubclass == null
+            ? 'Bitte eine Unterklasse wählen' : null,
+      ),
+    );
+  }
+
   Widget _buildClassDropdown() {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -218,7 +239,10 @@ class BasicInfoStepState extends State<BasicInfoStep> {
             child: Text(c.name, style: AppTextStyles.body),
           );
         }).toList(),
-        onChanged: (value) => setState(() => _selectedClass = value),
+        onChanged: (value) => setState(() {
+          _selectedClass = value;
+          _selectedSubclass = null; // Unterklasse zurücksetzen bei Klassenwechsel
+        }),
       ),
     );
   }

@@ -3,6 +3,7 @@
 import 'package:dnd_app/models/item.dart';
 import 'package:dnd_app/models/character_items.dart';
 import 'package:dnd_app/repositories/database_helper.dart';
+import 'package:sqflite/sqflite.dart';
 
 class ItemRepository {
   final _db = DatabaseHelper();
@@ -28,8 +29,27 @@ class ItemRepository {
 
   Future<void> addItemToCharacter(CharacterItem characterItem) async {
     final db = await _db.database;
-    await db.insert('items', characterItem.item.toMap());
-    await db.insert('character_items', characterItem.toMap());
+    // Items aus dem Kompendium teilen eine ID – INSERT OR IGNORE verhindert
+    // einen UNIQUE-Fehler wenn dasselbe Item bereits in der DB liegt.
+    await db.insert('items', characterItem.item.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.ignore);
+    // Wenn derselbe Charakter dasselbe Item nochmals hinzufügt: Menge erhöhen
+    final existing = await db.query(
+      'character_items',
+      where: 'characterId = ? AND itemId = ?',
+      whereArgs: [characterItem.characterId, characterItem.item.id],
+    );
+    if (existing.isEmpty) {
+      await db.insert('character_items', characterItem.toMap());
+    } else {
+      final currentQty = existing.first['quantity'] as int? ?? 1;
+      await db.update(
+        'character_items',
+        {'quantity': currentQty + characterItem.quantity},
+        where: 'characterId = ? AND itemId = ?',
+        whereArgs: [characterItem.characterId, characterItem.item.id],
+      );
+    }
   }
 
   // ── Item-Vorlage aktualisieren ────────────────────────────────────────────
@@ -65,6 +85,7 @@ class ItemRepository {
       where: 'characterId = ? AND itemId = ?',
       whereArgs: [characterItem.characterId, characterItem.item.id],
     );
+    // Kompendium-Items werden nie gelöscht – nur die Verknüpfung wird entfernt.
   }
 
   // ── Menge aktualisieren, bei 0 entfernen ─────────────────────────────────

@@ -1,6 +1,7 @@
 import 'package:dnd_app/models/character.dart';
 import 'package:dnd_app/repositories/database_helper.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:dnd_app/models/spell.dart';
 
 class CharacterRepository {
   final DatabaseHelper _dbHelper = DatabaseHelper();
@@ -57,7 +58,6 @@ class CharacterRepository {
   Future<void> deleteCharacter(String id) async {
     final db = await _dbHelper.database;
 
-    // Schritt 1: Charakter löschen
     // ON DELETE CASCADE räumt automatisch character_spells,
     // character_abilities und character_items auf
     await db.delete(
@@ -67,9 +67,17 @@ class CharacterRepository {
     );
   }
 
+
   // ── Zauber-Verknüpfungen ───────────────────────────────────────────────────
 
   // Zauber einem Charakter hinzufügen
+  // Zauber in die spells-Tabelle schreiben (INSERT OR IGNORE)
+  Future<void> upsertSpell(Spell spell) async {
+    final db = await _dbHelper.database;
+    await db.insert('spells', spell.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.ignore);
+  }
+
   Future<void> addSpellToCharacter(
       String characterId, String spellId, {bool isPrepared = false}) async {
     final db = await _dbHelper.database;

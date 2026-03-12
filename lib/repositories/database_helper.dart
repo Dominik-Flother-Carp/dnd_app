@@ -106,11 +106,11 @@ Future<void> _createTables(Database db, int version) async {
       materialComponent    TEXT,
       attackRollType       TEXT,
       savingThrowAttribute TEXT,
-      weaponCategory       TEXT,
       damageDice           TEXT,
       damageType           TEXT,
       effectDescription    TEXT,
-      atHigherLevels       TEXT
+      atHigherLevels       TEXT,
+      classes              TEXT DEFAULT ''
     )
   ''');
 

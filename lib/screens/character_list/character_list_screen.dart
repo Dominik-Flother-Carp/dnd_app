@@ -10,6 +10,7 @@ import 'package:dnd_app/screens/character_create/character_create_screen.dart';
 import 'package:dnd_app/screens/compendium/compendium_screen.dart';
 import 'package:dnd_app/models/classes.dart';
 import 'package:dnd_app/theme/app_text_styles.dart';
+import 'package:dnd_app/screens/initiative/initiative_tracker_screen.dart';
 
 class CharacterListScreen extends StatefulWidget {
   const CharacterListScreen({super.key});
@@ -214,6 +215,21 @@ class _CharacterListScreenState extends State<CharacterListScreen> {
                   context,
                   MaterialPageRoute(
                     builder: (_) => const CompendiumScreen(),
+                  ),
+                );
+              },
+            ),
+             _buildDrawerItem(
+              context,
+              icon: Icons.swap_vert,
+              label: 'Initiative',
+              isActive: false,
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const InitiativeTrackerScreen(),
                   ),
                 );
               },

@@ -6,79 +6,169 @@ import 'package:dnd_app/repositories/character_repository.dart';
 import 'package:dnd_app/screens/character_sheet/tabs/overview_tab.dart';
 import 'package:dnd_app/screens/character_sheet/tabs/skills_tab.dart';
 import 'package:dnd_app/screens/character_sheet/tabs/inventory_tab.dart';
+import 'package:dnd_app/screens/character_sheet/tabs/spell_tab.dart' show SpellTab;
 import 'package:dnd_app/theme/app_text_styles.dart';
 import 'package:dnd_app/models/spell_slot.dart';
 import 'package:dnd_app/models/classes.dart';
 
-// ── Level-Dialog ──────────────────────────────────────────────────────────────
+// ── Stufenaufstieg-Dialog ────────────────────────────────────────────────────
 
-class _LevelDialogResult {
-  final int level;
-  const _LevelDialogResult(this.level);
+class _LevelUpResult {
+  final String? newSubclass; // null = keine Unterklasse gewählt/erforderlich
+  final int hpGain;
+  const _LevelUpResult({this.newSubclass, required this.hpGain});
 }
 
-class _LevelDialog extends StatefulWidget {
-  final int currentLevel;
+class _LevelUpDialog extends StatefulWidget {
+  final int newLevel;          // Das Level auf das aufgestiegen wird
+  final int hitDie;
+  final int conModifier;
+  final String characterClass;
+  final String currentSubclass; // leer = noch keine
   final Color themeColor;
 
-  const _LevelDialog({
-    required this.currentLevel,
+  const _LevelUpDialog({
+    required this.newLevel,
+    required this.hitDie,
+    required this.conModifier,
+    required this.characterClass,
+    required this.currentSubclass,
     required this.themeColor,
   });
 
   @override
-  State<_LevelDialog> createState() => _LevelDialogState();
+  State<_LevelUpDialog> createState() => _LevelUpDialogState();
 }
 
-class _LevelDialogState extends State<_LevelDialog> {
-  late int _level;
+class _LevelUpDialogState extends State<_LevelUpDialog> {
+  String? _selectedSubclass;
+  bool _useMax = false;
 
   @override
   void initState() {
     super.initState();
-    _level = widget.currentLevel;
+    _selectedSubclass = widget.currentSubclass.isEmpty
+        ? null
+        : widget.currentSubclass;
   }
+
+  List<CharacterSubclass> get _availableSubs =>
+      availableSubclasses(widget.characterClass, widget.newLevel);
+
+  /// Unterklasse ist bei diesem Level-Up neu wählbar wenn:
+  /// - noch keine gewählt
+  /// - und es Unterklassen gibt die genau bei diesem Level freischalten
+  bool get _subclassChoiceRequired =>
+      widget.currentSubclass.isEmpty &&
+      _availableSubs.any((s) => s.unlocksAtLevel == widget.newLevel);
+
+  int get _hpGain {
+    final roll = _useMax ? widget.hitDie : (widget.hitDie / 2).ceil();
+    return (roll + widget.conModifier).clamp(1, 999);
+  }
+
+  bool get _canConfirm =>
+      !_subclassChoiceRequired || _selectedSubclass != null;
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Stufe ändern', style: AppTextStyles.sectionTitle),
-      content: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      title: Text(
+        'Stufenaufstieg auf Stufe ${widget.newLevel}',
+        style: AppTextStyles.sectionTitle,
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          IconButton(
-            icon: const Icon(Icons.remove_circle_outline),
-            color: widget.themeColor,
-            onPressed: _level > 1
-                ? () => setState(() => _level--)
-                : null,
+          // ── HP-Gewinn ──────────────────────────────────────────────
+          Text('Trefferpunkte', style: AppTextStyles.bodySmall
+              .copyWith(color: Colors.grey[600])),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: SegmentedButton<bool>(
+                  segments: [
+                    ButtonSegment(
+                      value: false,
+                      label: Text(
+                        'Durchschnitt (+${(widget.hitDie / 2).ceil() + widget.conModifier})',
+                        style: AppTextStyles.bodySmall,
+                      ),
+                    ),
+                    ButtonSegment(
+                      value: true,
+                      label: Text(
+                        'Maximum (+${widget.hitDie + widget.conModifier})',
+                        style: AppTextStyles.bodySmall,
+                      ),
+                    ),
+                  ],
+                  selected: {_useMax},
+                  onSelectionChanged: (s) =>
+                      setState(() => _useMax = s.first),
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStateProperty.resolveWith(
+                      (states) => states.contains(WidgetState.selected)
+                          ? widget.themeColor
+                          : null,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-          Text(
-            '$_level',
-            style: AppTextStyles.statLarge
-                .copyWith(color: widget.themeColor),
-          ),
-          IconButton(
-            icon: const Icon(Icons.add_circle_outline),
-            color: widget.themeColor,
-            onPressed: _level < 20
-                ? () => setState(() => _level++)
-                : null,
-          ),
+          // ── Unterklasse ────────────────────────────────────────────
+          if (_subclassChoiceRequired) ...[
+            const SizedBox(height: 16),
+            Text('Unterklasse wählen',
+                style: AppTextStyles.bodySmall
+                    .copyWith(color: Colors.grey[600])),
+            const SizedBox(height: 8),
+            DropdownButtonFormField<String>(
+              initialValue: _selectedSubclass,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                isDense: true,
+                hintText: 'Wählen…',
+              ),
+              items: _availableSubs.map((s) => DropdownMenuItem(
+                value: s.name,
+                child: Text(s.name, style: AppTextStyles.body),
+              )).toList(),
+              onChanged: (v) => setState(() => _selectedSubclass = v),
+            ),
+          ],
         ],
       ),
       actions: [
-        FilledButton(
-          onPressed: () =>
-              Navigator.pop(context, _LevelDialogResult(_level)),
-          style: FilledButton.styleFrom(
-              backgroundColor: widget.themeColor),
-          child: Text('Fertig', style: AppTextStyles.body),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Abbrechen', style: AppTextStyles.body),
+            ),
+            const SizedBox(width: 10),
+            FilledButton(
+              onPressed: _canConfirm
+                  ? () => Navigator.pop(context, _LevelUpResult(
+                        newSubclass: _selectedSubclass,
+                        hpGain: _hpGain,
+                      ))
+                  : null,
+              style: FilledButton.styleFrom(
+                  backgroundColor: widget.themeColor),
+              child: Text('Aufsteigen', style: AppTextStyles.body),
+            ),
+          ],
         ),
       ],
     );
   }
 }
+
 
 // ── Trefferwürfel-Dialog ──────────────────────────────────────────────────────
 
@@ -284,58 +374,105 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      body: NestedScrollView(
-        headerSliverBuilder: (context, innerBoxIsScrolled) => [
-          _buildSliverAppBar(innerBoxIsScrolled),
+      body: Column(
+        children: [
+          // ── AppBar als normales Widget ─────────────────────────────
+          _buildAppBar(),
+          // ── Tabs ──────────────────────────────────────────────────
+          _buildTabBar(),
+          // ── Tab-Inhalte mit fester Höhe ───────────────────────────
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                OverviewTab(
+                  character: _character!,
+                  themeColor: _themeColor,
+                  editMode: _editMode,
+                  onChanged: () => setState(() {}),
+                  onSave: _saveCharacter,
+                ),
+                SkillsTab(
+                  character: _character!,
+                  themeColor: _themeColor,
+                  editMode: _editMode,
+                  onSave: _saveCharacter,
+                ),
+                InventoryTab(
+                  character: _character!,
+                  themeColor: _themeColor,
+                ),
+                SpellTab(
+                  character: _character!,
+                  themeColor: _themeColor,
+                ),
+              ],
+            ),
+          ),
         ],
-        body: TabBarView(
-          controller: _tabController,
+      ),
+    );
+  }
+
+  Widget _buildAppBar() {
+    return Container(
+      color: _themeColor,
+      child: SafeArea(
+        bottom: false,
+        child: Row(
           children: [
-            OverviewTab(
-              character: _character!,
-              themeColor: _themeColor,
-              editMode: _editMode,
-              onChanged: () => setState(() {}),
-              onSave: _saveCharacter,
+            IconButton(
+              icon: const Icon(Icons.arrow_back, color: Color(0xFFF5DEB3)),
+              onPressed: () => Navigator.of(context).pop(),
             ),
-            SkillsTab(
-              character: _character!,
-              themeColor: _themeColor,
-              editMode: _editMode,
-              onSave: _saveCharacter,
+            Expanded(
+              child: GestureDetector(
+                onLongPress: _showIdentitySheet,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      _buildFirstName(),
+                      style: AppTextStyles.screenTitle.copyWith(
+                          color: const Color(0xFFF5DEB3), fontSize: 18),
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                    ),
+                    if (_buildLastName().isNotEmpty)
+                      Text(
+                        _buildLastName(),
+                        style: AppTextStyles.screenTitle.copyWith(
+                            color: const Color(0xFFF5DEB3), fontSize: 18),
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                      ),
+                  ],
+                ),
+              ),
             ),
-            InventoryTab(
-              character: _character!,
-              themeColor: _themeColor,
+            if (_character!.level < 20)
+              _buildAppBarButton(
+                  icon: Icons.arrow_circle_up_outlined,
+                  onTap: _showLevelUpDialog),
+            const SizedBox(width: 8),
+            _buildAppBarButton(
+                icon: Icons.bedtime, onTap: _showRestDialog),
+            const SizedBox(width: 8),
+            _buildAppBarButton(
+              icon: _editMode ? Icons.edit_off : Icons.edit,
+              onTap: () => setState(() => _editMode = !_editMode),
             ),
-            _buildComingSoon('Zauber & Fähigkeiten'),
+            const SizedBox(width: 12),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSliverAppBar(bool innerBoxIsScrolled) {
-    return SliverAppBar(
-      expandedHeight: 150,
-      pinned: true,
-      backgroundColor: _themeColor,
-      foregroundColor: const Color(0xFFF5DEB3),
-      actions: [
-        _buildAppBarButton(
-            icon: Icons.bedtime, onTap: _showRestDialog),
-        const SizedBox(width: 8),
-        _buildAppBarButton(
-          icon: _editMode ? Icons.edit_off : Icons.edit,
-          onTap: () => setState(() => _editMode = !_editMode),
-        ),
-        const SizedBox(width: 12),
-      ],
-      flexibleSpace: FlexibleSpaceBar(
-        background: _buildHeader(),
-        collapseMode: CollapseMode.pin,
-      ),
-      bottom: TabBar(
+  Widget _buildTabBar() {
+    return Container(
+      color: _themeColor,
+      child: TabBar(
         isScrollable: true,
         controller: _tabController,
         tabAlignment: TabAlignment.center,
@@ -371,103 +508,123 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
     );
   }
 
-  Widget _buildHeader() {
-    final character = _character!;
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: Container(
-        color: _themeColor,
-        width: double.infinity,
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 48),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              character.name,
-              style: AppTextStyles.screenTitle
-                  .copyWith(color: const Color(0xFFF5DEB3)),
-            ),
-            const SizedBox(height: 4),
-            GestureDetector(
-              onTap: _editMode ? () => _showLevelDialog() : null,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Flexible(
-                    child: Text(
-                      _buildSubtitle(),
-                      style: AppTextStyles.body.copyWith(
-                        color: const Color(0xFFF5DEB3)
-                            .withValues(alpha: 0.8),
-                      ),
-                      softWrap: true,
-                      overflow: TextOverflow.visible,
-                      textAlign: TextAlign.center,
-                    ),
+  // ── Name splitten ────────────────────────────────────────────────────────
+
+  String _buildFirstName() {
+    final parts = _character!.name.trim().split(' ');
+    return parts.first;
+  }
+
+  String _buildLastName() {
+    final parts = _character!.name.trim().split(' ');
+    if (parts.length <= 1) return '';
+    return parts.skip(1).join(' ');
+  }
+
+  // ── Identitäts-Sheet ─────────────────────────────────────────────────────
+
+  void _showIdentitySheet() {
+    final c = _character!;
+    final rows = <_IdentityRow>[
+      if (c.characterClass.isNotEmpty)
+        _IdentityRow(
+          label: 'Klasse',
+          value: c.subclass.isNotEmpty
+              ? '${c.characterClass} · ${c.subclass}'
+              : c.characterClass,
+        ),
+      if (c.race.isNotEmpty)
+        _IdentityRow(label: 'Rasse', value: c.race),
+      if (c.alignment.isNotEmpty)
+        _IdentityRow(label: 'Gesinnung', value: c.alignment),
+      if (c.background.isNotEmpty)
+        _IdentityRow(label: 'Hintergrund', value: c.background),
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Griffleiste
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
                   ),
-                  if (_editMode) ...[
-                    const SizedBox(width: 6),
-                    Icon(
-                      Icons.edit,
-                      size: 14,
-                      color: const Color(0xFFF5DEB3)
-                          .withValues(alpha: 0.7),
+                ),
+              ),
+              Text(c.name, style: AppTextStyles.sectionTitle),
+              const SizedBox(height: 16),
+              ...rows.map((r) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: 100,
+                      child: Text(
+                        r.label,
+                        style: AppTextStyles.bodySmall
+                            .copyWith(color: Colors.grey[500]),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(r.value, style: AppTextStyles.body),
                     ),
                   ],
-                ],
-              ),
-            ),
-          ],
+                ),
+              )),
+              if (rows.isEmpty)
+                Text(
+                  'Keine weiteren Angaben.',
+                  style: AppTextStyles.bodySmall
+                      .copyWith(color: Colors.grey),
+                ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  String _buildSubtitle() {
-    final c = _character!;
-    final parts = <String>[];
-    if (c.characterClass.isNotEmpty) {
-      final classEntry = c.subclass.isNotEmpty
-          ? '${c.characterClass} (${c.subclass})'
-          : c.characterClass;
-      parts.add(classEntry);
-    }
-    if (c.race.isNotEmpty) parts.add(c.race);
-    parts.add('Stufe ${c.level}');
-    return parts.join(' · ');
-  }
-
-  Widget _buildComingSoon(String label) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.construction, size: 48, color: Colors.grey[400]),
-          const SizedBox(height: 12),
-          Text(
-            '$label ist in Arbeit!',
-            style:
-                AppTextStyles.body.copyWith(color: Colors.grey[500]),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _showLevelDialog() async {
-    final result = await showDialog<_LevelDialogResult>(
+  Future<void> _showLevelUpDialog() async {
+    final newLevel = _character!.level + 1;
+    if (newLevel > 20) return;
+    final result = await showDialog<_LevelUpResult>(
       context: context,
-      builder: (_) => _LevelDialog(
-        currentLevel: _character!.level,
-        themeColor: _themeColor,
+      builder: (_) => _LevelUpDialog(
+        newLevel:        newLevel,
+        hitDie:          _character!.hitDie,
+        conModifier:     _character!.conModifier,
+        characterClass:  _character!.characterClass,
+        currentSubclass: _character!.subclass,
+        themeColor:      _themeColor,
       ),
     );
-    if (result != null) {
-      setState(() => _character!.level = result.level);
-      _updateSpellSlots();
-      await _saveCharacter();
-    }
+    if (result == null || !mounted) return;
+    setState(() {
+      _character!.level          = newLevel;
+      _character!.maxHitPoints  += result.hpGain;
+      _character!.currentHitPoints = (_character!.currentHitPoints + result.hpGain)
+          .clamp(0, _character!.maxHitPoints);
+      if (result.newSubclass != null) {
+        _character!.subclass = result.newSubclass!;
+      }
+    });
+    _updateSpellSlots();
+    await _saveCharacter();
   }
 
   void longRest() {
@@ -627,4 +784,12 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
     }
     _character!.spellSlots = updated;
   }
+}
+
+// ── Hilfsklasse für Identity-Sheet ───────────────────────────────────────────
+
+class _IdentityRow {
+  final String label;
+  final String value;
+  const _IdentityRow({required this.label, required this.value});
 }
