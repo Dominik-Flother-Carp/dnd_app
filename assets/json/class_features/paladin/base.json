@@ -1,0 +1,70 @@
+{
+    "className": "Paladin",
+    "features": [
+        {
+            "id": "paladin_divine_sense",
+            "name": "Göttliches Gespür",
+            "unlocksAtLevel": 1,
+            "subclassName": null,
+            "description": "Deine Sinne nehmen die Gegenwart von starkem Bösen wie den Geruch der Verderbnis wahr, wohingegen das machtvolle Gute wie himmlische Musik in deinen Ohren klingt. Als Aktion kannst du deine Aufmerksamkeit auf die Suche nach solchen Kräften richten. Bis zum Ende deines nächsten Zuges ist dir innerhalb von 18 m der Standort jeglicher himmlischen und untoten Kreatur sowie jedes Unholds bekannt, außer eine Kreatur befindet sich in in voller Deckung. Dir ist die Art dieser Wesen bewusst (himmlisch, untot, Unhold), doch ihre Identität (etwa der Vampir Graf Strahd von Zarovich) bleibt dir verborgen. Innerhalb desselben Radius spürst du auch die Präsenz jedes Ortes oder Gegenstandes, der geweiht beziehungsweise entweiht wurde (wie etwa durch den Zauber Weihen).\n\nDiese Fähigkeit kannst du so oft nutzen, wie es deinem Charismamodifikator + 1 entspricht. Beendest du eine lange Rast, stehen dir alle verbrauchten Anwendungen wieder zur Verfügung.",
+            "resource": {
+                "label": "Nutzungen",
+                "maxFormula": "charisma-modifier + 1",
+                "restType": "long"
+            }
+        },
+        {
+            "id": "paladin_lay_on_hands",
+            "name": "Handauflegen",
+            "unlocksAtLevel": 1,
+            "subclassName": null,
+            "description": "Deine gesegnete Berührung kann Wunden heilen. Du besitzt einen Vorrat an Heilkraft, der sich wieder auffüllt, sobald du eine lange Rast abgeschlossen hast. Dieser Vorrat reicht aus, um eine Trefferpunktanzahl in Höhe deiner 5-fachen Stufe als Paladin wiederherzustellen.\n\nAls Aktion kannst du eine Kreatur berühren und bei ihr eine Anzahl Trefferpunkte wiederherstellen, die deine aktuell im Vorrat befindlichen Punkte nicht übersteigen darf. Alternativ kannst du 5 Punkte aus deinem Vorrat aufwenden, um die Kreatur von einer Krankheit zu heilen oder ein Gift zu neutralisieren, das auf sie einwirkt. Du kannst mehrere Gifte und Krankheiten mit einer Anwendung von Handauflegen unschädlich machen, musst aber jeweils einzeln die entsprechenden Punkte ausgeben.\n\nDiese Fähigkeit wirkt nicht bei Konstrukten oder Untoten.",
+            "resource": {
+                "label": "pool",
+                "maxFormula": "level * 5",
+                "restType": "long"
+            }
+        },
+        {
+            "id": "paladin_fighting_style",
+            "name": "Kampfstil",
+            "unlocksAtLevel": 2,
+            "subclassName": null,
+            "description": "Du nimmst einen Kampfstil als Spezialgebiet an.",
+            "choice": {
+                "prompt": "Wähle einen Kampfstil",
+                "options": [
+                    {
+                        "id": "fighting_style_defense",
+                        "name": "Verteidigung",
+                        "description": "Solange du eine Rüstung trägst, erhältst du einen Bonus von +1 auf deine Rüstungsklasse."
+                    },
+                    {
+                        "id": "fighting_style_dueling",
+                        "name": "Duell",
+                        "description": "Kämpfst du nur mit einer einhändig geführten Nahkampfwaffe und keiner Waffe in der anderen Hand, erhältst du einen Bonus von +2 auf die Schadenswürfe mit dieser Waffe."
+                    },
+                    {
+                        "id": "fighting_big_weapons",
+                        "name": "Kampf mit großen Waffen",
+                        "description": "Greifst du mit einer beidhändig geführten Nahkampfwaffe an und würfelst bei deinem Schadenswurf eine 1 oder 2, darfst du den entsprechenden Schadenswürfel erneut würfeln. Das zweite Ergebnis musst du verwenden, auch wenn es wieder eine 1 oder 2 sein sollte. Die Waffe muss die Waffeneigenschaft zweihändig oder vielseitig besitzen, um diesen Vorzug zu gewähren."
+                    },
+                    {
+                        "id": "fighting_sentinel",
+                        "name": "Leibwache",
+                        "description": "Führt eine Kreatur, die du sehen kannst, einen Angriff auf eine bis zu 1,50 m von dir entfernt stehende Kreatur aus (die nicht du selbst bist), kannst du deine Reaktion verwenden, damit der Angreifer bei seinem Wurf im Nachteil ist. Du musst dafür einen Schild tragen."
+                    }
+                ]
+            },
+            "resource": null
+        },
+        {
+            "id": "paladin_spellcasting",
+            "name": "Zauberwirken",
+            "unlocksAtLevel": 2,
+            "subclassName": null,
+            "description": "Du lernst durch Meditation und Gebete von der göttlichen Magie zu zehren, um ähnlich wie ein Kleriker Zauber zu wirken.\n\nAls Zauberfokus kannst du ein heiliges Symbol wählen.",
+            "resource": null
+        }
+    ]
+}

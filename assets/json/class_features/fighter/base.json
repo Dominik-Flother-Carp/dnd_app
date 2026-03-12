@@ -1,0 +1,25 @@
+{
+    "className": "Kämpfer",
+    "features": [
+        {
+            "id": "fighter_second_wind",
+            "name": "Zweiter Atem",
+            "unlocksAtLevel": 1,
+            "subclassName": null,
+            "description": "...",
+            "resource": {
+                "label": "Nutzungen",
+                "maxFormula": "1",
+                "restType": "short"
+            }
+        },
+        {
+            "id": "fighter_champion_improved_crit",
+            "name": "Verbesserter kritischer Treffer",
+            "unlocksAtLevel": 3,
+            "subclassName": "Champion",
+            "description": "...",
+            "resource": null
+        }
+    ]
+}
