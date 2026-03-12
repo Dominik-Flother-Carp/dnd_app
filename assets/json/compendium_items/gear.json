@@ -39,6 +39,32 @@
         "valueInCopper": 1
     },
     {
+        "id": "item_glocke",
+        "itemType": "base",
+        "name": "Glocke",
+        "description": "Eine kleine Glocke mit Griff. In der Regel gefertigt aus Eisen.",
+        "category": "gear",
+        "rarity": "common",
+        "requiresAttunement": false,
+        "isMagical": false,
+        "magicBonus": 0,
+        "weight": 0.0,
+        "valueInCopper": 100
+    },
+    {
+        "id": "item_hammer",
+        "itemType": "base",
+        "name": "Hammer",
+        "description": "Ein kleiner Hammer mit Eisenkopf. Gut geeignet um Objekte zu zerbrechen oder Nägel einzuschlagen.",
+        "category": "gear",
+        "rarity": "common",
+        "requiresAttunement": false,
+        "isMagical": false,
+        "magicBonus": 0,
+        "weight": 3.0,
+        "valueInCopper": 100
+    },
+    {
         "id": "item_heilerAusruestung",
         "itemType": "base",
         "name": "Heilerausrüstung",
@@ -104,6 +130,19 @@
         "valueInCopper": 1000
     },
     {
+        "id": "item_kletterhaken",
+        "itemType": "base",
+        "name": "Kletterhaken",
+        "description": "Ein eiserner Nagel mit Ring am Ende, an dem man z.B. ein Seil befestigen kann. Dient auch als Trittpunkt beim Klettern.",
+        "category": "gear",
+        "rarity": "common",
+        "requiresAttunement": false,
+        "isMagical": false,
+        "magicBonus": 0,
+        "weight": 0.25,
+        "valueInCopper": 5
+    },
+    {
         "id": "item_koecher",
         "itemType": "base",
         "name": "Köcher",
@@ -141,6 +180,45 @@
         "magicBonus": 0,
         "weight": 1.0,
         "valueInCopper": 10
+    },
+    {
+        "id": "item_papier",
+        "itemType": "base",
+        "name": "Papier (ein Blatt)",
+        "description": "Ein beschreibbares Blatt aus Papier.",
+        "category": "gear",
+        "rarity": "common",
+        "requiresAttunement": false,
+        "isMagical": false,
+        "magicBonus": 0,
+        "weight": 0.0,
+        "valueInCopper": 20
+    },
+    {
+        "id": "item_pergament",
+        "itemType": "base",
+        "name": "Pergament (ein Blatt)",
+        "description": "Ein robustes, beschreibbares Blatt aus Tierhaut.",
+        "category": "gear",
+        "rarity": "common",
+        "requiresAttunement": false,
+        "isMagical": false,
+        "magicBonus": 0,
+        "weight": 0.0,
+        "valueInCopper": 10
+    },
+    {
+        "id": "item_pfeil",
+        "itemType": "base",
+        "name": "Pfeil",
+        "description": "Ein gefiederter Holzpfeil mit Eisenspitze.",
+        "category": "gear",
+        "rarity": "common",
+        "requiresAttunement": false,
+        "isMagical": false,
+        "magicBonus": 0,
+        "weight": 0.05,
+        "valueInCopper": 5
     },
     {
         "id": "item_reisegeschirr",
@@ -182,6 +260,19 @@
         "valueInCopper": 1000
     },
     {
+        "id": "item_schreibfeder",
+        "itemType": "base",
+        "name": "Schreibfeder",
+        "description": "Eine Gänse- oder Schwanenfeder zum Schreiben mit Tinte.",
+        "category": "gear",
+        "rarity": "common",
+        "requiresAttunement": false,
+        "isMagical": false,
+        "magicBonus": 0,
+        "weight": 0.0,
+        "valueInCopper": 2
+    },
+    {
         "id": "item_seil_hanf_15",
         "itemType": "base",
         "name": "Seil, Hanf",
@@ -211,7 +302,7 @@
         "id": "item_siegelring",
         "itemType": "base",
         "name": "Siegelring",
-        "description": "Ein Ring aus Edelmetall, der sein Familienwappen trägt.",
+        "description": "Ein Ring aus Edelmetall, der dein Familienwappen trägt.",
         "category": "gear",
         "rarity": "common",
         "requiresAttunement": false,
@@ -219,6 +310,19 @@
         "magicBonus": 0,
         "weight": 0.0,
         "valueInCopper": 5000
+    },
+    {
+        "id": "item_tinte",
+        "itemType": "base",
+        "name": "Tinte (Flasche, 30 ml)",
+        "description": "Ein kleines Fläschchen mit Tinte.",
+        "category": "gear",
+        "rarity": "common",
+        "requiresAttunement": false,
+        "isMagical": false,
+        "magicBonus": 0,
+        "weight": 0.0,
+        "valueInCopper": 1000
     },
     {
         "id": "item_trinkschlauch",

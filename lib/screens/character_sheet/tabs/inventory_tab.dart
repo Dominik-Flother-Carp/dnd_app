@@ -124,16 +124,25 @@ class _WalletDialogState extends State<_WalletDialog> {
 
   Widget _coinField(String label, TextEditingController ctrl) {
     return Expanded(
-      child: TextField(
-        controller: ctrl,
-        keyboardType: TextInputType.number,
-        textAlign: TextAlign.center,
-        style: AppTextStyles.body,
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
-          isDense: true,
-        ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(label,
+              style: AppTextStyles.labelXs.copyWith(color: Colors.grey[600])),
+          const SizedBox(height: 4),
+          TextField(
+            controller: ctrl,
+            keyboardType: TextInputType.number,
+            textAlign: TextAlign.center,
+            style: AppTextStyles.body,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              isDense: true,
+              contentPadding:
+                  EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+            ),
+          ),
+        ],
       ),
     );
   }
