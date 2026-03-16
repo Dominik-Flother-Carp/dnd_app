@@ -56,7 +56,9 @@
                     }
                 ]
             },
-            "resource": null
+            "resource": null,
+            "grantedSpells": null,
+            "spellcasting": null
         },
         {
             "id": "paladin_spellcasting",
@@ -64,7 +66,13 @@
             "unlocksAtLevel": 2,
             "subclassName": null,
             "description": "Du lernst durch Meditation und Gebete von der göttlichen Magie zu zehren, um ähnlich wie ein Kleriker Zauber zu wirken.\n\nAls Zauberfokus kannst du ein heiliges Symbol wählen.",
-            "resource": null
+            "resource": null,
+            "choice": null,
+            "grantedSpells": null,
+            "spellcasting": {
+                "type": "prepared",
+                "spellPickerFilter": null
+            }
         },
         {
             "id": "paladin_divine_smite",
