@@ -6,9 +6,9 @@ import 'package:dnd_app/models/enums.dart';
 enum SpellSchool {
   abjuration,    // Bannmagie
   conjuration,   // Beschwörung
-  divination,    // Divination
+  divination,    // Erkenntnis
   enchantment,   // Verzauberung
-  evocation,     // Evokation
+  evocation,     // Hervorrufung
   illusion,      // Illusion
   necromancy,    // Nekromantie
   transmutation, // Verwandlung

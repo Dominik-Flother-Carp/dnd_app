@@ -392,11 +392,11 @@ class _SpellTile extends StatelessWidget {
       case SpellSchool.conjuration:
         return 'Beschwörung';
       case SpellSchool.divination:
-        return 'Divination';
+        return 'Erkenntnis';
       case SpellSchool.enchantment:
         return 'Verzauberung';
       case SpellSchool.evocation:
-        return 'Evokation';
+        return 'Hervorrufung';
       case SpellSchool.illusion:
         return 'Illusion';
       case SpellSchool.necromancy:

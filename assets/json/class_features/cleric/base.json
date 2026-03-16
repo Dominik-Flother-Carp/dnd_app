@@ -1,0 +1,13 @@
+{
+    "className": "Kleriker",
+    "features": [
+        {
+            "id": "cleric_spellcasting",
+            "name": "Zauberwirken",
+            "unlocksAtLevel": 1,
+            "subclassName": null,
+            "description": "Durch das Kanalisieren der Macht deiner Gottheit, kannst du mächtige Zauber erschaffen.",
+            "resource": null
+        }
+    ]
+}

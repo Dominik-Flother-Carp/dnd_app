@@ -65,6 +65,30 @@
             "subclassName": null,
             "description": "Du lernst durch Meditation und Gebete von der göttlichen Magie zu zehren, um ähnlich wie ein Kleriker Zauber zu wirken.\n\nAls Zauberfokus kannst du ein heiliges Symbol wählen.",
             "resource": null
+        },
+        {
+            "id": "paladin_divine_smite",
+            "name": "Göttliches Niederstrecken",
+            "unlocksAtLevel": 2,
+            "subclassName": null,
+            "description": "Wenn du eine Kreatur mit einem Nahkampf-Waffenangriff triffst, kannst du einen Zauberplatz aufgeben, um dem Ziel (zusätzlich zu dem Waffenschaden) gleißenden Schaden zuzufügen. Der zusätzliche Schaden beträgt 2W8 + 1W8 für jeden Grad des Zauberplatzes über den 1. hinaus, bis zu einem Maximum von 5W8. Der Schaden erhöht sich nochmals um 1W8, wenn es sich bei dem Ziel um einen Unhold oder einen Untaten handelt.",
+            "resource": null
+        },
+        {
+            "id": "paladin_divine_health",
+            "name": "Göttliche Gesundheit",
+            "unlocksAtLevel": 3,
+            "subclassName": null,
+            "description": "Du bist aufgrund der göttlichen Magie, die dich durchfließt, immun gegen Krankheiten.",
+            "resource": null
+        },
+        {
+            "id": "paladin_additional_attack",
+            "name": "Zusätzlicher Angriff",
+            "unlocksAtLevel": 5,
+            "subclassName": null,
+            "description": "Du kannst zweimal anstatt einmal angreifen, wenn du eine Angriffsaktion in deinem Zug ausführst.",
+            "resource": null
         }
     ]
 }
