@@ -5,6 +5,7 @@ import 'package:dnd_app/models/character.dart';
 import 'package:dnd_app/models/spell.dart';
 import 'package:dnd_app/repositories/character_repository.dart' show CharacterRepository;
 import 'package:dnd_app/services/compendium_service.dart';
+import 'package:dnd_app/services/class_feature_service.dart';
 import 'package:dnd_app/screens/compendium/compendium_detail_sheet.dart';
 import 'package:dnd_app/theme/app_text_styles.dart';
 import 'package:dnd_app/models/classes.dart';
@@ -275,12 +276,13 @@ class SpellTab extends StatefulWidget {
   });
 
   @override
-  State<SpellTab> createState() => _SpellTabState();
+  State<SpellTab> createState() => SpellTabState();
 }
 
-class _SpellTabState extends State<SpellTab>
+class SpellTabState extends State<SpellTab>
     with AutomaticKeepAliveClientMixin {
-  final _repo = CharacterRepository();
+  final _repo           = CharacterRepository();
+  final _featureService = ClassFeatureService();
 
   List<Spell> _spells = [];
   bool _isLoading = true;
@@ -298,7 +300,16 @@ class _SpellTabState extends State<SpellTab>
   // We track it separately in a Set of prepared spell IDs.
   Set<String> _preparedSpellIds = {};
 
+  /// IDs der immer vorbereiteten Zauber (grantedSpells) – zählen nicht zum Limit
+  Set<String> _grantedSpellIds = {};
+
+  /// Wird vom character_sheet_screen aufgerufen wenn neue gewährte Zauber
+  /// hinzugefügt wurden (z.B. nach Öffnen des Features-Tabs).
+  Future<void> reload() => _load();
+
   Future<void> _load() async {
+    final grantedIds = (await _featureService.getGrantedSpellIds(widget.character))
+        .toSet();
     final rows = await _repo.getSpellsForCharacter(widget.character.id);
     if (!mounted) return;
     setState(() {
@@ -312,6 +323,7 @@ class _SpellTabState extends State<SpellTab>
           })
           .map((m) => m['id'] as String)
           .toSet();
+      _grantedSpellIds = grantedIds;
       _isLoading = false;
     });
   }
@@ -329,12 +341,19 @@ class _SpellTabState extends State<SpellTab>
 
   int get _preparedLimit => _calcPreparedLimit(widget.character);
 
-  /// Vorbereitete Zauber (Grad > 0), Zaubertricks zählen nicht
+  /// Vorbereitete Zauber (Grad > 0), Zaubertricks und gewährte Zauber zählen nicht
   int get _preparedCount =>
-      _spells.where((s) => s.level > 0 && _preparedSpellIds.contains(s.id)).length;
+      _spells.where((s) =>
+          s.level > 0 &&
+          _preparedSpellIds.contains(s.id) &&
+          !_grantedSpellIds.contains(s.id)).length;
+
+
 
   bool _isPrepared(Spell s) =>
-      s.level == 0 || _preparedSpellIds.contains(s.id);
+      s.level == 0 ||
+      _grantedSpellIds.contains(s.id) ||
+      _preparedSpellIds.contains(s.id);
 
   /// Vorbereitete Zauber nach Grad gruppiert, innerhalb alphabetisch
   Map<int, List<Spell>> get _preparedGrouped {
@@ -350,10 +369,13 @@ class _SpellTabState extends State<SpellTab>
     );
   }
 
-  /// Bekannte aber nicht vorbereitete Zauber (Grad > 0)
+  /// Bekannte aber nicht vorbereitete Zauber (Grad > 0, nicht gewährt)
   List<Spell> get _unpreparedSpells {
     return _spells
-        .where((s) => s.level > 0 && !_preparedSpellIds.contains(s.id))
+        .where((s) =>
+            s.level > 0 &&
+            !_grantedSpellIds.contains(s.id) &&
+            !_preparedSpellIds.contains(s.id))
         .toList()
       ..sort((a, b) => a.name.compareTo(b.name));
   }
@@ -410,6 +432,7 @@ class _SpellTabState extends State<SpellTab>
 
   Future<void> _togglePrepared(Spell spell) async {
     if (spell.level == 0) return; // Zaubertricks sind immer "vorbereitet"
+    if (_grantedSpellIds.contains(spell.id)) return; // gewährte Zauber sind immer vorbereitet
     final nowPrepared = !_preparedSpellIds.contains(spell.id);
     await _repo.setSpellPrepared(
         widget.character.id, spell.id, nowPrepared);
@@ -822,7 +845,8 @@ class _SpellTabState extends State<SpellTab>
   }
 
   Future<void> _showSpellOptions(Spell spell) async {
-    final isPrepared = _isPrepared(spell);
+    final isPrepared  = _isPrepared(spell);
+    final isGranted   = _grantedSpellIds.contains(spell.id);
     await showModalBottomSheet(
       context: context,
       builder: (_) => SafeArea(
@@ -837,7 +861,7 @@ class _SpellTabState extends State<SpellTab>
                 showSpellDetailSheet(context, spell);
               },
             ),
-            if (spell.level > 0)
+            if (spell.level > 0 && !isGranted)
               ListTile(
                 leading: Icon(
                   isPrepared ? Icons.bookmark_remove : Icons.bookmark_add_outlined,
@@ -852,18 +876,27 @@ class _SpellTabState extends State<SpellTab>
                   _togglePrepared(spell);
                 },
               ),
-            ListTile(
-              leading:
-                  const Icon(Icons.delete_outline, color: Colors.red),
-              title: Text(
-                'Zauber entfernen',
-                style: AppTextStyles.body.copyWith(color: Colors.red),
+            if (!isGranted)
+              ListTile(
+                leading:
+                    const Icon(Icons.delete_outline, color: Colors.red),
+                title: Text(
+                  'Zauber entfernen',
+                  style: AppTextStyles.body.copyWith(color: Colors.red),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _removeSpell(spell);
+                },
               ),
-              onTap: () {
-                Navigator.pop(context);
-                _removeSpell(spell);
-              },
-            ),
+            if (isGranted)
+              ListTile(
+                leading: Icon(Icons.lock_outline, color: Colors.grey[400]),
+                title: Text(
+                  'Gewährter Zauber – immer vorbereitet',
+                  style: AppTextStyles.body.copyWith(color: Colors.grey[500]),
+                ),
+              ),
             const SizedBox(height: 8),
           ],
         ),

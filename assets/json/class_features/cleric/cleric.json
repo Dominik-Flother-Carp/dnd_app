@@ -1,0 +1,25 @@
+{
+    "className": "Kleriker",
+    "features": [
+        {
+            "id": "cleric_spellcasting",
+            "name": "Zauberwirken",
+            "unlocksAtLevel": 1,
+            "description": "Durch das Kanalisieren der Macht deiner Gottheit, kannst du mächtige Zauber erschaffen. Als Zauberfokus kannst du ein heiliges Symbol nutzen und dein Zauberwirken-Modifikator ist Weisheit.",
+            "spellcasting": {
+                "type": "prepared"
+            }
+        },
+        {
+            "id": "cleric_channel_divinity",
+            "name": "Göttliche Macht fokussieren",
+            "unlocksAtLevel": 2,
+            "description": "Du kannst göttliche Macht fokussieren um folgenden Effekt zu beschwören:\nUntote vertreiben: Du kannst deine göttliche Macht fokussieren, um die Mächte des Bösen zu vertreiben. Als Aktion zeigst du dein heiliges Symbol und sprichst ein Gebet. Alle Untoten, die dich sehen oder hören können und sich innerhalb von 9 m befinden, müssen einen Weisheitsrettungswurf ablegen. Bei einem Misserfolg ist die entsprechende Kreatur für 1 Minute oder bis sie Schaden erleidet vertrieben.\nEine vertriebene Kreatur muss ihren Zug dafür aufwenden, sich so weit wie möglich von dir wegzubewegen, und darf dir nicht absichtlich näher kommen als 9 m. Außerdem kann die Kreatur keine Reaktionen nutzen. Als Aktion kann sie nur spurten oder sich aus einem Effekt befreien, der sie an der Bewegung hindert. Sollte es keinen Ort geben, zu dem sie gelangen kann, darf die Kreatur die Ausweichaktion nutzen.",
+            "resource": {
+                "label": "Nutzungen",
+                "maxFormula": "1",
+                "restType": "short"
+            }
+        }
+    ]
+}

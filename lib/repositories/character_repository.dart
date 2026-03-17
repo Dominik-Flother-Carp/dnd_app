@@ -200,4 +200,92 @@ class CharacterRepository {
       ORDER BY items.name ASC
     ''', [characterId]);
   }
+
+  // ── Feature-Ressourcen ─────────────────────────────────────────────────────
+
+  /// Lädt alle aktuellen Nutzungszähler für einen Charakter.
+  Future<Map<String, int>> getFeatureUses(String characterId) async {
+    final db   = await _dbHelper.database;
+    final rows = await db.query(
+      'character_feature_resources',
+      where:     'characterId = ?',
+      whereArgs: [characterId],
+    );
+    return {
+      for (final r in rows) r['featureId'] as String: r['currentUses'] as int,
+    };
+  }
+
+  /// Setzt den Nutzungszähler eines Features (upsert).
+  Future<void> setFeatureUses(
+      String characterId, String featureId, int uses) async {
+    final db = await _dbHelper.database;
+    await db.insert(
+      'character_feature_resources',
+      {'characterId': characterId, 'featureId': featureId, 'currentUses': uses},
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  /// Setzt alle Feature-Ressourcen eines Typs zurück.
+  /// [restType] = 'short' setzt kurze UND lange Rast-Ressourcen zurück,
+  /// [restType] = 'long'  setzt nur lange Rast-Ressourcen zurück.
+  /// Die Logik welche Features betroffen sind liegt im Tab – hier wird nur
+  /// der Zähler auf 0 gesetzt (verbraucht = 0 bedeutet alle verfügbar).
+  Future<void> resetFeatureUses(
+      String characterId, List<String> featureIds) async {
+    final db = await _dbHelper.database;
+    for (final id in featureIds) {
+      await db.insert(
+        'character_feature_resources',
+        {'characterId': characterId, 'featureId': id, 'currentUses': 0},
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+  }
+
+  // ── Feature-Wahlen ─────────────────────────────────────────────────────────
+
+  /// Gibt die gewählte Option-ID für ein Feature zurück, oder null.
+  Future<String?> getFeatureChoice(
+      String characterId, String featureId) async {
+    final db   = await _dbHelper.database;
+    final rows = await db.query(
+      'character_feature_choices',
+      where:     'characterId = ? AND featureId = ?',
+      whereArgs: [characterId, featureId],
+      limit:     1,
+    );
+    if (rows.isEmpty) return null;
+    return rows.first['chosenOptionId'] as String;
+  }
+
+  /// Speichert die Wahl für ein Feature (upsert).
+  Future<void> setFeatureChoice(
+      String characterId, String featureId, String optionId) async {
+    final db = await _dbHelper.database;
+    await db.insert(
+      'character_feature_choices',
+      {
+        'characterId':    characterId,
+        'featureId':      featureId,
+        'chosenOptionId': optionId,
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  /// Lädt alle Feature-Wahlen eines Charakters.
+  Future<Map<String, String>> getAllFeatureChoices(String characterId) async {
+    final db   = await _dbHelper.database;
+    final rows = await db.query(
+      'character_feature_choices',
+      where:     'characterId = ?',
+      whereArgs: [characterId],
+    );
+    return {
+      for (final r in rows)
+        r['featureId'] as String: r['chosenOptionId'] as String,
+    };
+  }
 }

@@ -1,0 +1,18 @@
+{
+    "className": "Schurke",
+    "subclassName": "Dieb",
+    "features": [
+        {
+            "id": "rogue_thief_fast_hands",
+            "name": "Flinke Finger",
+            "unlocksAtLevel": 3,
+            "description": "Du kannst die Bonusaktion, die dir durch dein Merkmal Raffinierte Aktion zukommt, auch auf folgende Arten verwenden: um einen Wurf auf Geschicklichkeit (Fingerfertigkeit) abzulegen, dein Diebeswerkzeug einzusetzen, ein Schloss zu öffnen, eine Falle zu entschärfen oder die Aktion Objekt benutzen auszuführen."
+        },
+        {
+            "id": "rogue_thief_climbing",
+            "name": "Kletteraffe",
+            "unlocksAtLevel": 3,
+            "description": "Du erhältst die Fähigkeit, schneller als normal zu klettern. Klettern kostet dich ab sofort keine zusätzliche Bewegung mehr. Außerdem springst du aus dem Lauf 0,30 m pro Punkt deines Geschicklichkeitsmodifikators weiter als gewöhnlich."
+        }
+    ]
+}

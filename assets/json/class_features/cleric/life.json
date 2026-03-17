@@ -1,0 +1,43 @@
+{
+    "className": "Kleriker",
+    "subclassName": "Domäne des Lebens",
+    "features": [
+        {
+            "id": "cleric_life_domain_spells",
+            "name": "Domänenzauber",
+            "unlocksAtLevel": 1,
+            "description": "Deine Domäne gewährt dir weitere Zauber.",
+            "grantedSpells": [
+                {
+                    "spellId": "spell_segnen",
+                    "atLevel": 1
+                },
+                {
+                    "spellId": "spell_wundenHeilen",
+                    "atLevel": 1
+                },
+                {
+                    "spellId": "spell_schwacheGenesung",
+                    "atLevel": 3
+                },
+                {
+                    "spellId": "spell_waffeDesGlaubens",
+                    "atLevel": 3
+                }
+            ]
+        },
+        {
+            "id": "cleric_life_disciple_of_life",
+            "name": "Jünger des Lebens",
+            "unlocksAtLevel": 1,
+            "description": "Deine Heilzauber sind effektiver. Immer wenn du einen Zauber wirkst, der bei einer Kreatur Trefferpunkte wiederherstellt, erhält sie zusätzliche Punkte in Höhe von 2 + dem Grad des Zaubers."
+        },
+        {
+            "id": "cleric_life_channel_divinity_preserve_life",
+            "name": "Göttliche Macht fokussieren: Leben erhalten",
+            "unlocksAtLevel": 2,
+            "description": "Du kannst eine Welle göttlicher Macht hervorrufen, die schwerste Verletzungen zu heilen vermag. Als Aktion zeigst du dein heiliges Symbol und setzt dein Merkmal Göttliche Macht fokussieren ein, um eine Anzahl von Trefferpunkten in Höhe deiner Stufe als Kleriker mal 5 wiederherzustellen. Als Ziel bestimmst du innerhalb von 9 m beliebig viele Kreaturen, unter denen du die Trefferpunkte aufteilst. Diese Fähigkeit kann keine Trefferpunkte über die Hälfte des Trefferpunktemaximums hinaus zurückgeben und wirkt nicht bei Konstrukten und Untoten.",
+            "extends": "cleric_channel_divinity"
+        }
+    ]
+}

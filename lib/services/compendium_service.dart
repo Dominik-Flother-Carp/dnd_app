@@ -31,6 +31,7 @@ class CompendiumService {
     'assets/json/compendium_items/armors/heavy.json',
     'assets/json/compendium_items/armors/shields.json',
     'assets/json/compendium_items/tools.json',
+    'assets/json/compendium_items/gear.json',
     'assets/json/compendium_items/consumables.json',
   ];
 
@@ -73,8 +74,6 @@ class CompendiumService {
           }
         }
       } catch (e) {
-        // Datei noch nicht vorhanden (z.B. tools.json, consumables.json)
-        // wird stillschweigend übersprungen
       }
     }
 
@@ -122,6 +121,15 @@ class CompendiumService {
       final matchesCategory = category == null || item.category == category;
       return matchesQuery && matchesCategory;
     }).toList();
+  }
+
+  /// Gibt einen Zauber anhand seiner ID zurück, oder null.
+  Spell? getSpellById(String id) {
+    try {
+      return _spells.firstWhere((s) => s.id == id);
+    } catch (_) {
+      return null;
+    }
   }
 
   List<Spell> searchSpells(String query, {String? className}) {

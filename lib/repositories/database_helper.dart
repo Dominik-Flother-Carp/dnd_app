@@ -38,7 +38,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 4,
+      version: 5,
       onCreate: _createTables,
       onUpgrade: _onUpgrade,
     );
@@ -208,12 +208,36 @@ Future<void> _createTables(Database db, int version) async {
       FOREIGN KEY (characterId) REFERENCES characters(id) ON DELETE CASCADE
     )
   ''');
+
+  // ── Klassen-Feature-Ressourcen ───────────────────────────────────────────
+  await db.execute('''
+    CREATE TABLE character_feature_resources (
+      characterId  TEXT NOT NULL,
+      featureId    TEXT NOT NULL,
+      currentUses  INTEGER NOT NULL DEFAULT 0,
+      PRIMARY KEY (characterId, featureId),
+      FOREIGN KEY (characterId) REFERENCES characters(id) ON DELETE CASCADE
+    )
+  ''');
+
+  // ── Klassen-Feature-Wahlen ───────────────────────────────────────────────
+  await db.execute('''
+    CREATE TABLE character_feature_choices (
+      characterId    TEXT NOT NULL,
+      featureId      TEXT NOT NULL,
+      chosenOptionId TEXT NOT NULL,
+      PRIMARY KEY (characterId, featureId),
+      FOREIGN KEY (characterId) REFERENCES characters(id) ON DELETE CASCADE
+    )
+  ''');
 }
 
 Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
   // Kein Migrationssystem – einfach alles löschen und neu anlegen.
   // Bestehende Charaktere gehen dabei verloren.
-  final tables = ['character_items', 'character_abilities', 'character_spells',
+  final tables = ['character_feature_choices', 'character_feature_resources',
+                  'character_quick_items', 'character_items',
+                  'character_abilities', 'character_spells',
                   'items', 'abilities', 'spells', 'characters'];
   for (final table in tables) {
     await db.execute('DROP TABLE IF EXISTS $table');

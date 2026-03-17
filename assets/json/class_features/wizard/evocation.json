@@ -1,0 +1,18 @@
+{
+    "className": "Magier",
+    "subclassName": "Schule der Hervorrufung",
+    "features": [
+        {
+            "id": "wizard_evocation_savant",
+            "name": "Gelehrter der Hervorrufung",
+            "unlocksAtLevel": 2,
+            "description": "Die Geldkosten und der Zeitaufwand für das Kopieren von Hervorrufungszaubern in dein Zauberbuch werden halbiert. "
+        },
+        {
+            "id": "wizard_evocation_sculpt_spells",
+            "name": "Zauber formen",
+            "unlocksAtLevel": 2,
+            "description": "Du hast die Effekte deiner Hervorrufungszauber so unter Kontrolle, dass du Bereiche in ihnen formen kannst, in denen man vor ihren Auswirkungen sicher ist. Wenn du einen Hervorrufungszauber wirkst, der andere Kreaturen betrifft, die du sehen kannst, darfst du eine Anzahl dieser Kreaturen bestimmen, die 1 + dem Grad des Zaubers entspricht. Die ausgewählten Kreaturen schaffen ihren Rettungswurf gegen deinen Zauber automatisch und erleiden keinen Schaden, auch wenn sie normalerweise bei einem gelungenen Rettungswurf die Hälfte des Schadens erleiden würden."
+        }
+    ]
+}

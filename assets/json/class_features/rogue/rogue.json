@@ -1,0 +1,29 @@
+{
+    "className": "Schurke",
+    "features": [
+        {
+            "id": "rogue_expertise",
+            "name": "Expertise",
+            "unlocksAtLevel": 1,
+            "description": "Wähle zwei deiner Fertigkeiten aus, in denen du geübt bist, oder eine Fertigkeit, in der du geübt bist, sowie den Umgang mit Diebeswerkzeug. Dein Übungsbonus wird bei allen Attributswürfen verdoppelt, bei denen diese Fertigkeiten oder Diebeswerkzeug zur Anwendung kommen.\nAuf der 6. Stufe kannst du dir zwei weitere geübte Fertigkeiten oder eine geübte Fertigkeit und den Umgang mit Diebeswerkzeug aussuchen, auf die du den gleichen Vorzug erhältst."
+        },
+        {
+            "id": "rogue_stealth_attack",
+            "name": "Hinterhältiger Angriff",
+            "unlocksAtLevel": 1,
+            "description": "Beginnend ab Stufe 1 weißt du, wie man die Ablenkung eines Feindes ausnutzt, um gezielt zuzuschlagen. Einmal pro Zug kannst du einer Kreatur, die du triffst, zusätzlich 1 W6 Schaden zufügen, falls du bei dem Angriffswurf im Vorteil bist. Der Angriff muss mit einer Fernkampfwaffe oder einer Waffe mit der Eigenschaft Finesse ausgeführt werden.\nDu musst bei dem Angriffswurf nicht im Vorteil sein, wenn sich ein anderer Gegner des Ziels innerhalb von 1,50 m um dieses befindet, dieser Gegner nicht kampfunfähig ist und du bei dem Angriffswurf nicht im Nachteil bist."
+        },
+        {
+            "id": "rogue_thieves_cant",
+            "name": "Diebessprache",
+            "unlocksAtLevel": 1,
+            "description": "Während deiner Ausbildung zum Schurken hast du die Diebessprache erlernt. Diese geheime Mischung aus Dialekt, Jargon und Codes erlaubt es dir, in einer scheinbar gewöhnlichen Unterhaltung Botschaften zu verstecken. Nur eine andere Kreatur, die ebenfalls die Diebessprache beherrscht, kann diese Botschaften verstehen. Das Mitteilen einer solchen Nachricht dauert vier Mal so lange, als wenn man deren Inhalt direkt formulieren würde.\nAußerdem ist dir ein Satz geheimer Zeichen und Symbole bekannt, mit denen du einfache, kurze Informationen übermitteln kannst, etwa ob ein Gebiet sicher ist oder ob es zum Territorium einer Diebesgilde gehört. Auch ob man in der Nähe Beute machen kann, ob die Bevölkerung hier ein leichtes Ziele abgibt oder ob es einen Unterschlupf für Diebe auf der Flucht gibt."
+        },
+        {
+            "id": "rogue_cunning_action",
+            "name": "Raffinierte Aktion",
+            "unlocksAtLevel": 2,
+            "description": "Deine geistige und körperliche Agilität erlauben es dir, schnell Entscheidungen zu treffen und dich rasch zu bewegen und zu handeln. Du kannst in jedem deiner Züge eine Bonusaktion verwenden, um damit die Spurten-, Rückzugs- oder Versteckenaktion auszuführen."
+        }
+    ]
+}

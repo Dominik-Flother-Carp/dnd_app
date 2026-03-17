@@ -1,0 +1,34 @@
+{
+    "className": "Paladin",
+    "subclassName": "Schwur der Hingabe",
+    "fluff": "Mag der Wortlaut des Schwurs der Hingabe auch variieren, so folgen doch alle Paladine dieses Eids den gleichen Prinzipien.\n\nEhrlichkeit: Nicht lügen oder betrügen. Lass deine Worte ein Versprechen sein.\n\nTapferkeit: Fürchte dich nie zu handeln, doch lass auch Vorsicht walten.\n\nMitgefühl: Hilf anderen, schütze die Schwachen und bestrafe diejenigen, die sie bedrohen. Zeige deinen Feinden Gnade, doch zügle sie weise.\n\nEhre: Behandle andere gerecht und lass deine ehrenhaften Taten ein Beispiel für sie sein. Tu so viel Gutes wie möglich und verursache so wenig Schaden wie nötig.\n\nPflichtbewusstsein: Zeige Verantwortung für deine Handlungen und ihre Konsequenzen. Schütze diejenigen, deren Fürsorge du dich verschrieben hast, und gehorche denen, die berechtigte Autorität über dich haben.",
+    "features": [
+        {
+            "id": "paladin_devotion_oath_spells",
+            "name": "Schwurzauber",
+            "unlocksAtLevel": 3,
+            "description": "Dein Schwur gewährt dir weitere Zauber.",
+            "grantedSpells": [
+                {
+                    "spellId": "spell_heiligtum",
+                    "atLevel": 3
+                },
+                {
+                    "spellId": "spell_schutzGutUndBoese",
+                    "atLevel": 3
+                }
+            ]
+        },
+        {
+            "id": "paladin_devotion_channel_divinity",
+            "name": "Göttliche Macht fokussieren",
+            "unlocksAtLevel": 3,
+            "description": "Du kannst göttliche Macht fokussieren um einen der folgenden Effekte zu beschwören:\n\n**Heilige Waffe:** Du kannst dein Merkmal Göttliche Macht fokussieren dazu einsetzen, deine Waffe mit positiver Energie aufzuladen. Als Aktion kannst du eine Waffe bestimmen, die du in der Hand hältst. Für 1 Minute addierst du deinen Charismamodifikator (mindestens 1) zu Angriffswürfen, die du mit dieser ausführst. Die Waffe strahlt in einem Radius von 6 m helles Licht aus und in weiteren 6 m dämmriges Licht. Sollte die Waffe nicht bereits magisch sein, wird sie das für die Dauer des Effekts.\nAls Teil einer beliebigen Aktion in deinem Zug kannst du den Effekt beenden. Wenn du die Waffe nicht mehr trägst beziehungsweise hältst oder du ohnmächtig wirst, endet der Effekt sofort.\n\n**Die Unheiligen vertreiben:** Du kannst dein Merkmal Göttliche Macht fokussieren dazu einsetzen, die Mächte des Bösen zu vertreiben. Als Aktion zeigst du dein heiliges Symbol und sprichst ein Gebet. Alle Unholde oder Untaten, die dich sehen oder hören können und sich innerhalb von 9 m befinden, müssen einen Weisheitsrettungswurf ablegen. Bei einem Misserfolg ist die entsprechende Kreatur für 1 Minute oder bis sie Schaden erleidet vertrieben.\nEine vertriebene Kreatur muss ihren Zug dafür aufwenden, sich so weit wie möglich von dir wegzubewegen, und darf dir nicht absichtlich näher kommen als 9 m. Außerdem kann die Kreatur keine Reaktionen nutzen. Als Aktion kann sie nur spurten oder sich aus einem Effekt befreien, der sie an der Bewegung hindert. Sollte es keinen Ort geben, zu dem sie gelangen kann, darf die Kreatur die Ausweichaktion nutzen.",
+            "resource": {
+                "label": "Nutzungen",
+                "maxFormula": "1",
+                "restType": "long"
+            }
+        }
+    ]
+}

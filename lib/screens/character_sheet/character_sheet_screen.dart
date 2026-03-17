@@ -6,10 +6,13 @@ import 'package:dnd_app/repositories/character_repository.dart';
 import 'package:dnd_app/screens/character_sheet/tabs/overview_tab.dart';
 import 'package:dnd_app/screens/character_sheet/tabs/skills_tab.dart';
 import 'package:dnd_app/screens/character_sheet/tabs/inventory_tab.dart';
-import 'package:dnd_app/screens/character_sheet/tabs/spell_tab.dart' show SpellTab;
+import 'package:dnd_app/screens/character_sheet/tabs/spell_tab.dart' show SpellTab, SpellTabState;
+import 'package:dnd_app/screens/character_sheet/tabs/features_tab.dart';
 import 'package:dnd_app/theme/app_text_styles.dart';
 import 'package:dnd_app/models/spell_slot.dart';
 import 'package:dnd_app/models/classes.dart';
+import 'package:dnd_app/models/class_feature.dart';
+import 'package:dnd_app/services/class_feature_service.dart';
 
 // ── Stufenaufstieg-Dialog ────────────────────────────────────────────────────
 
@@ -311,6 +314,8 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
   bool _isLoading = true;
   bool _editMode = false;
   late TabController _tabController;
+  final _featuresTabKey = GlobalKey<FeaturesTabState>();
+  final _spellTabKey    = GlobalKey<SpellTabState>();
 
   Color get _themeColor => _character?.useEdition2024 == true
       ? const Color(0xFF1B4F72)
@@ -319,12 +324,25 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
+    _tabController.addListener(_onTabChanged);
     _loadCharacter();
+  }
+
+  // Features-Tab ist Index 3, Spell-Tab ist Index 4
+  // Wenn man vom Features-Tab wegwechselt, SpellTab neu laden
+  int _previousTabIndex = 0;
+  void _onTabChanged() {
+    if (!_tabController.indexIsChanging) return;
+    if (_previousTabIndex == 3) {
+      _spellTabKey.currentState?.reload();
+    }
+    _previousTabIndex = _tabController.index;
   }
 
   @override
   void dispose() {
+    _tabController.removeListener(_onTabChanged);
     _tabController.dispose();
     super.dispose();
   }
@@ -402,7 +420,13 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
                   character: _character!,
                   themeColor: _themeColor,
                 ),
+                FeaturesTab(
+                  key: _featuresTabKey,
+                  character: _character!,
+                  themeColor: _themeColor,
+                ),
                 SpellTab(
+                  key: _spellTabKey,
                   character: _character!,
                   themeColor: _themeColor,
                 ),
@@ -485,6 +509,7 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
           Tab(text: 'Übersicht'),
           Tab(text: 'Fertigkeiten'),
           Tab(text: 'Ausrüstung'),
+          Tab(text: 'Features'),
           Tab(text: 'Zauber'),
         ],
       ),
@@ -625,6 +650,158 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
     });
     _updateSpellSlots();
     await _saveCharacter();
+
+    // Neue Features laden und anzeigen
+    if (!mounted) return;
+    final featureService = ClassFeatureService();
+    await featureService.loadForClass(_character!.characterClass);
+    final allFeatures = await featureService.getFeaturesForCharacter(_character!);
+    final newFeatures = allFeatures.where((f) => f.unlocksAtLevel == newLevel).toList();
+
+    // FeaturesTab und SpellTab neu laden
+    _featuresTabKey.currentState?.reload();
+    _spellTabKey.currentState?.reload();
+
+    if (newFeatures.isNotEmpty && mounted) {
+      await _showNewFeaturesDialog(newLevel, newFeatures);
+    }
+  }
+
+  Future<void> _showNewFeaturesDialog(
+      int level, List<ClassFeature> features) async {
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) => DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.5,
+        minChildSize: 0.3,
+        maxChildSize: 0.85,
+        builder: (_, ctrl) => Padding(
+          padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40, height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              Row(
+                children: [
+                  Icon(Icons.auto_awesome, color: _themeColor, size: 22),
+                  const SizedBox(width: 10),
+                  Text('Neu auf Stufe $level',
+                      style: AppTextStyles.sectionTitle),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Folgende Features wurden freigeschaltet:',
+                style: AppTextStyles.bodySmall
+                    .copyWith(color: Colors.grey[500]),
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                child: ListView.separated(
+                  controller: ctrl,
+                  itemCount: features.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  itemBuilder: (_, i) {
+                    final f = features[i];
+                    return Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: _themeColor.withValues(alpha: 0.05),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: _themeColor.withValues(alpha: 0.2),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(f.name,
+                                    style: AppTextStyles.cardTitle),
+                              ),
+                              if (f.subclassName != null)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: _themeColor.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text('Unterklasse',
+                                      style: AppTextStyles.labelXs
+                                          .copyWith(color: _themeColor)),
+                                ),
+                            ],
+                          ),
+                          if (f.description.isNotEmpty) ...[
+                            const SizedBox(height: 6),
+                            Text(
+                              f.description.length > 200
+                                  ? '${f.description.substring(0, 200)}…'
+                                  : f.description,
+                              style: AppTextStyles.bodySmall
+                                  .copyWith(color: Colors.grey[600]),
+                            ),
+                          ],
+                          if (f.choice != null) ...[
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Icon(Icons.touch_app_outlined,
+                                    size: 14,
+                                    color: Colors.orange[600]),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Wahl erforderlich im Features-Tab',
+                                  style: AppTextStyles.bodySmall.copyWith(
+                                      color: Colors.orange[600]),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    // Direkt zum Features-Tab navigieren
+                    _tabController.animateTo(3);
+                  },
+                  style: FilledButton.styleFrom(
+                      backgroundColor: _themeColor),
+                  child: Text('Zum Features-Tab',
+                      style: AppTextStyles.body.copyWith(
+                          color: const Color(0xFFF5DEB3))),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   void longRest() {
@@ -643,6 +820,8 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
         slot.current = slot.max;
       }
     });
+    // Feature-Ressourcen zurücksetzen (lange Rast)
+    _featuresTabKey.currentState?.resetForRest('long');
   }
 
   Future<void> _showRestDialog() async {
@@ -668,6 +847,7 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
               onTap: () {
                 Navigator.pop(context);
                 _showUseHitDiceDialog();
+                _featuresTabKey.currentState?.resetForRest('short');
               },
             ),
             const SizedBox(height: 12),
