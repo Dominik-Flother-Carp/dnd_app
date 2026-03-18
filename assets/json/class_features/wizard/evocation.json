@@ -12,7 +12,7 @@
             "id": "wizard_evocation_sculpt_spells",
             "name": "Zauber formen",
             "unlocksAtLevel": 2,
-            "description": "Du hast die Effekte deiner Hervorrufungszauber so unter Kontrolle, dass du Bereiche in ihnen formen kannst, in denen man vor ihren Auswirkungen sicher ist. Wenn du einen Hervorrufungszauber wirkst, der andere Kreaturen betrifft, die du sehen kannst, darfst du eine Anzahl dieser Kreaturen bestimmen, die 1 + dem Grad des Zaubers entspricht.\nDie ausgewählten Kreaturen schaffen ihren Rettungswurf gegen deinen Zauber automatisch und erleiden keinen Schaden, auch wenn sie normalerweise bei einem gelungenen Rettungswurf die Hälfte des Schadens erleiden würden."
+            "description": "Du hast die Effekte deiner Hervorrufungszauber so unter Kontrolle, dass du Bereiche in ihnen formen kannst, in denen man vor ihren Auswirkungen sicher ist. Wenn du einen Hervorrufungszauber wirkst, der andere Kreaturen betrifft, die du sehen kannst, darfst du eine Anzahl dieser Kreaturen bestimmen, die 1 + dem Grad des Zaubers entspricht.\n\nDie ausgewählten Kreaturen schaffen ihren Rettungswurf gegen deinen Zauber automatisch und erleiden keinen Schaden, auch wenn sie normalerweise bei einem gelungenen Rettungswurf die Hälfte des Schadens erleiden würden."
         }
     ]
 }
