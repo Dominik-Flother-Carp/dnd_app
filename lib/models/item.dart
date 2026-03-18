@@ -163,6 +163,7 @@ class Item {
   double _weight = 0.0;
   int _valueInCopper = 0;
   int _magicBonus    = 0;
+  double? capacity;  // Traglast des Behälters in lb – null wenn kein Behälter
 
   Item({
     String? id,
@@ -175,6 +176,7 @@ class Item {
     double weight          = 0.0,
     int valueInCopper      = 0,
     int magicBonus         = 0,
+    this.capacity,
   }) : id = id ?? const Uuid().v4() {
     _weight        = weight.clamp(0.0, 9999.0);
     _valueInCopper = valueInCopper.clamp(0, 99999999);
@@ -194,6 +196,8 @@ class Item {
 
   // Gewicht pro Einheit – Gesamtgewicht wird von CharacterItem berechnet
   double get weightPerUnit => _weight;
+
+  bool get isContainer => capacity != null && capacity! > 0;
 
   String get valueDisplay {
     if (_valueInCopper == 0) return 'Wertlos';
@@ -222,6 +226,7 @@ class Item {
       'weight':             weight,
       'valueInCopper':      valueInCopper,
       'magicBonus':         magicBonus,
+      'capacity':           capacity,
       // Unterklassen-Felder – in der Basisklasse leer
       'damageDice':         null,
       'damageType':         null,
@@ -258,6 +263,9 @@ class Item {
       weight:             (map['weight'] ?? 0.0).toDouble(),
       valueInCopper:      map['valueInCopper'] ?? 0,
       magicBonus:         map['magicBonus'] ?? 0,
+      capacity:           map['capacity'] != null
+                              ? (map['capacity'] as num).toDouble()
+                              : null,
     );
   }
 }

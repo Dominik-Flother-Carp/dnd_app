@@ -1,5 +1,19 @@
 [
     {
+        "id": "item_beutel",
+        "itemType": "base",
+        "name": "Beutel",
+        "description": "",
+        "category": "gear",
+        "rarity": "common",
+        "requiresAttunement": false,
+        "isMagical": false,
+        "magicBonus": 0,
+        "weight": 0.0,
+        "valueInCopper": 50,
+        "capacity": 6.0
+    },
+    {
         "id": "item_blendlaterne",
         "itemType": "base",
         "name": "Blendlaterne",
@@ -234,6 +248,20 @@
         "valueInCopper": 20
     },
     {
+        "id": "item_rucksack",
+        "itemType": "base",
+        "name": "Rucksack",
+        "description": "",
+        "category": "gear",
+        "rarity": "common",
+        "requiresAttunement": false,
+        "isMagical": false,
+        "magicBonus": 0,
+        "weight": 5.0,
+        "valueInCopper": 200,
+        "capacity": 30.0
+    },
+    {
         "id": "item_schaufel",
         "itemType": "base",
         "name": "Schaufel",
@@ -245,6 +273,19 @@
         "magicBonus": 0,
         "weight": 5.0,
         "valueInCopper": 2000
+    },
+    {
+        "id": "item_schlafsack",
+        "itemType": "base",
+        "name": "Schlafsack",
+        "description": "",
+        "category": "gear",
+        "rarity": "common",
+        "requiresAttunement": false,
+        "isMagical": false,
+        "magicBonus": 0,
+        "weight": 7.0,
+        "valueInCopper": 100
     },
     {
         "id": "item_schloss",

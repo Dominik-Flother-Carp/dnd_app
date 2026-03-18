@@ -8,6 +8,7 @@ class CharacterItem {
   int _quantity;
   bool isEquipped;
   bool isAttuned;
+  bool isOnBody;
   String notes;
 
   CharacterItem({
@@ -16,6 +17,7 @@ class CharacterItem {
     int quantity = 1,
     this.isEquipped = false,
     this.isAttuned = false,
+    this.isOnBody = false,
     this.notes = '',
   }) : _quantity = quantity.clamp(0, 9999);
 
@@ -31,6 +33,7 @@ class CharacterItem {
     'quantity':    quantity,
     'isEquipped':  isEquipped ? 1 : 0,
     'isAttuned':   isAttuned ? 1 : 0,
+    'isOnBody':    isOnBody ? 1 : 0,
     'notes':       notes,
   };
 
@@ -41,6 +44,7 @@ class CharacterItem {
       quantity:    map['quantity'] ?? 1,
       isEquipped:  map['isEquipped'] == 1,
       isAttuned:   map['isAttuned'] == 1,
+      isOnBody:    map['isOnBody'] == 1,
       notes:       map['notes'] ?? '',
     );
   }

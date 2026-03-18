@@ -38,7 +38,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 7,
+      version: 9,
       onCreate: _createTables,
       onUpgrade: _onUpgrade,
     );
@@ -156,7 +156,8 @@ Future<void> _createTables(Database db, int version) async {
       armorType            TEXT,
       minStrength          INTEGER DEFAULT 0,
       maxDexBonusOverride  INTEGER,
-      stealthDisadvantage  INTEGER DEFAULT 0
+      stealthDisadvantage  INTEGER DEFAULT 0,
+      capacity             REAL
     )
   ''');
 
@@ -189,6 +190,7 @@ Future<void> _createTables(Database db, int version) async {
       quantity    INTEGER DEFAULT 1,
       isEquipped  INTEGER DEFAULT 0,
       isAttuned   INTEGER DEFAULT 0,
+      isOnBody    INTEGER DEFAULT 0,
       notes       TEXT DEFAULT '',
       PRIMARY KEY (characterId, itemId),
       FOREIGN KEY (characterId) REFERENCES characters(id) ON DELETE CASCADE,

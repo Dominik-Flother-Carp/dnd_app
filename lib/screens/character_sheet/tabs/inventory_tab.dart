@@ -741,6 +741,22 @@ class _InventoryTabState extends State<InventoryTab>
     return fromItems + fromQuick;
   }
 
+  /// Gesamtkapazität aller Behälter (addiert).
+  /// null wenn kein Behälter im Inventar.
+  double? get _totalContainerCapacity {
+    final containers = _items.where((ci) => ci.item.isContainer);
+    if (containers.isEmpty) return null;
+    return containers.fold(0.0, (s, ci) => s! + ci.item.capacity! * ci.quantity);
+  }
+
+  /// Gewicht aller Items die in einem Behälter liegen
+  /// (weder ausgerüstet noch am Körper getragen).
+  double get _containerLoad {
+    return _items
+        .where((ci) => !ci.isEquipped && !ci.isOnBody)
+        .fold(0.0, (s, ci) => s + ci.totalWeight);
+  }
+
   int get _attuneCount => _items.where((ci) => ci.isAttuned).length;
 
   bool get _isEmpty => _items.isEmpty && _quickItems.isEmpty;
@@ -876,6 +892,7 @@ class _InventoryTabState extends State<InventoryTab>
 
   Future<void> _toggleEquipped(CharacterItem ci) async {
     ci.isEquipped = !ci.isEquipped;
+    if (ci.isEquipped && ci.isOnBody) ci.isOnBody = false;
     await _itemRepo.updateCharacterItem(ci);
     await _load();
   }
@@ -883,6 +900,14 @@ class _InventoryTabState extends State<InventoryTab>
   Future<void> _toggleAttuned(CharacterItem ci) async {
     if (!ci.isAttuned && _attuneCount >= 3) return;
     ci.isAttuned = !ci.isAttuned;
+    await _itemRepo.updateCharacterItem(ci);
+    await _load();
+  }
+
+  Future<void> _toggleOnBody(CharacterItem ci) async {
+    ci.isOnBody = !ci.isOnBody;
+    // Am Körper und ausgerüstet schließen sich aus
+    if (ci.isOnBody && ci.isEquipped) ci.isEquipped = false;
     await _itemRepo.updateCharacterItem(ci);
     await _load();
   }
@@ -986,49 +1011,98 @@ class _InventoryTabState extends State<InventoryTab>
     final walletCp    = widget.character.walletInCopper;
     final carryLimit  = widget.character.strength * 15;
     final overloaded  = _totalWeight > carryLimit;
+    final capacity    = _totalContainerCapacity;
+    final containerOverloaded = capacity != null && _containerLoad > capacity;
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Row(
+        child: Column(
           children: [
-            _buildSummaryStat(
-              label: 'Gewicht (lb)',
-              value: '${_totalWeight.toStringAsFixed(1)} / $carryLimit',
-              icon: Icons.scale,
-              color: overloaded ? Colors.red : null,
+            Row(
+              children: [
+                _buildSummaryStat(
+                  label: 'Gewicht (lb)',
+                  value: '${_totalWeight.toStringAsFixed(1)} / $carryLimit',
+                  icon: Icons.scale,
+                  color: overloaded ? Colors.red : null,
+                ),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: _showWalletDialog,
+                    child: Column(
+                      children: [
+                        const Icon(Icons.toll,
+                            color: Color(0xFFB8860B), size: 20),
+                        const SizedBox(height: 4),
+                        Text(
+                          _formatGP(walletCp),
+                          style: AppTextStyles.statMedium
+                              .copyWith(color: const Color(0xFFB8860B)),
+                        ),
+                        Text(
+                          _formatWallet(walletCp),
+                          style: AppTextStyles.labelXs
+                              .copyWith(color: Colors.grey[500]),
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                        Text('Geldbeutel', style: AppTextStyles.labelXs),
+                      ],
+                    ),
+                  ),
+                ),
+                _buildSummaryStat(
+                  label: 'Einstimmungen',
+                  value: '$_attuneCount / 3',
+                  icon: Icons.auto_awesome,
+                  color: _attuneCount >= 3 ? Colors.red : widget.themeColor,
+                ),
+              ],
             ),
-            Expanded(
-              child: GestureDetector(
-                onTap: _showWalletDialog,
-                child: Column(
-                  children: [
-                    const Icon(Icons.toll,
-                        color: Color(0xFFB8860B), size: 20),
-                    const SizedBox(height: 4),
-                    Text(
-                      _formatGP(walletCp),
-                      style: AppTextStyles.statMedium
-                          .copyWith(color: const Color(0xFFB8860B)),
+            if (capacity != null) ...[
+              const SizedBox(height: 12),
+              Divider(height: 1, color: Colors.grey[200]),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Icon(Icons.backpack_outlined,
+                      size: 16,
+                      color: containerOverloaded
+                          ? Colors.red
+                          : Colors.grey[500]),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Behälter',
+                    style: AppTextStyles.labelXs
+                        .copyWith(color: Colors.grey[500]),
+                  ),
+                  const Spacer(),
+                  Text(
+                    '${_containerLoad.toStringAsFixed(1)} / ${capacity.toStringAsFixed(1)} lb',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: containerOverloaded ? Colors.red : Colors.grey[700],
+                      fontWeight: containerOverloaded
+                          ? FontWeight.bold
+                          : FontWeight.normal,
                     ),
-                    Text(
-                      _formatWallet(walletCp),
-                      style: AppTextStyles.labelXs
-                          .copyWith(color: Colors.grey[500]),
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
-                    Text('Geldbeutel', style: AppTextStyles.labelXs),
-                  ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: (_containerLoad / capacity).clamp(0.0, 1.0),
+                  minHeight: 6,
+                  backgroundColor: Colors.grey[200],
+                  valueColor: AlwaysStoppedAnimation(
+                    containerOverloaded ? Colors.red : widget.themeColor,
+                  ),
                 ),
               ),
-            ),
-            _buildSummaryStat(
-              label: 'Einstimmungen',
-              value: '$_attuneCount / 3',
-              icon: Icons.auto_awesome,
-              color: _attuneCount >= 3 ? Colors.red : widget.themeColor,
-            ),
+            ],
           ],
         ),
       ),
@@ -1142,6 +1216,8 @@ class _InventoryTabState extends State<InventoryTab>
                         Text(item.name, style: AppTextStyles.cardTitle),
                         if (ci.isEquipped)
                           _badge('Ausgerüstet', widget.themeColor),
+                        if (ci.isOnBody)
+                          _badge('Am Körper', Colors.teal),
                         if (ci.isAttuned)
                           _badge('Eingestimmt', Colors.purple),
                       ],
@@ -1201,6 +1277,22 @@ class _InventoryTabState extends State<InventoryTab>
                   _toggleEquipped(ci);
                 },
               ),
+            ListTile(
+              leading: Icon(
+                ci.isOnBody
+                    ? Icons.accessibility_new
+                    : Icons.accessibility_new_outlined,
+                color: ci.isOnBody ? Colors.teal : null,
+              ),
+              title: Text(
+                ci.isOnBody ? 'Nicht mehr am Körper' : 'Am Körper tragen',
+                style: AppTextStyles.body,
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                _toggleOnBody(ci);
+              },
+            ),
             if (ci.item.requiresAttunement)
               ListTile(
                 leading: Icon(
