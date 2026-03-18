@@ -87,7 +87,7 @@ class _CharacterListScreenState extends State<CharacterListScreen> {
       ..wisdom = 12
       ..charisma = 10
       ..armorClass = 12
-      ..speed = 9
+      ..speed = 9.0
       ..maxHitPoints = 28
       ..currentHitPoints = 20
       ..experiencePoints = 6500

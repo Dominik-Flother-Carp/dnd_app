@@ -41,7 +41,7 @@ class Character {
   int _currentHitPoints = 8;
   int _temporaryHitPoints = 0;
   int _armorClass = 10;
-  int _speed = 9;
+  double _speed = 9.0;
 
   int _walletInCopper = 0; // Geldbeutel, intern in Kupferstücken gespeichert
 
@@ -85,7 +85,7 @@ class Character {
     int currentHitPoints = 8,
     int temporaryHitPoints = 0,
     int armorClass = 10,
-    int speed = 9,
+    double speed = 9.0,
     int walletInCopper = 0,
     int usedHitDice = 0,
     int deathSaveSuccesses = 0,
@@ -115,7 +115,7 @@ class Character {
     _currentHitPoints = currentHitPoints.clamp(0, _maxHitPoints);
     _temporaryHitPoints = temporaryHitPoints.clamp(0, 9999);
     _armorClass = armorClass.clamp(1, 30);
-    _speed = speed.clamp(0, 99);
+    _speed = speed.clamp(0.0, 99.0);
     _walletInCopper = walletInCopper.clamp(0, 999999999);
     _deathSaveSuccesses = deathSaveSuccesses.clamp(0, 3);
     _deathSaveFailures = deathSaveFailures.clamp(0, 3);
@@ -179,8 +179,8 @@ class Character {
   set armorClass(int value) => _armorClass = value.clamp(1, 30);
 
   // Bewegungsgeschwindigkeit: 0 ist möglich (gelähmt), Maximum 99m
-  int get speed => _speed;
-  set speed(int value) => _speed = value.clamp(0, 99);
+  double get speed => _speed;
+  set speed(double value) => _speed = value.clamp(0.0, 99.0);
 
   // Geldbeutel: intern in Kupferstücken, nie negativ
   // Geldbeutel: intern in Kupferstücken, nie negativ
@@ -372,7 +372,7 @@ class Character {
       temporaryHitPoints: map['temporaryHitPoints'] ?? 0,
       hitDie: map['hitDie'] ?? 8,
       armorClass: map['armorClass'] ?? 10,
-      speed: map['speed'] ?? 9,
+      speed: (map['speed'] ?? 9.0).toDouble(),
       walletInCopper: map['walletInCopper'] ?? 0,
       notes: map['notes'] ?? '',
       personalityTraits: map['personalityTraits'] ?? '',

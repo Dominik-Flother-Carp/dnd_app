@@ -13,6 +13,7 @@ import 'package:dnd_app/models/spell_slot.dart';
 import 'package:dnd_app/models/classes.dart';
 import 'package:dnd_app/models/class_feature.dart';
 import 'package:dnd_app/services/class_feature_service.dart';
+import 'package:dnd_app/services/compendium_service.dart';
 
 // ── Stufenaufstieg-Dialog ────────────────────────────────────────────────────
 
@@ -354,6 +355,38 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
       _character = character;
       _isLoading = false;
     });
+    if (_character != null) {
+      await _syncClassSpells(_character!);
+    }
+  }
+
+  /// Für prepared-Caster: trägt alle Klassenzauber bis zum verfügbaren
+  /// Zaubergrad als bekannt (isPrepared=false) ein. Idempotent.
+  Future<void> _syncClassSpells(Character c) async {
+    final featureService  = ClassFeatureService();
+    final compendium      = CompendiumService();
+    await compendium.load();
+
+    final features = await featureService.getFeaturesForCharacter(c);
+    final hasPrepared = features.any((f) => f.spellcasting?.type == 'prepared');
+    if (!hasPrepared) return;
+
+    if (c.spellSlots.isEmpty) return;
+    final maxGrade = c.spellSlots.keys.reduce((a, b) => a > b ? a : b);
+
+    final classSpells = compendium
+        .searchSpells('', className: c.characterClass)
+        .where((s) => s.level > 0 && s.level <= maxGrade)
+        .toList();
+
+    for (final spell in classSpells) {
+      await _repository.upsertSpell(spell);
+      await _repository.addSpellToCharacter(
+        c.id,
+        spell.id,
+        isPrepared: false,
+      );
+    }
   }
 
   Future<void> _saveCharacter() async {
@@ -650,6 +683,7 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
     });
     _updateSpellSlots();
     await _saveCharacter();
+    await _syncClassSpells(_character!);
 
     // Neue Features laden und anzeigen
     if (!mounted) return;
@@ -658,9 +692,10 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
     final allFeatures = await featureService.getFeaturesForCharacter(_character!);
     final newFeatures = allFeatures.where((f) => f.unlocksAtLevel == newLevel).toList();
 
-    // FeaturesTab und SpellTab neu laden
-    _featuresTabKey.currentState?.reload();
-    _spellTabKey.currentState?.reload();
+    // FeaturesTab neu laden (syncGrantedSpells schreibt gewährte Zauber in DB)
+    await _featuresTabKey.currentState?.reload();
+    // Erst danach SpellTab laden, damit gewährte Zauber bereits in der DB sind
+    await _spellTabKey.currentState?.reload();
 
     if (newFeatures.isNotEmpty && mounted) {
       await _showNewFeaturesDialog(newLevel, newFeatures);

@@ -5,6 +5,93 @@ import 'package:dnd_app/models/character.dart';
 import 'package:dnd_app/theme/app_text_styles.dart';
 import 'package:dnd_app/models/attributes.dart';
 
+/// Formatiert einen Meterwert: ganze Zahlen ohne Dezimalstelle, sonst mit einer.
+String _fmtSpeed(double meters) {
+  if (meters == meters.roundToDouble()) return '${meters.toInt()} m';
+  return '${meters.toStringAsFixed(1)} m';
+}
+
+// ── Double-Dialog für Bewegungsgeschwindigkeit ────────────────────────────────
+
+class _DoubleDialogResult {
+  final double value;
+  const _DoubleDialogResult(this.value);
+}
+
+class _DoubleDialog extends StatefulWidget {
+  final String label;
+  final double currentValue;
+  final double min;
+  final double max;
+  final Color themeColor;
+
+  const _DoubleDialog({
+    required this.label,
+    required this.currentValue,
+    required this.min,
+    required this.max,
+    required this.themeColor,
+  });
+
+  @override
+  State<_DoubleDialog> createState() => _DoubleDialogState();
+}
+
+class _DoubleDialogState extends State<_DoubleDialog> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(
+      text: _fmtSpeed(widget.currentValue).replaceAll(' m', ''),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(widget.label, style: AppTextStyles.sectionTitle),
+      content: TextField(
+        controller: _controller,
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'^\d*[,.]?\d*')),
+        ],
+        style: AppTextStyles.body,
+        decoration: const InputDecoration(
+          border: OutlineInputBorder(),
+          suffixText: 'm',
+        ),
+        autofocus: true,
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text('Abbrechen', style: AppTextStyles.body),
+        ),
+        FilledButton(
+          onPressed: () {
+            final text = _controller.text.replaceAll(',', '.');
+            final value = double.tryParse(text);
+            if (value != null && value >= widget.min && value <= widget.max) {
+              Navigator.pop(context, _DoubleDialogResult(value));
+            }
+          },
+          style: FilledButton.styleFrom(backgroundColor: widget.themeColor),
+          child: Text('Speichern', style: AppTextStyles.body),
+        ),
+      ],
+    );
+  }
+}
+
 // ── Dialog-Widgets ────────────────────────────────────────────────────────────
 
 class _NumberDialogResult {
@@ -318,7 +405,7 @@ class _TempHpDialogState extends State<_TempHpDialog> {
 // ── Bewegungs-Info-Dialog ─────────────────────────────────────────────────────
 
 class _MovementInfoDialog extends StatelessWidget {
-  final int speed;
+  final double speed;
   final int strength;
   final int strModifier;
   final Color themeColor;
@@ -363,8 +450,8 @@ class _MovementInfoDialog extends StatelessWidget {
             label: 'Bewegungsrate',
             color: themeColor,
             rows: [
-              ('Laufen', '$speed m'),
-              ('Schleichen', '${(speed / 2).floor()} m'),
+              ('Laufen', fmt(speed)),
+              ('Schleichen', fmt(speed / 2)),
             ],
           ),
           const SizedBox(height: 16),
@@ -543,12 +630,12 @@ class _OverviewTabState extends State<OverviewTab>
                   ),
                   _buildStatBox(
                     'Bewegung',
-                    '${c.speed} m',
+                    _fmtSpeed(c.speed),
                     onTap: widget.editMode
-                        ? () => _showNumberDialog(
+                        ? () => _showDoubleDialog(
                             'Bewegungsgeschwindigkeit', c.speed,
-                            min: 0,
-                            max: 99,
+                            min: 0.0,
+                            max: 99.0,
                             onSave: (v) => setState(() => c.speed = v))
                         : () => showDialog(
                             context: context,
@@ -1150,6 +1237,29 @@ class _OverviewTabState extends State<OverviewTab>
     final result = await showDialog<_NumberDialogResult>(
       context: context,
       builder: (_) => _NumberDialog(
+        label: label,
+        currentValue: currentValue,
+        min: min,
+        max: max,
+        themeColor: widget.themeColor,
+      ),
+    );
+    if (result != null) {
+      onSave(result.value);
+      _save();
+    }
+  }
+
+  Future<void> _showDoubleDialog(
+    String label,
+    double currentValue, {
+    required double min,
+    required double max,
+    required void Function(double) onSave,
+  }) async {
+    final result = await showDialog<_DoubleDialogResult>(
+      context: context,
+      builder: (_) => _DoubleDialog(
         label: label,
         currentValue: currentValue,
         min: min,

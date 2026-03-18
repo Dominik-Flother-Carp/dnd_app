@@ -337,8 +337,9 @@ class FeaturesTabState extends State<FeaturesTab>
         ),
         child: ExpansionTile(
           tilePadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
-          childrenPadding:
-              const EdgeInsets.fromLTRB(14, 0, 14, 12),
+          childrenPadding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
+          expandedCrossAxisAlignment: CrossAxisAlignment.start,
+          expandedAlignment: Alignment.topLeft,
           title: Row(
             children: [
               Expanded(

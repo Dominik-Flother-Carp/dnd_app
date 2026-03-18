@@ -38,7 +38,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 5,
+      version: 6,
       onCreate: _createTables,
       onUpgrade: _onUpgrade,
     );
@@ -70,7 +70,7 @@ Future<void> _createTables(Database db, int version) async {
       hitDie                   INTEGER DEFAULT 8,
       usedHitDice              INTEGER DEFAULT 0,
       armorClass               INTEGER DEFAULT 10,
-      speed                    INTEGER DEFAULT 9,
+      speed                    REAL DEFAULT 9.0,
       walletInCopper           INTEGER DEFAULT 0,
       notes                    TEXT,
       personalityTraits        TEXT,

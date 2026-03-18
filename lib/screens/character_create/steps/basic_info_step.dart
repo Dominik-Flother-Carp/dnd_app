@@ -9,6 +9,11 @@ import 'package:dnd_app/theme/app_text_styles.dart';
 import 'package:dnd_app/models/skills.dart';
 import 'package:dnd_app/models/attributes.dart';
 
+String _fmtSpeed(double meters) {
+  if (meters == meters.roundToDouble()) return '${meters.toInt()} m';
+  return '${meters.toStringAsFixed(1)} m';
+}
+
 class BasicInfoStep extends StatefulWidget {
   final Character character;
   final bool useEdition2024;
@@ -336,7 +341,7 @@ class BasicInfoStepState extends State<BasicInfoStep> {
               _buildDerivedRow(
                 Icons.directions_walk,
                 'Bewegungsgeschwindigkeit',
-                '${_selectedRace!.speed} m',
+                _fmtSpeed(_selectedRace!.speed),
               ),
               if (!widget.useEdition2024 &&
                   _selectedRace!.attributeBonuses2014.isNotEmpty)

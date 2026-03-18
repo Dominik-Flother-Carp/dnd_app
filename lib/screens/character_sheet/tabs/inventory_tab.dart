@@ -898,16 +898,19 @@ class _InventoryTabState extends State<InventoryTab>
 
 
   Widget _buildSummaryCard() {
-    final walletCp = widget.character.walletInCopper;
+    final walletCp    = widget.character.walletInCopper;
+    final carryLimit  = widget.character.strength * 15;
+    final overloaded  = _totalWeight > carryLimit;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
             _buildSummaryStat(
-              label: 'Gesamtgewicht',
-              value: '${_totalWeight.toStringAsFixed(1)} lb',
+              label: 'Gewicht (lb)',
+              value: '${_totalWeight.toStringAsFixed(1)} / $carryLimit',
               icon: Icons.scale,
+              color: overloaded ? Colors.red : null,
             ),
             Expanded(
               child: GestureDetector(

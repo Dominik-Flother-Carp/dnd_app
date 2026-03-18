@@ -29,7 +29,7 @@ int _calcPreparedLimit(Character c) {
   final effectiveLevel = cls.casterType == 'half'
       ? (c.level / 2).floor()
       : c.level;
-  return (effectiveLevel + attrMod).clamp(1, 99);
+  return (effectiveLevel + attrMod).clamp(1, 99).toInt();
 }
 
 // ── Kompendium-Picker (Zauber) ────────────────────────────────────────────────
