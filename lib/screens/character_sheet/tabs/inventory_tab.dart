@@ -220,6 +220,76 @@ class _WalletDialogState extends State<_WalletDialog> {
   }
 }
 
+// ── Notiz-Dialog (für Kompendium-Items) ──────────────────────────────────────
+
+class _NotesDialog extends StatefulWidget {
+  final String itemName;
+  final String currentNotes;
+  final Color themeColor;
+
+  const _NotesDialog({
+    required this.itemName,
+    required this.currentNotes,
+    required this.themeColor,
+  });
+
+  @override
+  State<_NotesDialog> createState() => _NotesDialogState();
+}
+
+class _NotesDialogState extends State<_NotesDialog> {
+  late final TextEditingController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = TextEditingController(text: widget.currentNotes);
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(widget.itemName, style: AppTextStyles.sectionTitle),
+      content: TextField(
+        controller: _ctrl,
+        style: AppTextStyles.body,
+        maxLines: 5,
+        textAlignVertical: TextAlignVertical.top,
+        autofocus: true,
+        decoration: const InputDecoration(
+          hintText: 'Notizen zum Item…',
+          border: OutlineInputBorder(),
+          alignLabelWithHint: true,
+        ),
+      ),
+      actions: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Abbrechen', style: AppTextStyles.body),
+            ),
+            const SizedBox(width: 10),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                  backgroundColor: widget.themeColor),
+              onPressed: () => Navigator.pop(context, _ctrl.text.trim()),
+              child: Text('Speichern', style: AppTextStyles.body),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
 // ── Schnellitem-Dialog ────────────────────────────────────────────────────────
 
 class _QuickItemDialog extends StatefulWidget {
@@ -817,6 +887,21 @@ class _InventoryTabState extends State<InventoryTab>
     await _load();
   }
 
+  Future<void> _showCiNotes(CharacterItem ci) async {
+    final result = await showDialog<String>(
+      context: context,
+      builder: (_) => _NotesDialog(
+        itemName:     ci.item.name,
+        currentNotes: ci.notes,
+        themeColor:   widget.themeColor,
+      ),
+    );
+    if (result == null || !mounted) return;
+    ci.notes = result;
+    await _itemRepo.updateCharacterItem(ci);
+    await _load();
+  }
+
   // ── Build ─────────────────────────────────────────────────────────────────
 
   @override
@@ -1030,7 +1115,7 @@ class _InventoryTabState extends State<InventoryTab>
       margin: const EdgeInsets.only(bottom: 8),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: () => showItemDetailSheet(context, item),
+        onTap: () => showItemDetailSheet(context, item, notes: ci.notes),
         onLongPress: () => _showCiOptions(ci),
         child: Padding(
           padding: const EdgeInsets.all(12),
@@ -1133,6 +1218,17 @@ class _InventoryTabState extends State<InventoryTab>
                   _toggleAttuned(ci);
                 },
               ),
+            ListTile(
+              leading: Icon(Icons.notes_outlined, color: widget.themeColor),
+              title: Text(
+                ci.notes.isEmpty ? 'Notiz hinzufügen' : 'Notiz bearbeiten',
+                style: AppTextStyles.body,
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                _showCiNotes(ci);
+              },
+            ),
             ListTile(
               leading: const Icon(Icons.delete_outline, color: Colors.red),
               title: Text(

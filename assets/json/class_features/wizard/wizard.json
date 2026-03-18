@@ -13,7 +13,7 @@
             "unlocksAtLevel": 1,
             "description": "Durch jahrelanges Studium der arkanen Künste kannst du die Welt um dich verformen und mächtige Zauber erschaffen.\n\nAls Zauberfokus kannst du einen arkanen Fokus verwenden und dein Zauberwirken-Modifikator ist Intelligenz.",
             "spellcasting": {
-                "type": "prepared"
+                "type": "spellbook"
             }
         },
         {

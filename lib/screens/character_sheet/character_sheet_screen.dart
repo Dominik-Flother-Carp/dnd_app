@@ -371,6 +371,10 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
     final hasPrepared = features.any((f) => f.spellcasting?.type == 'prepared');
     if (!hasPrepared) return;
 
+    // Zauberbuch-Caster (Magier) verwalten ihre Zauber manuell
+    final cls = characterClasses.where((cl) => cl.name == c.characterClass).firstOrNull;
+    if (cls?.casterType == 'spellbook') return;
+
     if (c.spellSlots.isEmpty) return;
     final maxGrade = c.spellSlots.keys.reduce((a, b) => a > b ? a : b);
 

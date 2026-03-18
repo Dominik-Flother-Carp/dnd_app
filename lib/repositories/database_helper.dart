@@ -38,7 +38,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 6,
+      version: 7,
       onCreate: _createTables,
       onUpgrade: _onUpgrade,
     );
@@ -189,6 +189,7 @@ Future<void> _createTables(Database db, int version) async {
       quantity    INTEGER DEFAULT 1,
       isEquipped  INTEGER DEFAULT 0,
       isAttuned   INTEGER DEFAULT 0,
+      notes       TEXT DEFAULT '',
       PRIMARY KEY (characterId, itemId),
       FOREIGN KEY (characterId) REFERENCES characters(id) ON DELETE CASCADE,
       FOREIGN KEY (itemId)      REFERENCES items(id)      ON DELETE CASCADE

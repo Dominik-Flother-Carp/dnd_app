@@ -13,7 +13,7 @@ class ItemRepository {
   Future<List<CharacterItem>> getItemsForCharacter(String characterId) async {
     final db = await _db.database;
     final results = await db.rawQuery('''
-      SELECT i.*, ci.quantity, ci.isEquipped, ci.isAttuned, ci.characterId
+      SELECT i.*, ci.quantity, ci.isEquipped, ci.isAttuned, ci.characterId, ci.notes
       FROM items i
       JOIN character_items ci ON i.id = ci.itemId
       WHERE ci.characterId = ?

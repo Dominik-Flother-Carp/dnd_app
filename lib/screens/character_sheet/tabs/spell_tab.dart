@@ -13,8 +13,9 @@ import 'package:dnd_app/models/classes.dart';
 // ── Vorbereitungslimit ─────────────────────────────────────────────────────────
 //
 // Formel nach 5e-Regeln:
-// Full-Caster:  Zauberattribut-Modifier + Charakterlevel
-// Half-Caster:  Zauberattribut-Modifier + floor(Charakterlevel / 2)
+// Full-Caster:    Zauberattribut-Modifier + Charakterlevel
+// Half-Caster:    Zauberattribut-Modifier + floor(Charakterlevel / 2)
+// Spellbook:      Zauberattribut-Modifier + Charakterlevel (Magier)
 // Zaubertricks (Grad 0) zählen nie zum Limit.
 // Nicht-Zauberer: kein Limit relevant.
 

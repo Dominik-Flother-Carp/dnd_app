@@ -8,12 +8,12 @@ import 'package:dnd_app/theme/app_text_styles.dart';
 
 // ── Einstiegspunkte ───────────────────────────────────────────────────────────
 
-void showItemDetailSheet(BuildContext context, Item item) {
+void showItemDetailSheet(BuildContext context, Item item, {String? notes}) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (_) => _ItemDetailSheet(item: item),
+    builder: (_) => _ItemDetailSheet(item: item, notes: notes),
   );
 }
 
@@ -131,7 +131,9 @@ Widget _buildChip(String label, {Color? color}) {
 
 class _ItemDetailSheet extends StatelessWidget {
   final Item item;
-  const _ItemDetailSheet({required this.item});
+  final String? notes;
+
+  const _ItemDetailSheet({required this.item, this.notes});
 
   @override
   Widget build(BuildContext context) {
@@ -201,6 +203,13 @@ class _ItemDetailSheet extends StatelessWidget {
             _buildSection(
               'Beschreibung',
               Text(item.description, style: AppTextStyles.body),
+            ),
+
+          // ── Charakter-Notiz ────────────────────────────────────────────
+          if (notes != null && notes!.isNotEmpty)
+            _buildSection(
+              'Notiz',
+              Text(notes!, style: AppTextStyles.body),
             ),
         ],
       ),
@@ -300,7 +309,26 @@ class _SpellDetailSheet extends StatelessWidget {
     return '${spell.level}. Grad';
   }
 
-  String get _schoolLabel => spell.school.label;
+  String get _schoolLabel {
+    switch (spell.school) {
+      case SpellSchool.abjuration:
+        return 'Bannmagie';
+      case SpellSchool.conjuration:
+        return 'Beschwörung';
+      case SpellSchool.divination:
+        return 'Erkenntnis';
+      case SpellSchool.enchantment:
+        return 'Verzauberung';
+      case SpellSchool.evocation:
+        return 'Hervorrufung';
+      case SpellSchool.illusion:
+        return 'Illusion';
+      case SpellSchool.necromancy:
+        return 'Nekromantie';
+      case SpellSchool.transmutation:
+        return 'Verwandlung';
+    }
+  }
 
   Color get _schoolColor {
     switch (spell.school) {

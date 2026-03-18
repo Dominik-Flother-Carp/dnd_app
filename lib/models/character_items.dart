@@ -8,6 +8,7 @@ class CharacterItem {
   int _quantity;
   bool isEquipped;
   bool isAttuned;
+  String notes;
 
   CharacterItem({
     required this.characterId,
@@ -15,6 +16,7 @@ class CharacterItem {
     int quantity = 1,
     this.isEquipped = false,
     this.isAttuned = false,
+    this.notes = '',
   }) : _quantity = quantity.clamp(0, 9999);
 
   int get quantity => _quantity;
@@ -29,6 +31,7 @@ class CharacterItem {
     'quantity':    quantity,
     'isEquipped':  isEquipped ? 1 : 0,
     'isAttuned':   isAttuned ? 1 : 0,
+    'notes':       notes,
   };
 
   factory CharacterItem.fromMap(Map<String, dynamic> map, Item item) {
@@ -38,6 +41,7 @@ class CharacterItem {
       quantity:    map['quantity'] ?? 1,
       isEquipped:  map['isEquipped'] == 1,
       isAttuned:   map['isAttuned'] == 1,
+      notes:       map['notes'] ?? '',
     );
   }
 }

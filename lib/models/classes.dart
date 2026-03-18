@@ -4,7 +4,7 @@ class CharacterClass {
   final String name;
   final int hitDie;
   final String spellcastingAttribute; // '' wenn keine Zauberei
-  final String? casterType;           // 'full', 'half' oder null
+  final String? casterType;           // 'full', 'half', 'spellbook' oder null
   final List<String> availableSkills; // Fertigkeiten aus denen gewählt werden kann
   final List<String> proficientSavingThrows;
   final int skillChoices;             // Anzahl der wählbaren Fertigkeiten
@@ -166,7 +166,7 @@ const List<CharacterClass> characterClasses = [
   CharacterClass(
     name: 'Magier',
     hitDie: 6,
-    casterType: 'full',
+    casterType: 'spellbook',
     spellcastingAttribute: 'intelligence',
     skillChoices: 2,
     availableSkills: [
@@ -305,8 +305,9 @@ Map<int, SpellSlot> calculateSpellSlots(String className, int level) {
   // Kein Zauberer: casterType ist null oder leer
   if (casterType == null || casterType.isEmpty) return {};
 
-  // Unbekannter casterType (sollte nicht vorkommen, aber sicher ist sicher)
-  final table = spellSlotTable[casterType];
+  // 'spellbook' nutzt dieselbe Slot-Tabelle wie 'full'
+  final lookupType = casterType == 'spellbook' ? 'full' : casterType;
+  final table = spellSlotTable[lookupType];
   if (table == null) return {};
 
   final slots = table[level.clamp(1, 20)];
