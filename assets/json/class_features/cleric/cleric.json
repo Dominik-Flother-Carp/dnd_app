@@ -5,7 +5,7 @@
             "id": "cleric_spellcasting",
             "name": "Zauberwirken",
             "unlocksAtLevel": 1,
-            "description": "Durch das Kanalisieren der Macht deiner Gottheit, kannst du mächtige Zauber erschaffen. Als Zauberfokus kannst du ein heiliges Symbol nutzen und dein Zauberwirken-Modifikator ist Weisheit.",
+            "description": "Durch das Kanalisieren der Macht deiner Gottheit, kannst du mächtige Zauber erschaffen.\n\nAls Zauberfokus kannst du ein heiliges Symbol nutzen und dein Zauberwirken-Modifikator ist Weisheit.",
             "spellcasting": {
                 "type": "prepared"
             }

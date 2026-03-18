@@ -20,6 +20,12 @@ class DndApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF8B0000),
           brightness: Brightness.light,
+        ).copyWith(
+          // In Material3 hebt DropdownButtonFormField den ausgewählten Eintrag
+          // mit primaryContainer hervor – das wirkt wie eine Überschrift.
+          // Transparent entfernt dieses Highlighting.
+          primaryContainer: Colors.transparent,
+          onPrimaryContainer: Colors.black87,
         ),
         useMaterial3: true,
         appBarTheme: const AppBarTheme(

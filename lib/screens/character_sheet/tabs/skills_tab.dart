@@ -134,16 +134,61 @@ class _SkillsTabState extends State<SkillsTab> with AutomaticKeepAliveClientMixi
   }
 
   Widget _buildSkills() {
+    final c               = widget.character;
+    final isRogue         = c.characterClass == 'Schurke';
+    final expertiseCount  = c.skillExpertise.values.where((v) => v).length;
+    final expertiseMax    = isRogue ? (c.level >= 6 ? 4 : 2) : 0;
+    final expertiseOver   = expertiseCount > expertiseMax;
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Fertigkeiten',
-              style: AppTextStyles.sectionTitle.copyWith(color: widget.themeColor),
+            Row(
+              children: [
+                Text(
+                  'Fertigkeiten',
+                  style: AppTextStyles.sectionTitle
+                      .copyWith(color: widget.themeColor),
+                ),
+                if (isRogue) ...[
+                  const Spacer(),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: expertiseOver
+                          ? Colors.red.withValues(alpha: 0.12)
+                          : expertiseCount == expertiseMax
+                              ? Colors.green.withValues(alpha: 0.12)
+                              : widget.themeColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      'Expertise: $expertiseCount / $expertiseMax',
+                      style: AppTextStyles.labelXs.copyWith(
+                        color: expertiseOver
+                            ? Colors.red
+                            : expertiseCount == expertiseMax
+                                ? Colors.green
+                                : widget.themeColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
+            if (isRogue && widget.editMode) ...[
+              const SizedBox(height: 6),
+              Text(
+                'Tippe auf eine geübte Fertigkeit um Expertise zu vergeben.',
+                style: AppTextStyles.labelXs
+                    .copyWith(color: Colors.grey[500]),
+              ),
+            ],
             const SizedBox(height: 12),
             ...Skills.labels.keys.map((skillKey) {
               final bonus        = widget.character.skillBonus(skillKey);

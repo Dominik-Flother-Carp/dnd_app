@@ -146,9 +146,7 @@ class FeaturesTabState extends State<FeaturesTab>
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
+      backgroundColor: Colors.transparent,
       builder: (_) => _FeatureDetailSheet(
         feature:    f,
         character:  widget.character,
@@ -480,66 +478,149 @@ class _FeatureDetailSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
-      expand: false,
-      initialChildSize: 0.55,
-      minChildSize: 0.35,
-      maxChildSize: 0.92,
-      builder: (_, ctrl) => Padding(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+      initialChildSize: 0.6,
+      minChildSize: 0.4,
+      maxChildSize: 0.95,
+      builder: (context, scrollController) => Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          borderRadius:
+              const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Griffleiste
-            Center(
+            // Ziehgriff
+            Padding(
+              padding: const EdgeInsets.only(top: 12, bottom: 8),
               child: Container(
-                width: 40, height: 4,
-                margin: const EdgeInsets.only(bottom: 16),
+                width: 40,
+                height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.grey[300],
+                  color: Colors.grey[400],
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
             ),
-            // Header
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Text(feature.name,
-                      style: AppTextStyles.sectionTitle),
-                ),
-                if (feature.subclassName != null) ...[
-                  const SizedBox(width: 8),
-                  _sheetChip('Unterklasse', themeColor),
-                ],
-              ],
-            ),
-            const SizedBox(height: 4),
-            Text('Stufe ${feature.unlocksAtLevel}',
-                style: AppTextStyles.bodySmall
-                    .copyWith(color: Colors.grey[500])),
-            const SizedBox(height: 16),
-            // Scrollbarer Inhalt
             Expanded(
-              child: ListView(
-                controller: ctrl,
-                children: [
-                  if (feature.description.isNotEmpty)
-                    _buildDescription(feature.description),
-                  if (feature.extensions.isNotEmpty) ...[
-                    const SizedBox(height: 16),
-                    ...feature.extensions.map(_buildExtension),
+              child: SingleChildScrollView(
+                controller: scrollController,
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // ── Header ────────────────────────────────────────────
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(Icons.auto_awesome,
+                            size: 28, color: themeColor),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(feature.name,
+                                  style: AppTextStyles.sectionTitle),
+                              const SizedBox(height: 4),
+                              Wrap(
+                                spacing: 6,
+                                runSpacing: 4,
+                                children: [
+                                  _chip('Stufe ${feature.unlocksAtLevel}'),
+                                  if (feature.subclassName != null)
+                                    _chip('Unterklasse', color: themeColor),
+                                  if (feature.resource != null)
+                                    _chip(
+                                      feature.resource!.restType == 'short'
+                                          ? 'Kurze Rast'
+                                          : 'Lange Rast',
+                                      color: feature.resource!.restType ==
+                                              'short'
+                                          ? Colors.blue
+                                          : Colors.purple,
+                                    ),
+                                  if (feature.choice != null &&
+                                      choices[feature.id] == null)
+                                    _chip('Wahl erforderlich',
+                                        color: Colors.orange),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    // ── Beschreibung ──────────────────────────────────────
+                    if (feature.description.isNotEmpty)
+                      _section('Beschreibung',
+                          _buildDescription(feature.description)),
+
+                    // ── Erweiterungen (Domänen) ───────────────────────────
+                    if (feature.extensions.isNotEmpty)
+                      _section(
+                        'Domänen-Erweiterungen',
+                        Column(
+                          children: feature.extensions.map((ext) {
+                            return Container(
+                              width: double.infinity,
+                              margin: const EdgeInsets.only(bottom: 10),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: themeColor.withValues(alpha: 0.05),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                    color:
+                                        themeColor.withValues(alpha: 0.2)),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(ext.name,
+                                            style: AppTextStyles.cardTitle
+                                                .copyWith(color: themeColor)),
+                                      ),
+                                      _chip('Domäne', color: themeColor),
+                                    ],
+                                  ),
+                                  if (ext.description.isNotEmpty) ...[
+                                    const SizedBox(height: 8),
+                                    _buildDescription(ext.description),
+                                  ],
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+
+                    // ── Gewährte Zauber ───────────────────────────────────
+                    if (feature.grantedSpells != null &&
+                        feature.grantedSpells!.isNotEmpty)
+                      _section(
+                        'Gewährte Zauber',
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: feature.grantedSpells!.map((gs) {
+                            final available = gs.atLevel <= character.level;
+                            final name =
+                                spellNames[gs.spellId] ?? gs.spellId;
+                            return _chip(name,
+                                color:
+                                    available ? themeColor : Colors.grey);
+                          }).toList(),
+                        ),
+                      ),
+
+                    // ── Wahl ─────────────────────────────────────────────
+                    if (feature.choice != null)
+                      _section('Wahl', _buildChoice(context)),
                   ],
-                  if (feature.grantedSpells != null &&
-                      feature.grantedSpells!.isNotEmpty) ...[
-                    const SizedBox(height: 16),
-                    _buildGrantedSpells(),
-                  ],
-                  if (feature.choice != null) ...[
-                    const SizedBox(height: 16),
-                    _buildChoice(context),
-                  ],
-                ],
+                ),
               ),
             ),
           ],
@@ -548,15 +629,41 @@ class _FeatureDetailSheet extends StatelessWidget {
     );
   }
 
-  Widget _sheetChip(String label, Color color) {
+  Widget _chip(String label, {Color? color}) {
+    final c = color ?? Colors.grey;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
+        color: c.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: c.withValues(alpha: 0.3)),
       ),
-      child: Text(label,
-          style: AppTextStyles.labelXs.copyWith(color: color)),
+      child: Text(
+        label,
+        style: AppTextStyles.labelXs.copyWith(
+          color: color ?? Colors.grey[700],
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  Widget _section(String title, Widget content) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 16),
+        Text(
+          title.toUpperCase(),
+          style: AppTextStyles.bodySmall.copyWith(
+            fontWeight: FontWeight.bold,
+            color: Colors.grey[500],
+            letterSpacing: 0.8,
+          ),
+        ),
+        const SizedBox(height: 8),
+        content,
+      ],
     );
   }
 
@@ -582,71 +689,6 @@ class _FeatureDetailSheet extends StatelessWidget {
     return RichText(text: TextSpan(style: baseStyle, children: spans));
   }
 
-  Widget _buildExtension(ClassFeature ext) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: themeColor.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: themeColor.withValues(alpha: 0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(ext.name,
-                    style: AppTextStyles.cardTitle
-                        .copyWith(color: themeColor)),
-              ),
-              _sheetChip('Domäne', themeColor),
-            ],
-          ),
-          if (ext.description.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            _buildDescription(ext.description),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildGrantedSpells() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Gewährte Zauber', style: AppTextStyles.cardTitle),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 6,
-          runSpacing: 6,
-          children: feature.grantedSpells!.map((gs) {
-            final available = gs.atLevel <= character.level;
-            final name = spellNames[gs.spellId] ?? gs.spellId;
-            return Chip(
-              label: Text(name,
-                  style: AppTextStyles.labelXs.copyWith(
-                    color: available ? themeColor : Colors.grey[400],
-                  )),
-              backgroundColor: available
-                  ? themeColor.withValues(alpha: 0.08)
-                  : Colors.grey[100],
-              side: BorderSide(
-                color: available
-                    ? themeColor.withValues(alpha: 0.3)
-                    : Colors.grey[300]!,
-              ),
-              padding: EdgeInsets.zero,
-              visualDensity: VisualDensity.compact,
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
-
   Widget _buildChoice(BuildContext context) {
     final choice   = feature.choice!;
     final chosenId = choices[feature.id];
@@ -656,48 +698,40 @@ class _FeatureDetailSheet extends StatelessWidget {
         (o) => o.id == chosenId,
         orElse: () => choice.options.first,
       );
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Gewählte Option', style: AppTextStyles.cardTitle),
-          const SizedBox(height: 8),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: themeColor.withValues(alpha: 0.06),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: themeColor.withValues(alpha: 0.2)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: themeColor.withValues(alpha: 0.06),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: themeColor.withValues(alpha: 0.2)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Row(
-                  children: [
-                    Icon(Icons.check_circle_outline,
-                        size: 16, color: themeColor),
-                    const SizedBox(width: 6),
-                    Text(option.name,
-                        style: AppTextStyles.body
-                            .copyWith(fontWeight: FontWeight.bold)),
-                  ],
-                ),
-                if (option.description.isNotEmpty) ...[
-                  const SizedBox(height: 6),
-                  Text(option.description,
-                      style: AppTextStyles.bodySmall
-                          .copyWith(color: Colors.grey[600])),
-                ],
+                Icon(Icons.check_circle_outline,
+                    size: 16, color: themeColor),
+                const SizedBox(width: 6),
+                Text(option.name,
+                    style: AppTextStyles.body
+                        .copyWith(fontWeight: FontWeight.bold)),
               ],
             ),
-          ),
-        ],
+            if (option.description.isNotEmpty) ...[
+              const SizedBox(height: 6),
+              Text(option.description,
+                  style: AppTextStyles.bodySmall
+                      .copyWith(color: Colors.grey[600])),
+            ],
+          ],
+        ),
       );
     }
 
-    // Noch keine Wahl – _ChoiceSelector mit Bestätigungsschritt
     return _ChoiceSelector(
-      choice:     choice,
+      choice:    choice,
       themeColor: themeColor,
       onConfirm: (optionId) async {
         await onChoiceMade(feature.id, optionId);
@@ -816,8 +850,10 @@ class _ChoiceSelectorState extends State<_ChoiceSelector> {
           Center(
             child: Text(
               'Diese Wahl kann nicht rückgängig gemacht werden.',
-              style: AppTextStyles.labelXs
-                  .copyWith(color: Colors.grey[400]),
+              style: AppTextStyles.labelXs.copyWith(
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+              ),
               textAlign: TextAlign.center,
             ),
           ),
