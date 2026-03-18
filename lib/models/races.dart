@@ -13,7 +13,6 @@ class Race {
     this.freeAttributePoints2024 = 3,
     this.languages = const ['Gemeinsprache'],
     this.skillProficiencies = const [],
-    //warum hier const und bei klassen nicht
   });
 }
 

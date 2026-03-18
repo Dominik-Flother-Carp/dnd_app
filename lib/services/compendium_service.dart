@@ -1,6 +1,7 @@
 // lib/services/compendium_service.dart
 
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:dnd_app/models/item.dart';
 import 'package:dnd_app/models/spell.dart';
@@ -74,6 +75,7 @@ class CompendiumService {
           }
         }
       } catch (e) {
+        debugPrint('CompendiumService: Fehler beim Laden von $path: $e');
       }
     }
 
@@ -94,7 +96,7 @@ class CompendiumService {
           spells.add(Spell.fromMap(m));
         }
       } catch (e) {
-        // übersprungen
+        debugPrint('CompendiumService: Fehler beim Laden von $path: $e');
       }
     }
 
@@ -124,13 +126,8 @@ class CompendiumService {
   }
 
   /// Gibt einen Zauber anhand seiner ID zurück, oder null.
-  Spell? getSpellById(String id) {
-    try {
-      return _spells.firstWhere((s) => s.id == id);
-    } catch (_) {
-      return null;
-    }
-  }
+  Spell? getSpellById(String id) =>
+      _spells.where((s) => s.id == id).firstOrNull;
 
   List<Spell> searchSpells(String query, {String? className}) {
     final q = query.toLowerCase().trim();

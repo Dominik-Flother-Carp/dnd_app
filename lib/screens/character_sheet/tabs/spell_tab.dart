@@ -25,29 +25,11 @@ int _calcPreparedLimit(Character c) {
   if (cls == null || cls.casterType == null || cls.casterType!.isEmpty) {
     return 0;
   }
-  final attrMod = _spellcastingModifier(c, cls.spellcastingAttribute);
+  final attrMod = c.spellcastingModifier(cls.spellcastingAttribute);
   final effectiveLevel = cls.casterType == 'half'
       ? (c.level / 2).floor()
       : c.level;
   return (effectiveLevel + attrMod).clamp(1, 99);
-}
-
-int _spellcastingModifier(Character c, String attr) {
-  switch (attr) {
-    case 'intelligence': return c.intModifier;
-    case 'wisdom':       return c.wisModifier;
-    case 'charisma':     return c.chaModifier;
-    default:             return 0;
-  }
-}
-
-String _spellcastingAttrLabel(String attr) {
-  switch (attr) {
-    case 'intelligence': return 'INT';
-    case 'wisdom':       return 'WEI';
-    case 'charisma':     return 'CHA';
-    default:             return '';
-  }
 }
 
 // ── Kompendium-Picker (Zauber) ────────────────────────────────────────────────
@@ -246,21 +228,6 @@ Widget _levelBadge(int level, Color color) {
       ),
     ),
   );
-}
-
-extension on SpellSchool {
-  String get label {
-    switch (this) {
-      case SpellSchool.abjuration:    return 'Bannmagie';
-      case SpellSchool.conjuration:   return 'Beschwörung';
-      case SpellSchool.divination:    return 'Erkenntnis';
-      case SpellSchool.enchantment:   return 'Verzauberung';
-      case SpellSchool.evocation:     return 'Hervorrufung';
-      case SpellSchool.illusion:      return 'Illusion';
-      case SpellSchool.necromancy:    return 'Nekromantie';
-      case SpellSchool.transmutation: return 'Verwandlung';
-    }
-  }
 }
 
 // ── Zauber-Tab ────────────────────────────────────────────────────────────────
@@ -571,10 +538,10 @@ class SpellTabState extends State<SpellTab>
   // ── Summary-Karte ─────────────────────────────────────────────────────────
 
   Widget _buildSummaryCard() {
-    final cls     = _characterClass;
-    final attr    = cls?.spellcastingAttribute ?? '';
-    final attrMod = _spellcastingModifier(widget.character, attr);
-    final attrLabel = _spellcastingAttrLabel(attr);
+    final cls       = _characterClass;
+    final attr      = cls?.spellcastingAttribute ?? '';
+    final attrMod   = widget.character.spellcastingModifier(attr);
+    final attrLabel = widget.character.spellcastingAttrLabel(attr);
     final profBonus = widget.character.proficiencyBonus;
     final saveDC = attr.isNotEmpty ? 8 + profBonus + attrMod : 0;
     final attackBonus = attr.isNotEmpty ? profBonus + attrMod : 0;

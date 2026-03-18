@@ -123,11 +123,12 @@ class FeaturesTabState extends State<FeaturesTab>
 
   /// Wird vom character_sheet_screen aus aufgerufen wenn eine Rast gemacht wird.
   Future<void> resetForRest(String restType) async {
-    // 'short' setzt kurze + lange zurück, 'long' setzt nur lange zurück
+    // 'short': nur Features mit restType == 'short' zurücksetzen
+    // 'long':  alle Features zurücksetzen (lange Rast schließt kurze ein)
     final toReset = _features.where((f) {
       if (f.resource == null) return false;
-      if (restType == 'short') return true;
-      return f.resource!.restType == 'long';
+      if (restType == 'long') return true;
+      return f.resource!.restType == 'short';
     }).map((f) => f.id).toList();
 
     await _repo.resetFeatureUses(widget.character.id, toReset);

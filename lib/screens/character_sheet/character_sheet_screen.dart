@@ -804,7 +804,7 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
     );
   }
 
-  void longRest() {
+  void _longRest() {
     setState(() {
       _character!.currentHitPoints = _character!.maxHitPoints;
       _character!.usedHitDice = (_character!.usedHitDice -
@@ -859,7 +859,7 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
               color: _themeColor,
               onTap: () {
                 Navigator.pop(context);
-                longRest();
+                _longRest();
               },
             ),
             const SizedBox(height: 16),

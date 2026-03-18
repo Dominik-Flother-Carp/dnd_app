@@ -57,11 +57,8 @@ class _CharacterCreateScreenState extends State<CharacterCreateScreen> {
         _skillsKey.currentState?.applyTo(_character);
       case 3:
         _attributesKey.currentState?.applyTo(_character);
-    }
-
-    if (_currentStep == 3) {
-      await _saveCharacter();
-      return;
+        await _saveCharacter();
+        return;
     }
 
     setState(() => _currentStep++);

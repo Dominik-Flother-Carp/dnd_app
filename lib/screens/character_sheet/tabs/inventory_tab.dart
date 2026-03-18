@@ -1239,7 +1239,7 @@ class _InventoryTabState extends State<InventoryTab>
           child: Container(
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              color: qty <= 1 ? themeColor : Colors.grey[100],
+              color: qty <= 1 ? Colors.red : themeColor,
               borderRadius: BorderRadius.circular(6),
             ),
             child: qty <= 1
@@ -1248,7 +1248,7 @@ class _InventoryTabState extends State<InventoryTab>
                     style: AppTextStyles.labelXs
                         .copyWith(color: Colors.white),
                   )
-                : const Icon(Icons.remove, size: 16),
+                : const Icon(Icons.remove, size: 16, color: Colors.white),
           ),
         ),
         if (qty > 1) ...[
@@ -1261,10 +1261,10 @@ class _InventoryTabState extends State<InventoryTab>
           child: Container(
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              color: Colors.grey[100],
+              color: themeColor,
               borderRadius: BorderRadius.circular(6),
             ),
-            child: const Icon(Icons.add, size: 16),
+            child: const Icon(Icons.add, size: 16, color: Colors.white),
           ),
         ),
       ],

@@ -14,6 +14,21 @@ enum SpellSchool {
   transmutation, // Verwandlung
 }
 
+extension SpellSchoolExtension on SpellSchool {
+  String get label {
+    switch (this) {
+      case SpellSchool.abjuration:    return 'Bannmagie';
+      case SpellSchool.conjuration:   return 'Beschwörung';
+      case SpellSchool.divination:    return 'Erkenntnis';
+      case SpellSchool.enchantment:   return 'Verzauberung';
+      case SpellSchool.evocation:     return 'Hervorrufung';
+      case SpellSchool.illusion:      return 'Illusion';
+      case SpellSchool.necromancy:    return 'Nekromantie';
+      case SpellSchool.transmutation: return 'Verwandlung';
+    }
+  }
+}
+
 // Welches Attribut wird für den Angriffswurf genutzt?
 enum AttackRollType {
   none,      // Kein Angriffswurf

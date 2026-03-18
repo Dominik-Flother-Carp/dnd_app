@@ -110,8 +110,6 @@ class AttributesStepState extends State<AttributesStep> {
       character.wisdom       += _distributedPoints['wisdom']!;
       character.charisma     += _distributedPoints['charisma']!;
     }
-
-    character.maxHitPoints += character.conModifier;
   }
 
   String _modifierText(int score) {

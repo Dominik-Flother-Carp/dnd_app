@@ -214,6 +214,26 @@ class Character {
   int get initiative => dexModifier;
   int get passivePerception => 10 + skillBonus('perception');
 
+  /// Zauberattribut-Modifikator anhand eines Attribut-Strings ('intelligence' etc.)
+  int spellcastingModifier(String attr) {
+    switch (attr) {
+      case 'intelligence': return intModifier;
+      case 'wisdom':       return wisModifier;
+      case 'charisma':     return chaModifier;
+      default:             return 0;
+    }
+  }
+
+  /// Kürzel des Zauberattributs ('INT', 'WEI', 'CHA')
+  String spellcastingAttrLabel(String attr) {
+    switch (attr) {
+      case 'intelligence': return 'INT';
+      case 'wisdom':       return 'WEI';
+      case 'charisma':     return 'CHA';
+      default:             return '';
+    }
+  }
+
   /// Bonus für eine Fertigkeit (inkl. Übung und Expertise)
   int skillBonus(String skillKey) {
     final base = _skillBaseModifier(skillKey);

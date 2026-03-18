@@ -385,26 +385,7 @@ class _SpellTile extends StatelessWidget {
     }
   }
 
-  String get _schoolLabel {
-    switch (spell.school) {
-      case SpellSchool.abjuration:
-        return 'Bannmagie';
-      case SpellSchool.conjuration:
-        return 'Beschwörung';
-      case SpellSchool.divination:
-        return 'Erkenntnis';
-      case SpellSchool.enchantment:
-        return 'Verzauberung';
-      case SpellSchool.evocation:
-        return 'Hervorrufung';
-      case SpellSchool.illusion:
-        return 'Illusion';
-      case SpellSchool.necromancy:
-        return 'Nekromantie';
-      case SpellSchool.transmutation:
-        return 'Verwandlung';
-    }
-  }
+  String get _schoolLabel => spell.school.label;
 
   @override
   Widget build(BuildContext context) {

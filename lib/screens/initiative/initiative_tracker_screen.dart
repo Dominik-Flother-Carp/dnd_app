@@ -1,6 +1,6 @@
 // lib/screens/initiative/initiative_tracker_screen.dart
 
-// ignore_for_file: unnecessary_underscores, prefer_final_fields
+// ignore_for_file: prefer_final_fields
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -53,9 +53,9 @@ class InitiativeTrackerScreen extends StatefulWidget {
 }
 
 class _InitiativeTrackerScreenState extends State<InitiativeTrackerScreen> {
-  static const _themeColor = Color(0xFF3B1F0A);
-  static const _accent     = Color(0xFF8B0000);
-  static const _cream      = Color(0xFFF5DEB3);
+  static const themeColor = Color(0xFF3B1F0A);
+  static const accent     = Color(0xFF8B0000);
+  static const cream      = Color(0xFFF5DEB3);
 
   List<Character> _pcList   = [];
   List<CombatParticipant> _participants = [];
@@ -140,20 +140,20 @@ class _InitiativeTrackerScreenState extends State<InitiativeTrackerScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF9F5EF),
       appBar: AppBar(
-        backgroundColor: _themeColor,
-        foregroundColor: _cream,
+        backgroundColor: themeColor,
+        foregroundColor: cream,
         title: _combatStarted
             ? Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text('Kampf', style: AppTextStyles.cardTitle
-                      .copyWith(color: _cream)),
+                      .copyWith(color: cream)),
                   const SizedBox(width: 12),
                   Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 10, vertical: 3),
                     decoration: BoxDecoration(
-                      color: _accent,
+                      color: accent,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -165,7 +165,7 @@ class _InitiativeTrackerScreenState extends State<InitiativeTrackerScreen> {
                 ],
               )
             : Text('Initiative', style: AppTextStyles.cardTitle
-                .copyWith(color: _cream)),
+                .copyWith(color: cream)),
         actions: [
           if (_combatStarted)
             IconButton(
@@ -191,7 +191,7 @@ class _InitiativeTrackerScreenState extends State<InitiativeTrackerScreen> {
       floatingActionButton: _combatStarted
           ? null
           : FloatingActionButton.extended(
-              backgroundColor: _accent,
+              backgroundColor: accent,
               foregroundColor: Colors.white,
               onPressed: _participants.isEmpty ? null : _startCombat,
               icon: const Icon(Icons.sports_martial_arts),
@@ -232,7 +232,7 @@ class _InitiativeTrackerScreenState extends State<InitiativeTrackerScreen> {
 
   Widget _buildPcChips() {
     return Container(
-      color: _themeColor.withValues(alpha: 0.05),
+      color: themeColor.withValues(alpha: 0.05),
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -256,8 +256,8 @@ class _InitiativeTrackerScreenState extends State<InitiativeTrackerScreen> {
                           duringCombat: false,
                           prefillCharacter: pc,
                         ),
-                selectedColor: _themeColor.withValues(alpha: 0.2),
-                checkmarkColor: _themeColor,
+                selectedColor: themeColor.withValues(alpha: 0.2),
+                checkmarkColor: themeColor,
               );
             }).toList(),
           ),
@@ -303,13 +303,13 @@ class _InitiativeTrackerScreenState extends State<InitiativeTrackerScreen> {
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: p.isPlayerCharacter
-              ? _themeColor.withValues(alpha: 0.15)
+              ? themeColor.withValues(alpha: 0.15)
               : Colors.grey[200],
           child: Text(
             '${p.initiative}',
             style: AppTextStyles.bodySmall.copyWith(
               fontWeight: FontWeight.bold,
-              color: p.isPlayerCharacter ? _themeColor : Colors.grey[700],
+              color: p.isPlayerCharacter ? themeColor : Colors.grey[700],
             ),
           ),
         ),
@@ -368,11 +368,11 @@ class _InitiativeTrackerScreenState extends State<InitiativeTrackerScreen> {
       child: Container(
         margin: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: _themeColor,
+          color: themeColor,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: _themeColor.withValues(alpha: 0.35),
+              color: themeColor.withValues(alpha: 0.35),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -389,13 +389,13 @@ class _InitiativeTrackerScreenState extends State<InitiativeTrackerScreen> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: _cream.withValues(alpha: 0.15),
+                      color: cream.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       'Jetzt am Zug',
                       style: AppTextStyles.labelXs
-                          .copyWith(color: _cream.withValues(alpha: 0.8)),
+                          .copyWith(color: cream.withValues(alpha: 0.8)),
                     ),
                   ),
                   const Spacer(),
@@ -403,7 +403,7 @@ class _InitiativeTrackerScreenState extends State<InitiativeTrackerScreen> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 10, vertical: 3),
                     decoration: BoxDecoration(
-                      color: _accent,
+                      color: accent,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -417,7 +417,7 @@ class _InitiativeTrackerScreenState extends State<InitiativeTrackerScreen> {
               const SizedBox(height: 12),
               Text(p.name,
                   style: AppTextStyles.screenTitle
-                      .copyWith(color: _cream, fontSize: 22)),
+                      .copyWith(color: cream, fontSize: 22)),
               if (p.maxHp != null) ...[
                 const SizedBox(height: 12),
                 _buildHpBar(p, light: true),
@@ -443,7 +443,7 @@ class _InitiativeTrackerScreenState extends State<InitiativeTrackerScreen> {
                     icon: const Icon(Icons.arrow_forward, size: 18),
                     label: Text('Zug beenden', style: AppTextStyles.body),
                     style: FilledButton.styleFrom(
-                      backgroundColor: _accent,
+                      backgroundColor: accent,
                       foregroundColor: Colors.white,
                     ),
                   ),
@@ -556,7 +556,7 @@ class _InitiativeTrackerScreenState extends State<InitiativeTrackerScreen> {
               '$hp/$max',
               style: AppTextStyles.labelXs.copyWith(
                 color: light
-                    ? _cream.withValues(alpha: 0.7)
+                    ? cream.withValues(alpha: 0.7)
                     : Colors.grey[500],
               ),
             ),
@@ -617,8 +617,8 @@ class _InitiativeTrackerScreenState extends State<InitiativeTrackerScreen> {
       builder: (_) => _AddParticipantSheet(
         pcList: _pcList,
         prefillCharacter: prefillCharacter,
-        themeColor: _themeColor,
-        accentColor: _accent,
+        themeColor: themeColor,
+        accentColor: accent,
       ),
     );
     if (result == null || !mounted) return;
@@ -645,7 +645,7 @@ class _InitiativeTrackerScreenState extends State<InitiativeTrackerScreen> {
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(backgroundColor: _accent),
+            style: FilledButton.styleFrom(backgroundColor: accent),
             child: Text('Beenden', style: AppTextStyles.body
                 .copyWith(color: Colors.white)),
           ),
