@@ -347,29 +347,6 @@ class SpellTabState extends State<SpellTab>
       ..sort((a, b) => a.name.compareTo(b.name));
   }
 
-  // ── Zauberschlitze ────────────────────────────────────────────────────────
-
-  Future<void> _useSlot(int level) async {
-    final slot = widget.character.spellSlots[level];
-    if (slot == null || slot.current <= 0) return;
-    setState(() {
-      widget.character.spellSlots[level] =
-          slot.copyWith(current: slot.current - 1);
-    });
-    await _repo.updateCharacter(widget.character);
-  }
-
-  Future<void> _restoreSlot(int level) async {
-    final slot = widget.character.spellSlots[level];
-    if (slot == null || slot.current >= slot.max) return;
-    setState(() {
-      widget.character.spellSlots[level] =
-          slot.copyWith(current: slot.current + 1);
-    });
-    await _repo.updateCharacter(widget.character);
-  }
-
-
   // ── Zauber hinzufügen / entfernen ─────────────────────────────────────────
 
   Future<void> _showSpellPicker() async {
@@ -447,10 +424,6 @@ class SpellTabState extends State<SpellTab>
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
                     sliver: SliverList(
                       delegate: SliverChildListDelegate([
-                        if (widget.character.spellSlots.isNotEmpty) ...[
-                          _buildSpellSlotsCard(),
-                          const SizedBox(height: 16),
-                        ],
                         if (_spells.isEmpty)
                           _buildEmptySpells()
                         else ...[
@@ -599,88 +572,6 @@ class SpellTabState extends State<SpellTab>
           Text(value, style: AppTextStyles.statMedium.copyWith(color: c)),
           Text(label, style: AppTextStyles.labelXs),
         ],
-      ),
-    );
-  }
-
-  // ── Zauberslot-Karte (analog overview_tab) ──────────────────────────────────
-
-  Widget _buildSpellSlotsCard() {
-    final slots = widget.character.spellSlots;
-    final sortedEntries = slots.entries.toList()
-      ..sort((a, b) => a.key.compareTo(b.key));
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Zauberplätze', style: AppTextStyles.cardTitle),
-            const SizedBox(height: 16),
-            ...sortedEntries.map((entry) {
-              final grade = entry.key;
-              final slot  = entry.value;
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Row(
-                  children: [
-                    SizedBox(
-                      width: 60,
-                      child: Text(
-                        'Grad $grade',
-                        style: AppTextStyles.bodySmall
-                            .copyWith(color: Colors.grey[600]),
-                      ),
-                    ),
-                    Expanded(
-                      child: Row(
-                        children: List.generate(slot.max, (index) {
-                          final filled = index < slot.current;
-                          return GestureDetector(
-                            onTap: () {
-                              if (filled) {
-                                _useSlot(grade);
-                              } else {
-                                _restoreSlot(grade);
-                              }
-                            },
-                            child: Container(
-                              width: 28,
-                              height: 28,
-                              margin: const EdgeInsets.only(right: 6),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: filled
-                                    ? widget.themeColor
-                                    : Colors.transparent,
-                                border: Border.all(
-                                  color: filled
-                                      ? widget.themeColor
-                                      : Colors.grey[400]!,
-                                  width: 2,
-                                ),
-                              ),
-                              child: filled
-                                  ? const Icon(Icons.auto_awesome,
-                                      size: 14, color: Colors.white)
-                                  : null,
-                            ),
-                          );
-                        }),
-                      ),
-                    ),
-                    Text(
-                      '${slot.current}/${slot.max}',
-                      style: AppTextStyles.bodySmall
-                          .copyWith(color: Colors.grey[500]),
-                    ),
-                  ],
-                ),
-              );
-            }),
-          ],
-        ),
       ),
     );
   }

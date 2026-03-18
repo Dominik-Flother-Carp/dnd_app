@@ -364,16 +364,12 @@ class FeaturesTabState extends State<FeaturesTab>
               ],
             ],
           ),
-          subtitle: _buildSubtitle(f),
+          subtitle: f.resource != null
+              ? _buildHeaderResource(f)
+              : _buildSubtitle(f),
           children: [
             // Beschreibung
             _buildDescription(f.description),
-
-            // Ressource
-            if (f.resource != null) ...[
-              const SizedBox(height: 12),
-              _buildResourceRow(f),
-            ],
 
             // Wahl
             if (f.choice != null) ...[
@@ -431,74 +427,69 @@ class FeaturesTabState extends State<FeaturesTab>
     return null;
   }
 
-  // ── Ressource-Zeile ────────────────────────────────────────────────────────
-
-  Widget _buildResourceRow(ClassFeature f) {
+  /// Ressource-Anzeige für den sichtbaren Header (subtitle-Bereich).
+  /// Zeigt Rast-Badge + interaktive Kreise/Pool direkt im Tile-Header.
+  Widget _buildHeaderResource(ClassFeature f) {
     final remaining = _remaining(f);
     final max       = _maxUses(f);
     final isPool    = f.resource!.label == 'Pool';
+    final restColor = f.resource!.restType == 'short'
+        ? Colors.blue[600]!
+        : Colors.purple[600]!;
+    final restLabel = f.resource!.restType == 'short' ? 'K. Rast' : 'L. Rast';
 
-    return Row(
-      children: [
-        // Rast-Badge
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-          decoration: BoxDecoration(
-            color: f.resource!.restType == 'short'
-                ? Colors.blue.withValues(alpha: 0.1)
-                : Colors.purple.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: Text(
-            f.resource!.restType == 'short' ? 'K. Rast' : 'L. Rast',
-            style: AppTextStyles.labelXs.copyWith(
-              color: f.resource!.restType == 'short'
-                  ? Colors.blue[600]
-                  : Colors.purple[600],
+    return Padding(
+      padding: const EdgeInsets.only(top: 4, bottom: 2),
+      child: Row(
+        children: [
+          // Rast-Badge
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+            decoration: BoxDecoration(
+              color: restColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(4),
             ),
+            child: Text(restLabel,
+                style: AppTextStyles.labelXs.copyWith(color: restColor)),
           ),
-        ),
-        const SizedBox(width: 12),
-        if (isPool) ...[
-          // Pool: numerischer Zähler mit +/− Buttons
-          _hpStyleButton(Icons.remove, () => _spend(f),
-              active: remaining > 0),
           const SizedBox(width: 8),
-          Text('$remaining / $max', style: AppTextStyles.body),
-          const SizedBox(width: 8),
-          _hpStyleButton(Icons.add, () => _restore(f),
-              active: remaining < max),
-        ] else ...[
-          // Nutzungen: Kreise
-          ...List.generate(max, (i) {
-            final used = i >= remaining;
-            return GestureDetector(
-              onTap: used ? () => _restore(f) : () => _spend(f),
-              child: Container(
-                margin: const EdgeInsets.only(right: 6),
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  shape:       BoxShape.circle,
-                  color:       used
-                      ? Colors.grey[200]
-                      : widget.themeColor.withValues(alpha: 0.15),
-                  border:      Border.all(
+          if (isPool) ...[
+            _hpStyleButton(Icons.remove, () => _spend(f),
+                active: remaining > 0),
+            const SizedBox(width: 6),
+            Text('$remaining / $max', style: AppTextStyles.bodySmall),
+            const SizedBox(width: 6),
+            _hpStyleButton(Icons.add, () => _restore(f),
+                active: remaining < max),
+          ] else ...[
+            ...List.generate(max, (i) {
+              final used = i >= remaining;
+              return GestureDetector(
+                onTap: used ? () => _restore(f) : () => _spend(f),
+                child: Container(
+                  margin: const EdgeInsets.only(right: 5),
+                  width: 22,
+                  height: 22,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
                     color: used
-                        ? Colors.grey[300]!
-                        : widget.themeColor,
-                    width: 1.5,
+                        ? Colors.grey[200]
+                        : widget.themeColor.withValues(alpha: 0.15),
+                    border: Border.all(
+                      color: used ? Colors.grey[300]! : widget.themeColor,
+                      width: 1.5,
+                    ),
                   ),
+                  child: used
+                      ? null
+                      : Icon(Icons.circle,
+                          size: 8, color: widget.themeColor),
                 ),
-                child: used
-                    ? null
-                    : Icon(Icons.circle,
-                        size: 10, color: widget.themeColor),
-              ),
-            );
-          }),
+              );
+            }),
+          ],
         ],
-      ],
+      ),
     );
   }
 
