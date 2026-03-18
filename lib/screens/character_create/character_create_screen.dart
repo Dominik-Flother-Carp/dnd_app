@@ -8,7 +8,6 @@ import 'package:dnd_app/screens/character_create/steps/edition_step.dart';
 import 'package:dnd_app/screens/character_create/steps/basic_info_step.dart';
 import 'package:dnd_app/screens/character_create/steps/skills_step.dart';
 import 'package:dnd_app/screens/character_create/steps/attributes_step.dart';
-import 'package:dnd_app/screens/character_create/steps/combat_step.dart';
 import 'package:dnd_app/theme/app_text_styles.dart';
 
 class CharacterCreateScreen extends StatefulWidget {
@@ -28,7 +27,6 @@ class _CharacterCreateScreenState extends State<CharacterCreateScreen> {
   final GlobalKey<BasicInfoStepState>  _basicInfoKey  = GlobalKey();
   final GlobalKey<SkillsStepState>     _skillsKey     = GlobalKey();
   final GlobalKey<AttributesStepState> _attributesKey = GlobalKey();
-  final GlobalKey<CombatStepState>     _combatKey     = GlobalKey();
 
   bool _isSaving = false;
 
@@ -207,10 +205,6 @@ class _CharacterCreateScreenState extends State<CharacterCreateScreen> {
           key: _attributesKey,
           character: _character,
           useEdition2024: _character.useEdition2024,
-        ),
-      4 => CombatStep(
-          key: _combatKey,
-          character: _character,
         ),
       _ => const SizedBox.shrink(),
     };
