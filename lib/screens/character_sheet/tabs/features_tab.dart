@@ -31,12 +31,11 @@ class FeaturesTabState extends State<FeaturesTab>
   final _repo       = CharacterRepository();
   final _compendium = CompendiumService();
 
-  List<ClassFeature> _features   = [];
-  Map<String, int>    _uses      = {}; // featureId → verbrauchte Nutzungen
-  Map<String, String> _choices   = {}; // featureId → gewählte optionId
-  Map<String, String> _spellNames = {}; // spellId → Zaubername
+  List<ClassFeature> _features    = [];
+  Map<String, int>    _uses       = {};
+  Map<String, String> _choices    = {};
+  Map<String, String> _spellNames = {};
   bool _isLoading = true;
-
 
   @override
   void initState() {
@@ -44,7 +43,6 @@ class FeaturesTabState extends State<FeaturesTab>
     _load();
   }
 
-  /// Wird vom character_sheet_screen aufgerufen nach Levelup.
   Future<void> reload() => _load();
 
   Future<void> _load() async {
@@ -53,7 +51,6 @@ class FeaturesTabState extends State<FeaturesTab>
     final uses     = await _repo.getFeatureUses(widget.character.id);
     final choices  = await _repo.getAllFeatureChoices(widget.character.id);
 
-    // Zaubernamen für grantedSpells auflösen
     final spellNames = <String, String>{};
     for (final f in features) {
       for (final gs in f.grantedSpells ?? []) {
@@ -62,7 +59,6 @@ class FeaturesTabState extends State<FeaturesTab>
       }
     }
 
-    // Gewährte Zauber automatisch zum Charakter hinzufügen (idempotent)
     await _syncGrantedSpells(features);
 
     if (!mounted) return;
@@ -71,12 +67,10 @@ class FeaturesTabState extends State<FeaturesTab>
       _uses       = uses;
       _choices    = choices;
       _spellNames = spellNames;
-      _isLoading = false;
+      _isLoading  = false;
     });
   }
 
-  /// Fügt alle fälligen grantedSpells automatisch zum Charakter hinzu.
-  /// isPrepared=true da Domänenzauber immer vorbereitet sind.
   Future<void> _syncGrantedSpells(List<ClassFeature> features) async {
     for (final f in features) {
       if (f.grantedSpells == null) continue;
@@ -97,11 +91,8 @@ class FeaturesTabState extends State<FeaturesTab>
   // ── Ressourcen-Logik ───────────────────────────────────────────────────────
 
   int _currentUses(ClassFeature f) => _uses[f.id] ?? 0;
-
-  int _maxUses(ClassFeature f) =>
-      f.resource!.evaluate(widget.character);
-
-  int _remaining(ClassFeature f) =>
+  int _maxUses(ClassFeature f)     => f.resource!.evaluate(widget.character);
+  int _remaining(ClassFeature f)   =>
       (_maxUses(f) - _currentUses(f)).clamp(0, _maxUses(f));
 
   Future<void> _spend(ClassFeature f) async {
@@ -121,10 +112,7 @@ class FeaturesTabState extends State<FeaturesTab>
     await _repo.setFeatureUses(widget.character.id, f.id, newVal);
   }
 
-  /// Wird vom character_sheet_screen aus aufgerufen wenn eine Rast gemacht wird.
   Future<void> resetForRest(String restType) async {
-    // 'short': nur Features mit restType == 'short' zurücksetzen
-    // 'long':  alle Features zurücksetzen (lange Rast schließt kurze ein)
     final toReset = _features.where((f) {
       if (f.resource == null) return false;
       if (restType == 'long') return true;
@@ -139,32 +127,40 @@ class FeaturesTabState extends State<FeaturesTab>
     });
   }
 
-  // ── Wahl-Logik ─────────────────────────────────────────────────────────────
-
-  Future<void> _showChoiceDialog(ClassFeature f) async {
-    final chosen = await showDialog<String>(
-      context: context,
-      builder: (_) => _ChoiceDialog(
-        feature:    f,
-        themeColor: widget.themeColor,
-      ),
-    );
-    if (chosen == null || !mounted) return;
-    await _repo.setFeatureChoice(widget.character.id, f.id, chosen);
-    setState(() => _choices[f.id] = chosen);
-  }
-
   // ── Gruppierung nach Level ─────────────────────────────────────────────────
 
   Map<int, List<ClassFeature>> get _grouped {
     final map = <int, List<ClassFeature>>{};
     for (final f in _features) {
-      // Features mit extends werden im Basis-Feature angezeigt, nicht separat
       if (f.extendsFeatureId != null) continue;
       map.putIfAbsent(f.unlocksAtLevel, () => []).add(f);
     }
     return Map.fromEntries(
       map.entries.toList()..sort((a, b) => a.key.compareTo(b.key)),
+    );
+  }
+
+  // ── Detail-Sheet öffnen ───────────────────────────────────────────────────
+
+  void _openDetailSheet(ClassFeature f) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) => _FeatureDetailSheet(
+        feature:    f,
+        character:  widget.character,
+        themeColor: widget.themeColor,
+        spellNames: _spellNames,
+        choices:    _choices,
+        onChoiceMade: (featureId, optionId) async {
+          await _repo.setFeatureChoice(
+              widget.character.id, featureId, optionId);
+          if (mounted) setState(() => _choices[featureId] = optionId);
+        },
+      ),
     );
   }
 
@@ -185,11 +181,9 @@ class FeaturesTabState extends State<FeaturesTab>
             Icon(Icons.auto_awesome_outlined,
                 size: 64, color: Colors.grey[300]),
             const SizedBox(height: 16),
-            Text(
-              'Keine Features',
-              style: AppTextStyles.sectionTitle
-                  .copyWith(color: Colors.grey[400]),
-            ),
+            Text('Keine Features',
+                style: AppTextStyles.sectionTitle
+                    .copyWith(color: Colors.grey[400])),
             const SizedBox(height: 8),
             Text(
               'Für ${widget.character.characterClass} sind\nnoch keine Features hinterlegt.',
@@ -203,12 +197,10 @@ class FeaturesTabState extends State<FeaturesTab>
 
     return Column(
       children: [
-        // ── Fixe Summary ────────────────────────────────────────────────────
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
           child: _buildSummaryCard(),
         ),
-        // ── Scrollbarer Inhalt ───────────────────────────────────────────────
         Expanded(
           child: CustomScrollView(
             primary: false,
@@ -221,7 +213,6 @@ class FeaturesTabState extends State<FeaturesTab>
                     for (final entry in _grouped.entries) ...[
                       _buildLevelHeader(entry.key),
                       ...entry.value.map(_buildFeatureCard),
-                      const SizedBox(height: 8),
                     ],
                   ]),
                 ),
@@ -236,20 +227,18 @@ class FeaturesTabState extends State<FeaturesTab>
   // ── Summary-Karte ──────────────────────────────────────────────────────────
 
   Widget _buildSummaryCard() {
-    final c       = widget.character;
-    final hasRes  = _features.any((f) => f.resource != null);
+    final c      = widget.character;
+    final hasRes = _features.any((f) => f.resource != null);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Row(
           children: [
-            // Klasse + Unterklasse
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(c.characterClass,
-                      style: AppTextStyles.cardTitle),
+                  Text(c.characterClass, style: AppTextStyles.cardTitle),
                   if (c.subclass.isNotEmpty)
                     Text(c.subclass,
                         style: AppTextStyles.bodySmall
@@ -257,7 +246,6 @@ class FeaturesTabState extends State<FeaturesTab>
                 ],
               ),
             ),
-            // Feature-Anzahl
             _summaryItem(
               Icons.auto_awesome_outlined,
               '${_features.where((f) => f.extendsFeatureId == null).length}',
@@ -326,288 +314,258 @@ class FeaturesTabState extends State<FeaturesTab>
     );
   }
 
-  // ── Feature-Karte ──────────────────────────────────────────────────────────
+  // ── Feature-Karte (kompakt) ────────────────────────────────────────────────
 
   Widget _buildFeatureCard(ClassFeature f) {
+    final hasChoice = f.choice != null && _choices[f.id] == null;
+
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
-      child: Theme(
-        data: Theme.of(context).copyWith(
-          dividerColor: Colors.transparent,
-        ),
-        child: ExpansionTile(
-          tilePadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
-          childrenPadding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
-          expandedCrossAxisAlignment: CrossAxisAlignment.start,
-          expandedAlignment: Alignment.topLeft,
-          title: Row(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => _openDetailSheet(f),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
-                child: Text(f.name, style: AppTextStyles.cardTitle),
-              ),
-              // Unterklassen-Chip
-              if (f.subclassName != null) ...[
-                const SizedBox(width: 8),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: widget.themeColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    'Unterklasse',
-                    style: AppTextStyles.labelXs
-                        .copyWith(color: widget.themeColor),
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(f.name,
+                              style: AppTextStyles.cardTitle),
+                        ),
+                        if (f.subclassName != null) ...[
+                          const SizedBox(width: 6),
+                          _chip('Unterklasse', widget.themeColor),
+                        ],
+                        if (hasChoice) ...[
+                          const SizedBox(width: 6),
+                          _chip('Wahl!', Colors.orange),
+                        ],
+                      ],
+                    ),
+                    if (f.resource != null) ...[
+                      const SizedBox(height: 6),
+                      _buildInlineResource(f),
+                    ],
+                  ],
                 ),
-              ],
+              ),
+              const SizedBox(width: 8),
+              Icon(Icons.chevron_right,
+                  size: 18, color: Colors.grey[400]),
             ],
           ),
-          subtitle: f.resource != null
-              ? _buildHeaderResource(f)
-              : _buildSubtitle(f),
-          children: [
-            // Beschreibung
-            _buildDescription(f.description),
-
-            // Wahl
-            if (f.choice != null) ...[
-              const SizedBox(height: 12),
-              _buildChoiceRow(f),
-            ],
-
-            // Erweiterungen (z.B. Domänen-Kanal)
-            if (f.extensions.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              ...f.extensions.map(_buildExtensionTile),
-            ],
-
-            // Gewährte Zauber
-            if (f.grantedSpells != null && f.grantedSpells!.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              _buildGrantedSpells(f),
-            ],
-          ],
         ),
       ),
     );
   }
 
-  Widget? _buildSubtitle(ClassFeature f) {
-    // Ressource: verbleibende Nutzungen als Subtitle
-    if (f.resource != null) {
-      final remaining = _remaining(f);
-      final max       = _maxUses(f);
-      final color = remaining > 0 ? widget.themeColor : Colors.red[300]!;
-      return Text(
-        '${f.resource!.label}: $remaining / $max',
-        style: AppTextStyles.bodySmall.copyWith(color: color),
-      );
-    }
-    // Wahl: gewählte Option als Subtitle
-    if (f.choice != null) {
-      final chosenId = _choices[f.id];
-      if (chosenId != null) {
-        final option = f.choice!.options
-            .firstWhere((o) => o.id == chosenId,
-                orElse: () => f.choice!.options.first);
-        return Text(
-          option.name,
-          style: AppTextStyles.bodySmall
-              .copyWith(color: Colors.grey[500]),
-        );
-      }
-      return Text(
-        'Noch keine Wahl getroffen',
-        style: AppTextStyles.bodySmall
-            .copyWith(color: Colors.orange[400]),
-      );
-    }
-    return null;
+  Widget _chip(String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(label,
+          style: AppTextStyles.labelXs.copyWith(color: color)),
+    );
   }
 
-  /// Ressource-Anzeige für den sichtbaren Header (subtitle-Bereich).
-  /// Zeigt Rast-Badge + interaktive Kreise/Pool direkt im Tile-Header.
-  Widget _buildHeaderResource(ClassFeature f) {
+  // ── Ressource inline (auf der Karte) ───────────────────────────────────────
+
+  Widget _buildInlineResource(ClassFeature f) {
     final remaining = _remaining(f);
     final max       = _maxUses(f);
     final isPool    = f.resource!.label == 'Pool';
     final restColor = f.resource!.restType == 'short'
         ? Colors.blue[600]!
         : Colors.purple[600]!;
-    final restLabel = f.resource!.restType == 'short' ? 'K. Rast' : 'L. Rast';
+    final restLabel =
+        f.resource!.restType == 'short' ? 'K. Rast' : 'L. Rast';
 
-    return Padding(
-      padding: const EdgeInsets.only(top: 4, bottom: 2),
-      child: Row(
-        children: [
-          // Rast-Badge
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-            decoration: BoxDecoration(
-              color: restColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Text(restLabel,
-                style: AppTextStyles.labelXs.copyWith(color: restColor)),
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+          decoration: BoxDecoration(
+            color: restColor.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(4),
           ),
-          const SizedBox(width: 8),
-          if (isPool) ...[
-            _hpStyleButton(Icons.remove, () => _spend(f),
-                active: remaining > 0),
-            const SizedBox(width: 6),
-            Text('$remaining / $max', style: AppTextStyles.bodySmall),
-            const SizedBox(width: 6),
-            _hpStyleButton(Icons.add, () => _restore(f),
-                active: remaining < max),
-          ] else ...[
-            ...List.generate(max, (i) {
-              final used = i >= remaining;
-              return GestureDetector(
-                onTap: used ? () => _restore(f) : () => _spend(f),
-                child: Container(
-                  margin: const EdgeInsets.only(right: 5),
-                  width: 22,
-                  height: 22,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: used
-                        ? Colors.grey[200]
-                        : widget.themeColor.withValues(alpha: 0.15),
-                    border: Border.all(
-                      color: used ? Colors.grey[300]! : widget.themeColor,
-                      width: 1.5,
-                    ),
+          child: Text(restLabel,
+              style: AppTextStyles.labelXs.copyWith(color: restColor)),
+        ),
+        const SizedBox(width: 8),
+        if (isPool) ...[
+          _iconBtn(Icons.remove, () => _spend(f), active: remaining > 0),
+          const SizedBox(width: 6),
+          Text('$remaining / $max', style: AppTextStyles.bodySmall),
+          const SizedBox(width: 6),
+          _iconBtn(Icons.add, () => _restore(f), active: remaining < max),
+        ] else ...[
+          ...List.generate(max, (i) {
+            final used = i >= remaining;
+            return GestureDetector(
+              onTap: used ? () => _restore(f) : () => _spend(f),
+              child: Container(
+                margin: const EdgeInsets.only(right: 5),
+                width: 22,
+                height: 22,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: used
+                      ? Colors.grey[200]
+                      : widget.themeColor.withValues(alpha: 0.15),
+                  border: Border.all(
+                    color: used ? Colors.grey[300]! : widget.themeColor,
+                    width: 1.5,
                   ),
-                  child: used
-                      ? null
-                      : Icon(Icons.circle,
-                          size: 8, color: widget.themeColor),
                 ),
-              );
-            }),
-          ],
+                child: used
+                    ? null
+                    : Icon(Icons.circle, size: 8, color: widget.themeColor),
+              ),
+            );
+          }),
         ],
-      ),
+      ],
     );
   }
 
-  Widget _hpStyleButton(IconData icon, VoidCallback onTap,
-      {required bool active}) {
+  Widget _iconBtn(IconData icon, VoidCallback onTap, {required bool active}) {
     return GestureDetector(
       onTap: active ? onTap : null,
       child: Container(
-        width: 30,
-        height: 30,
+        width: 26,
+        height: 26,
         decoration: BoxDecoration(
           color: active
               ? widget.themeColor.withValues(alpha: 0.12)
               : Colors.grey[100],
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(5),
         ),
-        child: Icon(
-          icon,
-          size: 16,
-          color: active ? widget.themeColor : Colors.grey[300],
-        ),
+        child: Icon(icon,
+            size: 14,
+            color: active ? widget.themeColor : Colors.grey[300]),
       ),
     );
   }
+}
 
-  // ── Wahl-Zeile ─────────────────────────────────────────────────────────────
+// ── Feature-Detail-Sheet ──────────────────────────────────────────────────────
 
-  Widget _buildChoiceRow(ClassFeature f) {
-    final chosenId = _choices[f.id];
-    if (chosenId != null) {
-      final option = f.choice!.options
-          .firstWhere((o) => o.id == chosenId,
-              orElse: () => f.choice!.options.first);
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.check_circle_outline,
-                  size: 16, color: widget.themeColor),
-              const SizedBox(width: 6),
-              Text(option.name,
-                  style: AppTextStyles.body
-                      .copyWith(fontWeight: FontWeight.bold)),
-            ],
-          ),
-          const SizedBox(height: 4),
-          _buildDescription(option.description),
-        ],
-      );
-    }
-    return OutlinedButton.icon(
-      onPressed: () => _showChoiceDialog(f),
-      icon: const Icon(Icons.touch_app_outlined, size: 16),
-      label: Text(f.choice!.prompt, style: AppTextStyles.bodySmall),
-    );
-  }
+class _FeatureDetailSheet extends StatelessWidget {
+  final ClassFeature feature;
+  final Character    character;
+  final Color        themeColor;
+  final Map<String, String> spellNames;
+  final Map<String, String> choices;
+  final Future<void> Function(String featureId, String optionId) onChoiceMade;
 
-  // ── Erweiterungs-Kachel ────────────────────────────────────────────────────
+  const _FeatureDetailSheet({
+    required this.feature,
+    required this.character,
+    required this.themeColor,
+    required this.spellNames,
+    required this.choices,
+    required this.onChoiceMade,
+  });
 
-  Widget _buildExtensionTile(ClassFeature ext) {
-    return Container(
-      margin: const EdgeInsets.only(top: 8),
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: widget.themeColor.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-            color: widget.themeColor.withValues(alpha: 0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.add_circle_outline,
-                  size: 14, color: widget.themeColor),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(ext.name,
-                    style: AppTextStyles.bodySmall.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: widget.themeColor,
-                    )),
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      expand: false,
+      initialChildSize: 0.55,
+      minChildSize: 0.35,
+      maxChildSize: 0.92,
+      builder: (_, ctrl) => Padding(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Griffleiste
+            Center(
+              child: Container(
+                width: 40, height: 4,
+                margin: const EdgeInsets.only(bottom: 16),
                 decoration: BoxDecoration(
-                  color: widget.themeColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(4),
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
                 ),
-                child: Text('Domäne',
-                    style: AppTextStyles.labelXs
-                        .copyWith(color: widget.themeColor)),
               ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          _buildDescription(ext.description),
-        ],
+            ),
+            // Header
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(feature.name,
+                      style: AppTextStyles.sectionTitle),
+                ),
+                if (feature.subclassName != null) ...[
+                  const SizedBox(width: 8),
+                  _sheetChip('Unterklasse', themeColor),
+                ],
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text('Stufe ${feature.unlocksAtLevel}',
+                style: AppTextStyles.bodySmall
+                    .copyWith(color: Colors.grey[500])),
+            const SizedBox(height: 16),
+            // Scrollbarer Inhalt
+            Expanded(
+              child: ListView(
+                controller: ctrl,
+                children: [
+                  if (feature.description.isNotEmpty)
+                    _buildDescription(feature.description),
+                  if (feature.extensions.isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    ...feature.extensions.map(_buildExtension),
+                  ],
+                  if (feature.grantedSpells != null &&
+                      feature.grantedSpells!.isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    _buildGrantedSpells(),
+                  ],
+                  if (feature.choice != null) ...[
+                    const SizedBox(height: 16),
+                    _buildChoice(context),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  // ── Gewährte Zauber ────────────────────────────────────────────────────────
+  Widget _sheetChip(String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(label,
+          style: AppTextStyles.labelXs.copyWith(color: color)),
+    );
+  }
 
-  /// Rendert einen Text mit **fett**-Unterstützung.
-  /// Text zwischen ** wird fett dargestellt.
-  Widget _buildDescription(String text, {Color? color}) {
-    final baseColor = color ?? Colors.grey[600]!;
-    final baseStyle = AppTextStyles.bodySmall.copyWith(color: baseColor);
+  Widget _buildDescription(String text) {
+    final baseStyle = AppTextStyles.body.copyWith(color: Colors.grey[700]);
     final boldStyle = baseStyle.copyWith(
       fontWeight: FontWeight.bold,
-      color: Colors.grey[800],
+      color: Colors.grey[900],
     );
-
-    // Text in Segmente aufteilen: normaler Text und **fetter Text**
     final spans = <TextSpan>[];
     final re = RegExp(r'\*\*(.+?)\*\*');
     int last = 0;
@@ -621,43 +579,63 @@ class FeaturesTabState extends State<FeaturesTab>
     if (last < text.length) {
       spans.add(TextSpan(text: text.substring(last)));
     }
+    return RichText(text: TextSpan(style: baseStyle, children: spans));
+  }
 
-    return RichText(
-      text: TextSpan(style: baseStyle, children: spans),
+  Widget _buildExtension(ClassFeature ext) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: themeColor.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: themeColor.withValues(alpha: 0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(ext.name,
+                    style: AppTextStyles.cardTitle
+                        .copyWith(color: themeColor)),
+              ),
+              _sheetChip('Domäne', themeColor),
+            ],
+          ),
+          if (ext.description.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            _buildDescription(ext.description),
+          ],
+        ],
+      ),
     );
   }
 
-  Widget _buildGrantedSpells(ClassFeature f) {
+  Widget _buildGrantedSpells() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Gewährte Zauber',
-            style: AppTextStyles.bodySmall.copyWith(
-              color: Colors.grey[500],
-              fontWeight: FontWeight.bold,
-            )),
-        const SizedBox(height: 6),
+        Text('Gewährte Zauber', style: AppTextStyles.cardTitle),
+        const SizedBox(height: 8),
         Wrap(
           spacing: 6,
-          runSpacing: 4,
-          children: f.grantedSpells!.map((gs) {
-            final available = gs.atLevel <= widget.character.level;
-            final name = _spellNames[gs.spellId] ?? gs.spellId;
+          runSpacing: 6,
+          children: feature.grantedSpells!.map((gs) {
+            final available = gs.atLevel <= character.level;
+            final name = spellNames[gs.spellId] ?? gs.spellId;
             return Chip(
-              label: Text(
-                name,
-                style: AppTextStyles.labelXs.copyWith(
-                  color: available
-                      ? widget.themeColor
-                      : Colors.grey[400],
-                ),
-              ),
+              label: Text(name,
+                  style: AppTextStyles.labelXs.copyWith(
+                    color: available ? themeColor : Colors.grey[400],
+                  )),
               backgroundColor: available
-                  ? widget.themeColor.withValues(alpha: 0.08)
+                  ? themeColor.withValues(alpha: 0.08)
                   : Colors.grey[100],
               side: BorderSide(
                 color: available
-                    ? widget.themeColor.withValues(alpha: 0.3)
+                    ? themeColor.withValues(alpha: 0.3)
                     : Colors.grey[300]!,
               ),
               padding: EdgeInsets.zero,
@@ -668,9 +646,188 @@ class FeaturesTabState extends State<FeaturesTab>
       ],
     );
   }
+
+  Widget _buildChoice(BuildContext context) {
+    final choice   = feature.choice!;
+    final chosenId = choices[feature.id];
+
+    if (chosenId != null) {
+      final option = choice.options.firstWhere(
+        (o) => o.id == chosenId,
+        orElse: () => choice.options.first,
+      );
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Gewählte Option', style: AppTextStyles.cardTitle),
+          const SizedBox(height: 8),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: themeColor.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: themeColor.withValues(alpha: 0.2)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.check_circle_outline,
+                        size: 16, color: themeColor),
+                    const SizedBox(width: 6),
+                    Text(option.name,
+                        style: AppTextStyles.body
+                            .copyWith(fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                if (option.description.isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Text(option.description,
+                      style: AppTextStyles.bodySmall
+                          .copyWith(color: Colors.grey[600])),
+                ],
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+
+    // Noch keine Wahl – _ChoiceSelector mit Bestätigungsschritt
+    return _ChoiceSelector(
+      choice:     choice,
+      themeColor: themeColor,
+      onConfirm: (optionId) async {
+        await onChoiceMade(feature.id, optionId);
+        if (context.mounted) Navigator.pop(context);
+      },
+    );
+  }
 }
 
-// ── Wahl-Dialog ───────────────────────────────────────────────────────────────
+// ── Wahl-Selektor (im Detail-Sheet, mit Bestätigung) ─────────────────────────
+
+class _ChoiceSelector extends StatefulWidget {
+  final ClassFeatureChoice choice;
+  final Color themeColor;
+  final Future<void> Function(String optionId) onConfirm;
+
+  const _ChoiceSelector({
+    required this.choice,
+    required this.themeColor,
+    required this.onConfirm,
+  });
+
+  @override
+  State<_ChoiceSelector> createState() => _ChoiceSelectorState();
+}
+
+class _ChoiceSelectorState extends State<_ChoiceSelector> {
+  String? _selected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(widget.choice.prompt, style: AppTextStyles.cardTitle),
+        const SizedBox(height: 8),
+        ...widget.choice.options.map((opt) {
+          final isSelected = _selected == opt.id;
+          return GestureDetector(
+            onTap: () => setState(() => _selected = opt.id),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              width: double.infinity,
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? widget.themeColor.withValues(alpha: 0.08)
+                    : Colors.grey[50],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: isSelected
+                      ? widget.themeColor
+                      : Colors.grey[200]!,
+                  width: isSelected ? 1.5 : 1,
+                ),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    isSelected
+                        ? Icons.radio_button_checked
+                        : Icons.radio_button_off,
+                    size: 18,
+                    color: isSelected
+                        ? widget.themeColor
+                        : Colors.grey[400],
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(opt.name,
+                            style: AppTextStyles.body.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: isSelected
+                                  ? widget.themeColor
+                                  : null,
+                            )),
+                        if (opt.description.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Text(opt.description,
+                              style: AppTextStyles.bodySmall
+                                  .copyWith(color: Colors.grey[600])),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }),
+        const SizedBox(height: 8),
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton(
+            onPressed: _selected == null
+                ? null
+                : () => widget.onConfirm(_selected!),
+            style: FilledButton.styleFrom(
+                backgroundColor: widget.themeColor),
+            child: Text(
+              _selected == null
+                  ? 'Option auswählen'
+                  : 'Auswahl bestätigen',
+              style: AppTextStyles.body
+                  .copyWith(color: const Color(0xFFF5DEB3)),
+            ),
+          ),
+        ),
+        if (_selected != null) ...[
+          const SizedBox(height: 6),
+          Center(
+            child: Text(
+              'Diese Wahl kann nicht rückgängig gemacht werden.',
+              style: AppTextStyles.labelXs
+                  .copyWith(color: Colors.grey[400]),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+// ── Wahl-Dialog (wird noch vom character_sheet_screen.dart genutzt) ───────────
 
 class _ChoiceDialog extends StatefulWidget {
   final ClassFeature feature;
@@ -713,9 +870,7 @@ class _ChoiceDialogState extends State<_ChoiceDialog> {
                       : Colors.grey[50],
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: selected
-                        ? widget.themeColor
-                        : Colors.grey[200]!,
+                    color: selected ? widget.themeColor : Colors.grey[200]!,
                     width: selected ? 1.5 : 1,
                   ),
                 ),
@@ -737,9 +892,7 @@ class _ChoiceDialogState extends State<_ChoiceDialog> {
                         Text(opt.name,
                             style: AppTextStyles.body.copyWith(
                               fontWeight: FontWeight.bold,
-                              color: selected
-                                  ? widget.themeColor
-                                  : null,
+                              color: selected ? widget.themeColor : null,
                             )),
                       ],
                     ),
