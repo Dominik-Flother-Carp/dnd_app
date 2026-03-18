@@ -57,9 +57,11 @@ class ClassFeatureService {
         final data = json.decode(raw) as Map<String, dynamic>;
         final subclassName = data['subclassName'] as String?;
 
-        // Fluff speichern
+        // Fluff speichern – Klasse (kein subclassName) oder Unterklasse
         if (subclassName != null && data['fluff'] != null) {
           _fluffCache['$className/$subclassName'] = data['fluff'] as String;
+        } else if (subclassName == null && data['fluff'] != null) {
+          _fluffCache[className] = data['fluff'] as String;
         }
 
         for (final f in (data['features'] as List)) {
@@ -107,6 +109,12 @@ class ClassFeatureService {
   Future<String?> getSubclassFluff(String className, String subclassName) async {
     await loadForClass(className);
     return _fluffCache['$className/$subclassName'];
+  }
+
+  /// Gibt den Fluff-Text einer Klasse zurück, oder null.
+  Future<String?> getClassFluff(String className) async {
+    await loadForClass(className);
+    return _fluffCache[className];
   }
 
   /// Gibt alle `grantedSpells`-IDs zurück die für den Charakter bei seinem

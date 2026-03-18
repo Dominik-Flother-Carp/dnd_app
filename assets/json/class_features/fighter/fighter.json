@@ -1,25 +1,17 @@
 {
     "className": "Kämpfer",
+    "fluff": "Der Kämpfer ist die vielleicht am breitesten gefächerte Klasse von Helden. Ritter auf einer Queste, erobernde Kriegsherren, adelige Anführer, erfahrene Fußsoldaten, abgehärtete Söldner und Räuberkönige, als Kämpfer teilen sie alle die unvergleichliche Meisterschaft im Umgang mit Waffen und Rüstungen sowie die herausragende Beherrschung der Kampffertigkeiten. Auch mit dem Tod sind sie gut vertraut, sowohl damit, ihn zu vermeiden, als auch, ihm herausfordernd ins Gesicht zu starren.",
     "features": [
         {
             "id": "fighter_second_wind",
             "name": "Zweiter Atem",
             "unlocksAtLevel": 1,
-            "subclassName": null,
             "description": "...",
             "resource": {
                 "label": "Nutzungen",
                 "maxFormula": "1",
                 "restType": "short"
             }
-        },
-        {
-            "id": "fighter_champion_improved_crit",
-            "name": "Verbesserter kritischer Treffer",
-            "unlocksAtLevel": 3,
-            "subclassName": "Champion",
-            "description": "...",
-            "resource": null
         }
     ]
 }

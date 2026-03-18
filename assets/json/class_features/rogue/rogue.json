@@ -1,5 +1,6 @@
 {
     "className": "Schurke",
+    "fluff": "Schurken verlassen sich auf Erfahrung, Heimlichkeit und das Ausnutzen gegnerischer Schwachstellen, um in allen Situation die Oberhand zu gewinnen. Sie besitzen ein Talent dafür, für jedes Problem eine Lösung zu finden, und erweisen sich als vielseitig und einfallsreich, was den Grundstein jeder erfolgreichen Abenteurergruppe bildet.",
     "features": [
         {
             "id": "rogue_expertise",

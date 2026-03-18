@@ -1,6 +1,7 @@
 {
     "className": "Kleriker",
     "subclassName": "Domäne des Lebens",
+    "fluff": "Die Domäne des Lebens konzentriert sich auf die schöpferische und pulsierende Energie, die allem Lebendigen innewohnt eine der grundlegenden Kräfte des Universums. Die Götter des Lebens fördern Vitalität und Gesundheit und stellen sich den Mächten des Todes, besonders den Untaten, entgegen.\n\nNahezu jede nicht böse Gottheit kann Einfluss auf diese Domäne beanspruchen, besonders die Götter der Landwirtschaft (wie etwa Chauntea, Arawai und Demeter), Sonnengötter (wie etwa Lathander, Pelor und Re-Horachti), Götter der Heilung oder der Ausdauer (wie etwa Ilmater, Mishakal, Apollo und Dian Cecht) sowie Götter des Heimes und der Gemeinschaft (wie etwa Hestia, Hathor und Boldrei).",
     "features": [
         {
             "id": "cleric_life_domain_spells",

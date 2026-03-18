@@ -1,6 +1,7 @@
 {
     "className": "Schurke",
     "subclassName": "Dieb",
+    "fluff": "Du verfeinerst deine Fertigkeiten in den Diebeskünsten. Einbrecher, Banditen, Beutelschneider und andere Kriminelle folgen in der Regel diesem Archetyp, doch auch Schurken, die sich als professionelle Schatzsucher, Entdecker, Detektive und Grabräuber betrachten, schlagen diese Richtung ein. Du verbesserst nicht nur deine Beweglichkeit und Heimlichkeit, sondern lernst auch hilfreiche Fertigkeiten, um uralte Ruinen zu erforschen, unbekannte Sprachen zu entziffern und magische Gegenstände zu benutzen, deren Einsatz dir normalerweise verwehrt bleiben würde.",
     "features": [
         {
             "id": "rogue_thief_fast_hands",

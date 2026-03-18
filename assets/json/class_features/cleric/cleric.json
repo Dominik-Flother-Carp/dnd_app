@@ -1,5 +1,6 @@
 {
     "className": "Kleriker",
+    "fluff": "Kleriker sind Mittler zwischen der Welt der Sterblichen und den fernen Ebenen der Götter. So unterschiedlich die Gottheiten, denen sie dienen, auch sein mögen, streben doch alle Kleriker danach, deren Werk und deren Ideale mit jeder ihrer Taten zu verkörpern. Im Gegensatz zu einem gewöhnlichen Priester ist ein Kleriker von göttlicher Magie erfüllt.",
     "features": [
         {
             "id": "cleric_spellcasting",

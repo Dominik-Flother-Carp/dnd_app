@@ -587,76 +587,13 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
 
   void _showIdentitySheet() {
     final c = _character!;
-    final rows = <_IdentityRow>[
-      if (c.characterClass.isNotEmpty)
-        _IdentityRow(
-          label: 'Klasse',
-          value: c.subclass.isNotEmpty
-              ? '${c.characterClass} · ${c.subclass}'
-              : c.characterClass,
-        ),
-      if (c.race.isNotEmpty)
-        _IdentityRow(label: 'Rasse', value: c.race),
-      if (c.alignment.isNotEmpty)
-        _IdentityRow(label: 'Gesinnung', value: c.alignment),
-      if (c.background.isNotEmpty)
-        _IdentityRow(label: 'Hintergrund', value: c.background),
-    ];
-
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (_) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Griffleiste
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              Text(c.name, style: AppTextStyles.sectionTitle),
-              const SizedBox(height: 16),
-              ...rows.map((r) => Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: 100,
-                      child: Text(
-                        r.label,
-                        style: AppTextStyles.bodySmall
-                            .copyWith(color: Colors.grey[500]),
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(r.value, style: AppTextStyles.body),
-                    ),
-                  ],
-                ),
-              )),
-              if (rows.isEmpty)
-                Text(
-                  'Keine weiteren Angaben.',
-                  style: AppTextStyles.bodySmall
-                      .copyWith(color: Colors.grey),
-                ),
-            ],
-          ),
-        ),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _IdentitySheet(
+        character:    c,
+        themeColor:   _themeColor,
       ),
     );
   }
@@ -1011,4 +948,193 @@ class _IdentityRow {
   final String label;
   final String value;
   const _IdentityRow({required this.label, required this.value});
+}
+
+// ── Identity-Sheet ────────────────────────────────────────────────────────────
+
+class _IdentitySheet extends StatefulWidget {
+  final Character character;
+  final Color themeColor;
+
+  const _IdentitySheet({
+    required this.character,
+    required this.themeColor,
+  });
+
+  @override
+  State<_IdentitySheet> createState() => _IdentitySheetState();
+}
+
+class _IdentitySheetState extends State<_IdentitySheet> {
+  final _featureService = ClassFeatureService();
+  String? _classFluff;
+  String? _subclassFluff;
+  bool _fluffLoaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFluff();
+  }
+
+  Future<void> _loadFluff() async {
+    final c = widget.character;
+    if (c.characterClass.isEmpty) {
+      setState(() => _fluffLoaded = true);
+      return;
+    }
+    final classFluff = await _featureService.getClassFluff(c.characterClass);
+    final subclassFluff = c.subclass.isNotEmpty
+        ? await _featureService.getSubclassFluff(c.characterClass, c.subclass)
+        : null;
+    if (mounted) setState(() {
+      _classFluff    = classFluff;
+      _subclassFluff = subclassFluff;
+      _fluffLoaded   = true;
+    });
+  }
+
+  Widget _buildFluffText(String text) {
+    final baseStyle = AppTextStyles.body.copyWith(color: Colors.grey[700]);
+    final boldStyle = baseStyle.copyWith(
+      fontWeight: FontWeight.bold,
+      color: Colors.grey[900],
+    );
+    final spans = <TextSpan>[];
+    final re = RegExp(r'\*\*(.+?)\*\*');
+    int last = 0;
+    for (final match in re.allMatches(text)) {
+      if (match.start > last) {
+        spans.add(TextSpan(text: text.substring(last, match.start)));
+      }
+      spans.add(TextSpan(text: match.group(1), style: boldStyle));
+      last = match.end;
+    }
+    if (last < text.length) {
+      spans.add(TextSpan(text: text.substring(last)));
+    }
+    return RichText(
+      text: TextSpan(style: baseStyle, children: spans),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final c = widget.character;
+    final rows = <_IdentityRow>[
+      if (c.characterClass.isNotEmpty)
+        _IdentityRow(
+          label: 'Klasse',
+          value: c.subclass.isNotEmpty
+              ? '${c.characterClass} · ${c.subclass}'
+              : c.characterClass,
+        ),
+      if (c.race.isNotEmpty)
+        _IdentityRow(label: 'Rasse', value: c.race),
+      if (c.alignment.isNotEmpty)
+        _IdentityRow(label: 'Gesinnung', value: c.alignment),
+      if (c.background.isNotEmpty)
+        _IdentityRow(label: 'Hintergrund', value: c.background),
+    ];
+
+    return DraggableScrollableSheet(
+      expand: false,
+      initialChildSize: (_classFluff != null || _subclassFluff != null) ? 0.6 : 0.4,
+      minChildSize: 0.3,
+      maxChildSize: 0.92,
+      builder: (_, ctrl) => Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          borderRadius:
+              const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          children: [
+            // Griffleiste
+            Padding(
+              padding: const EdgeInsets.only(top: 12, bottom: 8),
+              child: Container(
+                width: 40, height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[400],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                controller: ctrl,
+                padding: const EdgeInsets.fromLTRB(24, 4, 24, 32),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(c.name, style: AppTextStyles.sectionTitle),
+                    const SizedBox(height: 16),
+                    // Identitäts-Zeilen
+                    ...rows.map((r) => Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: 100,
+                            child: Text(r.label,
+                                style: AppTextStyles.bodySmall
+                                    .copyWith(color: Colors.grey[500])),
+                          ),
+                          Expanded(
+                            child: Text(r.value,
+                                style: AppTextStyles.body),
+                          ),
+                        ],
+                      ),
+                    )),
+                    if (rows.isEmpty)
+                      Text('Keine weiteren Angaben.',
+                          style: AppTextStyles.bodySmall
+                              .copyWith(color: Colors.grey)),
+                    // Fluff-Texte
+                    if (!_fluffLoaded)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 8),
+                        child: LinearProgressIndicator(),
+                      )
+                    else ...[
+                      if (_classFluff != null && _classFluff!.isNotEmpty) ...[
+                        const SizedBox(height: 16),
+                        Divider(color: Colors.grey[200]),
+                        const SizedBox(height: 12),
+                        Text(
+                          widget.character.characterClass,
+                          style: AppTextStyles.cardTitle
+                              .copyWith(color: widget.themeColor),
+                        ),
+                        const SizedBox(height: 8),
+                        _buildFluffText(_classFluff!),
+                      ],
+                      if (_subclassFluff != null &&
+                          _subclassFluff!.isNotEmpty) ...[
+                        const SizedBox(height: 16),
+                        if (_classFluff == null)
+                          Divider(color: Colors.grey[200]),
+                        if (_classFluff == null)
+                          const SizedBox(height: 12),
+                        Text(
+                          widget.character.subclass,
+                          style: AppTextStyles.cardTitle
+                              .copyWith(color: widget.themeColor),
+                        ),
+                        const SizedBox(height: 8),
+                        _buildFluffText(_subclassFluff!),
+                      ],
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

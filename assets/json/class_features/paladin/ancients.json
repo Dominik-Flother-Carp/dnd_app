@@ -1,17 +1,14 @@
 {
   "className": "Paladin",
   "subclassName": "Schwur der Alten",
-  "fluff": "Die Lehre des Schwurs der Alten wurden über unzählige Jahrhunderte hinweg bewahrt. Dieser Schwur erhebt das Prinzip des Guten über alle Gedanken zu Recht oder Chaos. Seine vier Grundtugenden sind simpel.\n\nEntfache das Licht: Durch deine Gesten der Gnade, der Freundlichkeit und der Vergebung entfachst du das Licht der Hoffnung in der Welt und drängst die Verzweiflung zurück.\n\nSchütze das Licht: Wo es Gutes, Schönes, Liebe und Lachen in der Welt gibt, dort stellst du dich gegen die Grausamkeiten, die es verschlingen wollen. Wo das Leben gedeiht, dort wirfst du dich den Kräften entgegen, die es auslöschen wollen.\n\nErhalte dein eigenes Licht: Erfreue dich am Lachen und am Singen, an der Kunst und an der Schönheit. Wenn das Licht der Freude in dir selbst erlischt, kannst du es auch in der Welt nicht bewahren.\n\nSei das Licht: Sei das ruhmreiche Leuchtfeuer für alle, die in Verzweiflung leben. Lass das Licht deiner Freude und Tapferkeit aus all deinen Taten scheinen.",
+  "fluff": "Die Lehre des Schwurs der Alten wurden über unzählige Jahrhunderte hinweg bewahrt. Dieser Schwur erhebt das Prinzip des Guten über alle Gedanken zu Recht oder Chaos.\nSeine vier Grundtugenden sind simpel.\n\n**Entfache das Licht:** Durch deine Gesten der Gnade, der Freundlichkeit und der Vergebung entfachst du das Licht der Hoffnung in der Welt und drängst die Verzweiflung zurück.\n\n**Schütze das Licht:** Wo es Gutes, Schönes, Liebe und Lachen in der Welt gibt, dort stellst du dich gegen die Grausamkeiten, die es verschlingen wollen. Wo das Leben gedeiht, dort wirfst du dich den Kräften entgegen, die es auslöschen wollen.\n\n**Erhalte dein eigenes Licht:** Erfreue dich am Lachen und am Singen, an der Kunst und an der Schönheit. Wenn das Licht der Freude in dir selbst erlischt, kannst du es auch in der Welt nicht bewahren.\n\n**Sei das Licht:** Sei das ruhmreiche Leuchtfeuer für alle, die in Verzweiflung leben. Lass das Licht deiner Freude und Tapferkeit aus all deinen Taten scheinen.",
   "features": [
     {
             "id": "paladin__ancients_oath_spells",
             "name": "Schwurzauber",
             "unlocksAtLevel": 3,
             "description": "Dein Schwur gewährt dir weitere Zauber.",
-            "spellcasting": null,
-            "grantedSpells": [
-                
-            ]
+            "grantedSpells": []
     }
   ]
 }

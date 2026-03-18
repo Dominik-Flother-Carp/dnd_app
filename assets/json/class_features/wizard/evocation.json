@@ -1,6 +1,7 @@
 {
     "className": "Magier",
     "subclassName": "Schule der Hervorrufung",
+    "fluff": "Du konzentrierst deine Studien auf Zauber, die mächtige elementare Effekte hervorrufen, wie etwa bittere Kälte, sengende Flammen, grollenden Donner, zuckende Blitze und ätzende Säure. Manche Magier dieser Schule werden in der Armee eingesetzt, um feindliche Truppen von Weitem unter Beschuss zu nehmen. Manche nutzen ihre spektakulären Kräfte, um die Schwachen zu beschützen, während andere ihren eigenen Vorteil suchen und einen Weg als Bandit, Abenteurer oder aufstrebender Tyrann beschreiten.",
     "features": [
         {
             "id": "wizard_evocation_savant",

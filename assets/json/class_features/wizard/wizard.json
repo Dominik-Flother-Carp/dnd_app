@@ -1,5 +1,6 @@
 {
     "className": "Magier",
+    "fluff": "Magier sind herausragende Zauberwirker, deren Sprüche sie definieren und vereinen. An dem subtilen Geflecht magischer Energien zehrend, das den gesamten Kosmos durchdringt, rufen Magier explodierendes Feuer und züngelnde Blitze hervor, erschaffen unterschwellige Täuschung und erzwingen brutale Gedankenkontrolle. Ihre Zauberkunst beschwört Monster aus anderen Existenzebenen, erlaubt ihnen einen Blick in die Zukunft und macht aus getöteten Gegnern willenlose Zombies. Ihre mächtigen Sprüche verwandeln eine Substanz in eine andere, rufen Meteore vom Himmel herab oder öffnen Portale zu anderen Welten.",
     "features": [
         {
             "id": "wizard_spellbook",
