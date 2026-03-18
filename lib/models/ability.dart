@@ -21,8 +21,6 @@ enum RechargeOn {
 class Ability {
   final String id;
   String name;
-  bool isCustom;     // true = Hausregel, false = offizielle Fähigkeit
-  String creatorId;  // ID des Charakters der diese Fähigkeit erstellt hat
   String source;     // Quelle, z.B. 'Schurke 1', 'Volksmensch', 'Hausregel'
 
   // ── Mechanik ──────────────────────────────────────────────────────────────
@@ -46,8 +44,6 @@ class Ability {
   Ability({
     String? id,
     required this.name,
-    this.isCustom = false,
-    this.creatorId = '',
     this.source = '',
     this.actionType = ActionType.action,
     int? maxUses,
@@ -129,8 +125,6 @@ void rechargeOnDawn() {
     return {
       'id':                   id,
       'name':                 name,
-      'isCustom':             isCustom ? 1 : 0,
-      'creatorId':            creatorId,
       'source':               source,
       'actionType':           actionType.name,
       'maxUses':              maxUses,
@@ -147,8 +141,6 @@ void rechargeOnDawn() {
     return Ability(
       id:                   map['id'],
       name:                 map['name'],
-      isCustom:             map['isCustom'] == 1,
-      creatorId:            map['creatorId'] ?? '',
       source:               map['source'] ?? '',
       actionType:           ActionType.values.byName(
                               map['actionType'] ?? 'action'),
