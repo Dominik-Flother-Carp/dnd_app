@@ -278,7 +278,7 @@
         "id": "item_schlafsack",
         "itemType": "base",
         "name": "Schlafsack",
-        "description": "Ein robuster Schlafsack aus gefüttertem Leder.",
+        "description": "Ein robuster Schlafsack aus gefüttertem Leder. Ermöglicht eine angenehme Rast in der Wildnis.",
         "category": "gear",
         "rarity": "common",
         "requiresAttunement": false,
