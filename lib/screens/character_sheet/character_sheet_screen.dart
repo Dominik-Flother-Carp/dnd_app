@@ -9,11 +9,13 @@ import 'package:dnd_app/screens/character_sheet/tabs/inventory_tab.dart';
 import 'package:dnd_app/screens/character_sheet/tabs/spell_tab.dart' show SpellTab, SpellTabState;
 import 'package:dnd_app/screens/character_sheet/tabs/features_tab.dart';
 import 'package:dnd_app/theme/app_text_styles.dart';
+import 'package:dnd_app/theme/app_colors.dart';
 import 'package:dnd_app/models/spell_slot.dart';
 import 'package:dnd_app/models/classes.dart';
 import 'package:dnd_app/models/class_feature.dart';
 import 'package:dnd_app/services/class_feature_service.dart';
 import 'package:dnd_app/services/compendium_service.dart';
+import 'package:dnd_app/widgets/widget_utils.dart';
 
 // ── Stufenaufstieg-Dialog ────────────────────────────────────────────────────
 
@@ -318,9 +320,11 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
   final _featuresTabKey = GlobalKey<FeaturesTabState>();
   final _spellTabKey    = GlobalKey<SpellTabState>();
 
-  Color get _themeColor => _character?.useEdition2024 == true
-      ? const Color(0xFF1B4F72)
-      : const Color(0xFF3B1F0A);
+  // Merkt sich für welches Level _syncClassSpells zuletzt ausgeführt wurde.
+  // Verhindert redundante DB-Writes beim erneuten Öffnen desselben Charakterbogens.
+  int? _syncedForLevel;
+
+  Color get _themeColor => AppColors.themeColorFor(_character?.useEdition2024 ?? false);
 
   @override
   void initState() {
@@ -362,18 +366,29 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
 
   /// Für prepared-Caster: trägt alle Klassenzauber bis zum verfügbaren
   /// Zaubergrad als bekannt (isPrepared=false) ein. Idempotent.
+  /// Wird übersprungen wenn sich das Level seit dem letzten Aufruf nicht
+  /// geändert hat – verhindert redundante DB-Writes beim Öffnen des Bogens.
   Future<void> _syncClassSpells(Character c) async {
+    // Guard: nur ausführen wenn Level sich geändert hat oder noch nie gelaufen
+    if (_syncedForLevel == c.level) return;
+
     final featureService  = ClassFeatureService();
     final compendium      = CompendiumService();
     await compendium.load();
 
     final features = await featureService.getFeaturesForCharacter(c);
     final hasPrepared = features.any((f) => f.spellcasting?.type == 'prepared');
-    if (!hasPrepared) return;
+    if (!hasPrepared) {
+      _syncedForLevel = c.level;
+      return;
+    }
 
     // Zauberbuch-Caster (Magier) verwalten ihre Zauber manuell
     final cls = characterClasses.where((cl) => cl.name == c.characterClass).firstOrNull;
-    if (cls?.casterType == 'spellbook') return;
+    if (cls?.casterType == 'spellbook') {
+      _syncedForLevel = c.level;
+      return;
+    }
 
     if (c.spellSlots.isEmpty) return;
     final maxGrade = c.spellSlots.keys.reduce((a, b) => a > b ? a : b);
@@ -391,6 +406,7 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
         isPrepared: false,
       );
     }
+    _syncedForLevel = c.level;
   }
 
   Future<void> _saveCharacter() async {
@@ -430,9 +446,10 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
     return Scaffold(
       backgroundColor: Colors.grey[100],
       body: SafeArea(
-        // top: true  → schützt vor Statusleiste (oben)
-        // bottom: true → schützt vor Navigationsleiste / Home-Indicator (unten)
-        top: true,
+        // top: false → die AppBar-Container füllt die Statusleiste mit ihrer
+        //              eigenen Farbe aus (kein grauer Balken oben)
+        // bottom: true → schützt vor Navigationsleiste / Home-Indicator
+        top: false,
         bottom: true,
         child: Column(
         children: [
@@ -485,7 +502,7 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
     return Container(
       color: _themeColor,
       child: SafeArea(
-        top: false,   // Wird von der äußeren SafeArea im Scaffold-body übernommen
+        top: true,    // AppBar-Container füllt Statusleiste mit _themeColor aus
         bottom: false,
         child: Row(
           children: [
@@ -1003,30 +1020,6 @@ class _IdentitySheetState extends State<_IdentitySheet> {
     });
   }
 
-  Widget _buildFluffText(String text) {
-    final baseStyle = AppTextStyles.body.copyWith(color: Colors.grey[700]);
-    final boldStyle = baseStyle.copyWith(
-      fontWeight: FontWeight.bold,
-      color: Colors.grey[900],
-    );
-    final spans = <TextSpan>[];
-    final re = RegExp(r'\*\*(.+?)\*\*');
-    int last = 0;
-    for (final match in re.allMatches(text)) {
-      if (match.start > last) {
-        spans.add(TextSpan(text: text.substring(last, match.start)));
-      }
-      spans.add(TextSpan(text: match.group(1), style: boldStyle));
-      last = match.end;
-    }
-    if (last < text.length) {
-      spans.add(TextSpan(text: text.substring(last)));
-    }
-    return RichText(
-      text: TextSpan(style: baseStyle, children: spans),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final c = widget.character;
@@ -1119,7 +1112,7 @@ class _IdentitySheetState extends State<_IdentitySheet> {
                               .copyWith(color: widget.themeColor),
                         ),
                         const SizedBox(height: 8),
-                        _buildFluffText(_classFluff!),
+                        MarkdownText(_classFluff!),
                       ],
                       if (_subclassFluff != null &&
                           _subclassFluff!.isNotEmpty) ...[
@@ -1134,7 +1127,7 @@ class _IdentitySheetState extends State<_IdentitySheet> {
                               .copyWith(color: widget.themeColor),
                         ),
                         const SizedBox(height: 8),
-                        _buildFluffText(_subclassFluff!),
+                        MarkdownText(_subclassFluff!),
                       ],
                     ],
                   ],

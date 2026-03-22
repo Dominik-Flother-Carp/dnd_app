@@ -9,6 +9,7 @@ import 'package:dnd_app/screens/character_create/steps/basic_info_step.dart';
 import 'package:dnd_app/screens/character_create/steps/skills_step.dart';
 import 'package:dnd_app/screens/character_create/steps/attributes_step.dart';
 import 'package:dnd_app/theme/app_text_styles.dart';
+import 'package:dnd_app/theme/app_colors.dart';
 
 class CharacterCreateScreen extends StatefulWidget {
   const CharacterCreateScreen({super.key});
@@ -30,9 +31,7 @@ class _CharacterCreateScreenState extends State<CharacterCreateScreen> {
 
   bool _isSaving = false;
 
-  Color get _themeColor => _character.useEdition2024
-      ? const Color(0xFF1B4F72)
-      : const Color(0xFF3B1F0A);
+  Color get _themeColor => AppColors.themeColorFor(_character.useEdition2024);
 
   Future<void> _nextStep() async {
     final isValid = switch (_currentStep) {
@@ -208,7 +207,9 @@ class _CharacterCreateScreenState extends State<CharacterCreateScreen> {
   }
 
   Widget _buildNavigationButtons() {
-    return Container(
+    return SafeArea(
+      top: false,
+      child: Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -253,7 +254,8 @@ class _CharacterCreateScreenState extends State<CharacterCreateScreen> {
           ),
         ],
       ),
-    );
+      ), // Container
+    ); // SafeArea
   }
 
   Future<void> _showDiscardDialog() async {

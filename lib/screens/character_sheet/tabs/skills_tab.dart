@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:dnd_app/models/character.dart';
 import 'package:dnd_app/theme/app_text_styles.dart';
 import 'package:dnd_app/models/skills.dart';
+import 'package:dnd_app/utils/format_utils.dart';
 
 class SkillsTab extends StatefulWidget {
   final Character character;
@@ -217,7 +218,7 @@ class _SkillsTabState extends State<SkillsTab> with AutomaticKeepAliveClientMixi
     required bool hasExpertise,
     VoidCallback? onTap,
   }) {
-    final bonusText = bonus >= 0 ? '+$bonus' : '$bonus';
+    final bonusText = signedInt(bonus);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),

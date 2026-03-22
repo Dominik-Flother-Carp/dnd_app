@@ -3,13 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:dnd_app/models/character.dart';
 import 'package:dnd_app/theme/app_text_styles.dart';
+import 'package:dnd_app/theme/app_colors.dart';
 import 'package:dnd_app/models/attributes.dart';
-
-/// Formatiert einen Meterwert: ganze Zahlen ohne Dezimalstelle, sonst mit einer.
-String _fmtSpeed(double meters) {
-  if (meters == meters.roundToDouble()) return '${meters.toInt()} m';
-  return '${meters.toStringAsFixed(1)} m';
-}
+import 'package:dnd_app/utils/format_utils.dart';
 
 // ── Double-Dialog für Bewegungsgeschwindigkeit ────────────────────────────────
 
@@ -44,7 +40,7 @@ class _DoubleDialogState extends State<_DoubleDialog> {
   void initState() {
     super.initState();
     _controller = TextEditingController(
-      text: _fmtSpeed(widget.currentValue).replaceAll(' m', ''),
+      text: fmtSpeed(widget.currentValue).replaceAll(' m', ''),
     );
   }
 
@@ -630,7 +626,7 @@ class _OverviewTabState extends State<OverviewTab>
                   ),
                   _buildStatBox(
                     'Bewegung',
-                    _fmtSpeed(c.speed),
+                    fmtSpeed(c.speed),
                     onTap: widget.editMode
                         ? () => _showDoubleDialog(
                             'Bewegungsgeschwindigkeit', c.speed,
@@ -726,11 +722,7 @@ class _OverviewTabState extends State<OverviewTab>
   Widget _buildHpSection() {
     final ratio =
         c.maxHitPoints > 0 ? c.currentHitPoints / c.maxHitPoints : 0.0;
-    final hpColor = ratio > 0.5
-        ? Colors.green
-        : ratio > 0.25
-            ? Colors.orange
-            : Colors.red;
+    final hpColor = AppColors.hpColor(ratio);
     final hasTemp = c.temporaryHitPoints > 0;
 
     return Column(
@@ -1080,7 +1072,7 @@ class _OverviewTabState extends State<OverviewTab>
 
   Widget _buildAttributeBox(
       String label, int score, int modifier, String key) {
-    final modText = modifier >= 0 ? '+$modifier' : '$modifier';
+    final modText = signedInt(modifier);
 
     return Expanded(
       child: GestureDetector(

@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:dnd_app/models/character.dart';
 import 'package:dnd_app/repositories/character_repository.dart';
 import 'package:dnd_app/theme/app_text_styles.dart';
+import 'package:dnd_app/theme/app_colors.dart';
 
 // ── Datenmodell ───────────────────────────────────────────────────────────────
 
@@ -527,11 +528,7 @@ class _InitiativeTrackerScreenState extends State<InitiativeTrackerScreen> {
     final hp    = p.currentHp ?? p.maxHp!;
     final max   = p.maxHp!;
     final ratio = (hp / max).clamp(0.0, 1.0);
-    final color = ratio > 0.5
-        ? Colors.green[400]!
-        : ratio > 0.25
-            ? Colors.orange[400]!
-            : Colors.red[400]!;
+    final color = AppColors.hpColor(ratio);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

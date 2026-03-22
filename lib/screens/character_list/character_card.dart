@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:dnd_app/models/character.dart';
 import 'package:dnd_app/theme/app_text_styles.dart';
+import 'package:dnd_app/theme/app_colors.dart';
 
 class CharacterCard extends StatelessWidget {
   final Character character;
@@ -16,9 +17,7 @@ class CharacterCard extends StatelessWidget {
     required this.onTap,
   });
 
-  Color get _editionColor => character.useEdition2024
-      ? const Color(0xFF1B4F72)
-      : const Color(0xFF3B1F0A);
+  Color get _editionColor => AppColors.themeColorFor(character.useEdition2024);
 
   @override
   Widget build(BuildContext context) {
@@ -127,12 +126,7 @@ class CharacterCard extends StatelessWidget {
     final ratio = character.maxHitPoints > 0
         ? character.currentHitPoints / character.maxHitPoints
         : 0.0;
-
-    final color = ratio > 0.5
-        ? Colors.green
-        : ratio > 0.25
-            ? Colors.orange
-            : Colors.red;
+    final color = AppColors.hpColor(ratio);
 
     return Row(
       children: [

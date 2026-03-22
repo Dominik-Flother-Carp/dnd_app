@@ -6,6 +6,7 @@ import 'package:dnd_app/models/spell.dart';
 import 'package:dnd_app/services/compendium_service.dart';
 import 'package:dnd_app/screens/compendium/compendium_detail_sheet.dart';
 import 'package:dnd_app/theme/app_text_styles.dart';
+import 'package:dnd_app/theme/app_colors.dart';
 
 class CompendiumScreen extends StatefulWidget {
   const CompendiumScreen({super.key});
@@ -364,41 +365,19 @@ class _SpellTile extends StatelessWidget {
   final Spell spell;
   const _SpellTile({required this.spell});
 
-  Color get _schoolColor {
-    switch (spell.school) {
-      case SpellSchool.abjuration:
-        return Colors.blue;
-      case SpellSchool.conjuration:
-        return Colors.yellow[700]!;
-      case SpellSchool.divination:
-        return Colors.cyan;
-      case SpellSchool.enchantment:
-        return Colors.pink;
-      case SpellSchool.evocation:
-        return Colors.orange;
-      case SpellSchool.illusion:
-        return Colors.purple;
-      case SpellSchool.necromancy:
-        return Colors.green[700]!;
-      case SpellSchool.transmutation:
-        return Colors.teal;
-    }
-  }
-
-  String get _schoolLabel => spell.school.label;
-
   @override
   Widget build(BuildContext context) {
+    final schoolColor = AppColors.spellSchoolColor(spell.school);
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       leading: CircleAvatar(
-        backgroundColor: _schoolColor.withValues(alpha: 0.15),
-        child: Icon(Icons.auto_fix_high, color: _schoolColor, size: 18),
+        backgroundColor: schoolColor.withValues(alpha: 0.15),
+        child: Icon(Icons.auto_fix_high, color: schoolColor, size: 18),
       ),
       title: Text(spell.name, style: AppTextStyles.body),
       subtitle: Text(
         [
-          _schoolLabel,
+          spell.school.label,
           spell.castingTime,
           if (spell.concentration) 'Konz.',
           if (spell.ritual) 'Ritual',

@@ -5,6 +5,8 @@ import 'package:dnd_app/models/item.dart';
 import 'package:dnd_app/models/spell.dart';
 import 'package:dnd_app/models/enums.dart';
 import 'package:dnd_app/theme/app_text_styles.dart';
+import 'package:dnd_app/theme/app_colors.dart';
+import 'package:dnd_app/widgets/widget_utils.dart';
 
 // ── Einstiegspunkte ───────────────────────────────────────────────────────────
 
@@ -90,43 +92,6 @@ Widget _buildInfoRow(String label, String value) {
   );
 }
 
-Widget _buildSection(String title, Widget content) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      const SizedBox(height: 16),
-      Text(
-        title,
-        style: AppTextStyles.bodySmall.copyWith(
-          fontWeight: FontWeight.bold,
-          color: Colors.grey[500],
-          letterSpacing: 0.8,
-        ),
-      ),
-      const SizedBox(height: 8),
-      content,
-    ],
-  );
-}
-
-Widget _buildChip(String label, {Color? color}) {
-  return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-    decoration: BoxDecoration(
-      color: (color ?? Colors.grey).withValues(alpha: 0.12),
-      borderRadius: BorderRadius.circular(4),
-      border: Border.all(color: (color ?? Colors.grey).withValues(alpha: 0.3)),
-    ),
-    child: Text(
-      label,
-      style: AppTextStyles.labelXs.copyWith(
-        color: color ?? Colors.grey[700],
-        fontWeight: FontWeight.bold,
-      ),
-    ),
-  );
-}
-
 // ── Item-Detailsheet ──────────────────────────────────────────────────────────
 
 class _ItemDetailSheet extends StatelessWidget {
@@ -155,16 +120,16 @@ class _ItemDetailSheet extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        _buildChip(item.category.label),
+                        AppChip(label: item.category.label),
                         const SizedBox(width: 6),
-                        _buildChip(item.rarity.label, color: item.rarity.color),
+                        AppChip(label: item.rarity.label, color: item.rarity.color),
                         if (item.isMagical) ...[
                           const SizedBox(width: 6),
-                          _buildChip('Magisch', color: Colors.purple),
+                          AppChip(label: 'Magisch', color: Colors.purple),
                         ],
                         if (item.requiresAttunement) ...[
                           const SizedBox(width: 6),
-                          _buildChip('Einstimmung', color: Colors.amber),
+                          AppChip(label: 'Einstimmung', color: Colors.amber),
                         ],
                       ],
                     ),
@@ -175,9 +140,9 @@ class _ItemDetailSheet extends StatelessWidget {
           ),
 
           // ── Basisdaten ─────────────────────────────────────────────────
-          _buildSection(
-            'Eigenschaften',
-            Column(
+          DetailSection(
+              title: 'Eigenschaften',
+              child: Column(
               children: [
                 if (item.weight > 0)
                   _buildInfoRow('Gewicht', '${item.weight} lb'),
@@ -200,16 +165,16 @@ class _ItemDetailSheet extends StatelessWidget {
 
           // ── Beschreibung ───────────────────────────────────────────────
           if (item.description.isNotEmpty)
-            _buildSection(
-              'Beschreibung',
-              Text(item.description, style: AppTextStyles.body),
+            DetailSection(
+                title: 'Beschreibung',
+                child: Text(item.description, style: AppTextStyles.body),
             ),
 
           // ── Charakter-Notiz ────────────────────────────────────────────
           if (notes != null && notes!.isNotEmpty)
-            _buildSection(
-              'Notiz',
-              Text(notes!, style: AppTextStyles.body),
+            DetailSection(
+                title: 'Notiz',
+                child: Text(notes!, style: AppTextStyles.body),
             ),
         ],
       ),
@@ -261,7 +226,7 @@ class _ItemDetailSheet extends StatelessWidget {
                   spacing: 4,
                   runSpacing: 4,
                   children: w.properties
-                      .map((p) => _buildChip(p.label))
+                      .map((p) => AppChip(label: p.label))
                       .toList(),
                 ),
               ),
@@ -309,48 +274,6 @@ class _SpellDetailSheet extends StatelessWidget {
     return '${spell.level}. Grad';
   }
 
-  String get _schoolLabel {
-    switch (spell.school) {
-      case SpellSchool.abjuration:
-        return 'Bannmagie';
-      case SpellSchool.conjuration:
-        return 'Beschwörung';
-      case SpellSchool.divination:
-        return 'Erkenntnis';
-      case SpellSchool.enchantment:
-        return 'Verzauberung';
-      case SpellSchool.evocation:
-        return 'Hervorrufung';
-      case SpellSchool.illusion:
-        return 'Illusion';
-      case SpellSchool.necromancy:
-        return 'Nekromantie';
-      case SpellSchool.transmutation:
-        return 'Verwandlung';
-    }
-  }
-
-  Color get _schoolColor {
-    switch (spell.school) {
-      case SpellSchool.abjuration:
-        return Colors.blue;
-      case SpellSchool.conjuration:
-        return Colors.yellow[700]!;
-      case SpellSchool.divination:
-        return Colors.cyan;
-      case SpellSchool.enchantment:
-        return Colors.pink;
-      case SpellSchool.evocation:
-        return Colors.orange;
-      case SpellSchool.illusion:
-        return Colors.purple;
-      case SpellSchool.necromancy:
-        return Colors.green[700]!;
-      case SpellSchool.transmutation:
-        return Colors.teal;
-    }
-  }
-
   String get _savingThrowLabel {
     switch (spell.savingThrowAttribute) {
       case SavingThrowAttribute.strength:
@@ -380,7 +303,8 @@ class _SpellDetailSheet extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.auto_fix_high, size: 28, color: _schoolColor),
+              Icon(Icons.auto_fix_high, size: 28,
+                  color: AppColors.spellSchoolColor(spell.school)),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -390,16 +314,17 @@ class _SpellDetailSheet extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        _buildChip(_levelLabel),
+                        AppChip(label: _levelLabel),
                         const SizedBox(width: 6),
-                        _buildChip(_schoolLabel, color: _schoolColor),
+                        AppChip(label: spell.school.label,
+                            color: AppColors.spellSchoolColor(spell.school)),
                         if (spell.concentration) ...[
                           const SizedBox(width: 6),
-                          _buildChip('Konzentration', color: Colors.red),
+                          AppChip(label: 'Konzentration', color: Colors.red),
                         ],
                         if (spell.ritual) ...[
                           const SizedBox(width: 6),
-                          _buildChip('Ritual', color: Colors.teal),
+                          AppChip(label: 'Ritual', color: Colors.teal),
                         ],
                       ],
                     ),
@@ -410,9 +335,9 @@ class _SpellDetailSheet extends StatelessWidget {
           ),
 
           // ── Metadaten ──────────────────────────────────────────────────
-          _buildSection(
-            'Details',
-            Column(
+          DetailSection(
+              title: 'Details',
+              child: Column(
               children: [
                 _buildInfoRow('Zeitaufwand', spell.castingTime),
                 _buildInfoRow('Reichweite', spell.range),
@@ -437,17 +362,17 @@ class _SpellDetailSheet extends StatelessWidget {
           ),
 
           // ── Beschreibung ───────────────────────────────────────────────
-          _buildSection(
-            'Beschreibung',
-            Text(spell.effectDescription, style: AppTextStyles.body),
+          DetailSection(
+              title: 'Beschreibung',
+              child: Text(spell.effectDescription, style: AppTextStyles.body),
           ),
 
           // ── Auf höheren Graden ─────────────────────────────────────────
           if (spell.atHigherLevels != null &&
               spell.atHigherLevels!.trim().isNotEmpty)
-            _buildSection(
-              'Auf höheren Graden',
-              Text(spell.atHigherLevels!.trim(), style: AppTextStyles.body),
+            DetailSection(
+                title: 'Auf höheren Graden',
+                child: Text(spell.atHigherLevels!.trim(), style: AppTextStyles.body),
             ),
         ],
       ),

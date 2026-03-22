@@ -7,6 +7,7 @@ import 'package:dnd_app/repositories/character_repository.dart';
 import 'package:dnd_app/services/class_feature_service.dart';
 import 'package:dnd_app/services/compendium_service.dart';
 import 'package:dnd_app/theme/app_text_styles.dart';
+import 'package:dnd_app/widgets/widget_utils.dart';
 
 class FeaturesTab extends StatefulWidget {
   final Character character;
@@ -35,6 +36,8 @@ class FeaturesTabState extends State<FeaturesTab>
   Map<String, int>    _uses       = {};
   Map<String, String> _choices    = {};
   Map<String, String> _spellNames = {};
+  // Gecacht – wird nur in _load() neu berechnet, nicht bei jedem build()
+  List<MapEntry<int, List<ClassFeature>>> _groupedEntries = [];
   bool _isLoading = true;
 
   @override
@@ -63,11 +66,12 @@ class FeaturesTabState extends State<FeaturesTab>
 
     if (!mounted) return;
     setState(() {
-      _features   = features;
-      _uses       = uses;
-      _choices    = choices;
-      _spellNames = spellNames;
-      _isLoading  = false;
+      _features      = features;
+      _uses          = uses;
+      _choices       = choices;
+      _spellNames    = spellNames;
+      _groupedEntries = _buildGroupedEntries(features);
+      _isLoading     = false;
     });
   }
 
@@ -129,15 +133,27 @@ class FeaturesTabState extends State<FeaturesTab>
 
   // ── Gruppierung nach Level ─────────────────────────────────────────────────
 
-  Map<int, List<ClassFeature>> get _grouped {
+  /// Berechnet die Gruppierung einmalig – Ergebnis wird in _groupedEntries
+  /// gecacht und nur bei _load() neu berechnet.
+  List<MapEntry<int, List<ClassFeature>>> _buildGroupedEntries(
+      List<ClassFeature> features) {
     final map = <int, List<ClassFeature>>{};
-    for (final f in _features) {
+    for (final f in features) {
       if (f.extendsFeatureId != null) continue;
       map.putIfAbsent(f.unlocksAtLevel, () => []).add(f);
     }
-    return Map.fromEntries(
-      map.entries.toList()..sort((a, b) => a.key.compareTo(b.key)),
-    );
+    return (map.entries.toList()..sort((a, b) => a.key.compareTo(b.key)));
+  }
+
+  // Flache Liste aller Zeilen für den SliverChildBuilderDelegate:
+  // Abwechselnd ein Level-Header und n Feature-Karten pro Level.
+  List<Widget> get _flatRows {
+    final rows = <Widget>[];
+    for (final entry in _groupedEntries) {
+      rows.add(_buildLevelHeader(entry.key));
+      rows.addAll(entry.value.map(_buildFeatureCard));
+    }
+    return rows;
   }
 
   // ── Detail-Sheet öffnen ───────────────────────────────────────────────────
@@ -207,12 +223,10 @@ class FeaturesTabState extends State<FeaturesTab>
               SliverPadding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
                 sliver: SliverList(
-                  delegate: SliverChildListDelegate([
-                    for (final entry in _grouped.entries) ...[
-                      _buildLevelHeader(entry.key),
-                      ...entry.value.map(_buildFeatureCard),
-                    ],
-                  ]),
+                  delegate: SliverChildBuilderDelegate(
+                    (_, i) => _flatRows[i],
+                    childCount: _flatRows.length,
+                  ),
                 ),
               ),
             ],
@@ -339,11 +353,11 @@ class FeaturesTabState extends State<FeaturesTab>
                         ),
                         if (f.subclassName != null) ...[
                           const SizedBox(width: 6),
-                          _chip('Unterklasse', widget.themeColor),
+                          AppBadge(label: 'Unterklasse', color: widget.themeColor),
                         ],
                         if (hasChoice) ...[
                           const SizedBox(width: 6),
-                          _chip('Wahl!', Colors.orange),
+                          AppBadge(label: 'Wahl!', color: Colors.orange),
                         ],
                       ],
                     ),
@@ -361,18 +375,6 @@ class FeaturesTabState extends State<FeaturesTab>
           ),
         ),
       ),
-    );
-  }
-
-  Widget _chip(String label, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(label,
-          style: AppTextStyles.labelXs.copyWith(color: color)),
     );
   }
 
@@ -526,22 +528,21 @@ class _FeatureDetailSheet extends StatelessWidget {
                                 spacing: 6,
                                 runSpacing: 4,
                                 children: [
-                                  _chip('Stufe ${feature.unlocksAtLevel}'),
+                                  AppChip(label: 'Stufe ${feature.unlocksAtLevel}'),
                                   if (feature.subclassName != null)
-                                    _chip('Unterklasse', color: themeColor),
+                                    AppChip(label: 'Unterklasse', color: themeColor),
                                   if (feature.resource != null)
-                                    _chip(
-                                      feature.resource!.restType == 'short'
+                                    AppChip(
+                                      label: feature.resource!.restType == 'short'
                                           ? 'Kurze Rast'
                                           : 'Lange Rast',
-                                      color: feature.resource!.restType ==
-                                              'short'
+                                      color: feature.resource!.restType == 'short'
                                           ? Colors.blue
                                           : Colors.purple,
                                     ),
                                   if (feature.choice != null &&
                                       choices[feature.id] == null)
-                                    _chip('Wahl erforderlich',
+                                    AppChip(label: 'Wahl erforderlich',
                                         color: Colors.orange),
                                 ],
                               ),
@@ -553,14 +554,14 @@ class _FeatureDetailSheet extends StatelessWidget {
 
                     // ── Beschreibung ──────────────────────────────────────
                     if (feature.description.isNotEmpty)
-                      _section('Beschreibung',
-                          _buildDescription(feature.description)),
+                      DetailSection(title: 'Beschreibung',
+                          child: MarkdownText(feature.description)),
 
                     // ── Erweiterungen (Domänen) ───────────────────────────
                     if (feature.extensions.isNotEmpty)
-                      _section(
-                        'Domänen-Erweiterungen',
-                        Column(
+                      DetailSection(
+                        title: 'Domänen-Erweiterungen',
+                        child: Column(
                           children: feature.extensions.map((ext) {
                             return Container(
                               width: double.infinity,
@@ -583,12 +584,12 @@ class _FeatureDetailSheet extends StatelessWidget {
                                             style: AppTextStyles.cardTitle
                                                 .copyWith(color: themeColor)),
                                       ),
-                                      _chip('Domäne', color: themeColor),
+                                      AppChip(label: 'Domäne', color: themeColor),
                                     ],
                                   ),
                                   if (ext.description.isNotEmpty) ...[
                                     const SizedBox(height: 8),
-                                    _buildDescription(ext.description),
+                                    MarkdownText(ext.description),
                                   ],
                                 ],
                               ),
@@ -600,25 +601,24 @@ class _FeatureDetailSheet extends StatelessWidget {
                     // ── Gewährte Zauber ───────────────────────────────────
                     if (feature.grantedSpells != null &&
                         feature.grantedSpells!.isNotEmpty)
-                      _section(
-                        'Gewährte Zauber',
-                        Wrap(
+                      DetailSection(
+                        title: 'Gewährte Zauber',
+                        child: Wrap(
                           spacing: 6,
                           runSpacing: 6,
                           children: feature.grantedSpells!.map((gs) {
                             final available = gs.atLevel <= character.level;
                             final name =
                                 spellNames[gs.spellId] ?? gs.spellId;
-                            return _chip(name,
-                                color:
-                                    available ? themeColor : Colors.grey);
+                            return AppChip(label: name,
+                                color: available ? themeColor : Colors.grey);
                           }).toList(),
                         ),
                       ),
 
                     // ── Wahl ─────────────────────────────────────────────
                     if (feature.choice != null)
-                      _section('Wahl', _buildChoice(context)),
+                      DetailSection(title: 'Wahl', child: _buildChoice(context)),
                   ],
                 ),
               ),
@@ -627,66 +627,6 @@ class _FeatureDetailSheet extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Widget _chip(String label, {Color? color}) {
-    final c = color ?? Colors.grey;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: c.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: c.withValues(alpha: 0.3)),
-      ),
-      child: Text(
-        label,
-        style: AppTextStyles.labelXs.copyWith(
-          color: color ?? Colors.grey[700],
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-
-  Widget _section(String title, Widget content) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 16),
-        Text(
-          title.toUpperCase(),
-          style: AppTextStyles.bodySmall.copyWith(
-            fontWeight: FontWeight.bold,
-            color: Colors.grey[500],
-            letterSpacing: 0.8,
-          ),
-        ),
-        const SizedBox(height: 8),
-        content,
-      ],
-    );
-  }
-
-  Widget _buildDescription(String text) {
-    final baseStyle = AppTextStyles.body.copyWith(color: Colors.grey[700]);
-    final boldStyle = baseStyle.copyWith(
-      fontWeight: FontWeight.bold,
-      color: Colors.grey[900],
-    );
-    final spans = <TextSpan>[];
-    final re = RegExp(r'\*\*(.+?)\*\*');
-    int last = 0;
-    for (final match in re.allMatches(text)) {
-      if (match.start > last) {
-        spans.add(TextSpan(text: text.substring(last, match.start)));
-      }
-      spans.add(TextSpan(text: match.group(1), style: boldStyle));
-      last = match.end;
-    }
-    if (last < text.length) {
-      spans.add(TextSpan(text: text.substring(last)));
-    }
-    return RichText(text: TextSpan(style: baseStyle, children: spans));
   }
 
   Widget _buildChoice(BuildContext context) {

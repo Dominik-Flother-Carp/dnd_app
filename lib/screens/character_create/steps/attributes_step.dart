@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:dnd_app/models/character.dart';
 import 'package:dnd_app/models/races.dart';
 import 'package:dnd_app/theme/app_text_styles.dart';
+import 'package:dnd_app/utils/format_utils.dart';
 
 class AttributesStep extends StatefulWidget {
   final Character character;
@@ -112,10 +113,7 @@ class AttributesStepState extends State<AttributesStep> {
     }
   }
 
-  String _modifierText(int score) {
-    final mod = Character.modifier(score);
-    return mod >= 0 ? '+$mod' : '$mod';
-  }
+  String _modifierText(int score) => signedInt(Character.modifier(score));
 
   void _onAttributeChanged(String value, void Function(int) onUpdate) {
     final parsed = int.tryParse(value);

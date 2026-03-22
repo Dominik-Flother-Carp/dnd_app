@@ -1,5 +1,6 @@
 // lib/screens/character_sheet/tabs/spell_tab.dart
 
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:dnd_app/models/character.dart';
 import 'package:dnd_app/models/spell.dart';
@@ -9,6 +10,8 @@ import 'package:dnd_app/services/class_feature_service.dart';
 import 'package:dnd_app/screens/compendium/compendium_detail_sheet.dart';
 import 'package:dnd_app/theme/app_text_styles.dart';
 import 'package:dnd_app/models/classes.dart';
+import 'package:dnd_app/utils/format_utils.dart';
+import 'package:dnd_app/widgets/widget_utils.dart';
 
 // ── Vorbereitungslimit ─────────────────────────────────────────────────────────
 //
@@ -59,16 +62,20 @@ class _SpellPickerSheetState extends State<_SpellPickerSheet> {
   List<Spell> _results = [];
   bool _loading = true;
 
+  // Debounce-Timer: verhindert Filterung bei jedem einzelnen Tastendruck
+  Timer? _debounce;
+
   @override
   void initState() {
     super.initState();
     _load();
-    _searchCtrl.addListener(_onSearch);
+    _searchCtrl.addListener(_onSearchDebounced);
   }
 
   @override
   void dispose() {
-    _searchCtrl.removeListener(_onSearch);
+    _debounce?.cancel();
+    _searchCtrl.removeListener(_onSearchDebounced);
     _searchCtrl.dispose();
     super.dispose();
   }
@@ -76,6 +83,13 @@ class _SpellPickerSheetState extends State<_SpellPickerSheet> {
   Future<void> _load() async {
     await _service.load();
     _onSearch();
+  }
+
+  void _onSearchDebounced() {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 150), () {
+      if (mounted) _onSearch();
+    });
   }
 
   void _onSearch() {
@@ -271,6 +285,10 @@ class SpellTabState extends State<SpellTab>
   /// IDs der immer vorbereiteten Zauber (grantedSpells) – zählen nicht zum Limit
   Set<String> _grantedSpellIds = {};
 
+  // Gecacht – werden nur in _load() und _togglePrepared() neu berechnet
+  List<MapEntry<int, List<Spell>>> _preparedGroupedEntries = [];
+  List<Spell> _unpreparedCache = [];
+
   /// Wird vom character_sheet_screen aufgerufen wenn neue gewährte Zauber
   /// hinzugefügt wurden (z.B. nach Öffnen des Features-Tabs).
   Future<void> reload() => _load();
@@ -293,6 +311,7 @@ class SpellTabState extends State<SpellTab>
           .toSet();
       _grantedSpellIds = grantedIds;
       _isLoading = false;
+      _rebuildCaches();
     });
   }
 
@@ -323,8 +342,12 @@ class SpellTabState extends State<SpellTab>
       _grantedSpellIds.contains(s.id) ||
       _preparedSpellIds.contains(s.id);
 
-  /// Vorbereitete Zauber nach Grad gruppiert, innerhalb alphabetisch
-  Map<int, List<Spell>> get _preparedGrouped {
+  // ── Cache-Verwaltung ──────────────────────────────────────────────────────
+
+  /// Berechnet beide Spell-Caches neu. Wird nach jedem _load() und nach
+  /// _togglePrepared() aufgerufen – nie direkt im build().
+  void _rebuildCaches() {
+    // Vorbereitete Zauber nach Grad gruppiert
     final map = <int, List<Spell>>{};
     for (final s in _spells.where(_isPrepared)) {
       map.putIfAbsent(s.level, () => []).add(s);
@@ -332,20 +355,17 @@ class SpellTabState extends State<SpellTab>
     for (final list in map.values) {
       list.sort((a, b) => a.name.compareTo(b.name));
     }
-    return Map.fromEntries(
-      map.entries.toList()..sort((a, b) => a.key.compareTo(b.key)),
-    );
-  }
+    _preparedGroupedEntries = (map.entries.toList()
+      ..sort((a, b) => a.key.compareTo(b.key)));
 
-  /// Bekannte aber nicht vorbereitete Zauber (Grad > 0, nicht gewährt)
-  List<Spell> get _unpreparedSpells {
-    return _spells
+    // Bekannte aber nicht vorbereitete Zauber
+    _unpreparedCache = (_spells
         .where((s) =>
             s.level > 0 &&
             !_grantedSpellIds.contains(s.id) &&
             !_preparedSpellIds.contains(s.id))
         .toList()
-      ..sort((a, b) => a.name.compareTo(b.name));
+      ..sort((a, b) => a.name.compareTo(b.name)));
   }
 
   // ── Zauber hinzufügen / entfernen ─────────────────────────────────────────
@@ -387,6 +407,7 @@ class SpellTabState extends State<SpellTab>
       } else {
         _preparedSpellIds.remove(spell.id);
       }
+      _rebuildCaches();
     });
   }
 
@@ -405,8 +426,20 @@ class SpellTabState extends State<SpellTab>
     }
     if (!_isSpellcaster) return _buildNonCasterState();
 
-    final prepared   = _preparedGrouped;
-    final unprepared = _unpreparedSpells;
+    // Flache Zeilenliste aus gecachten Werten aufbauen – einmalig pro build()
+    final rows = <Widget>[];
+    if (_spells.isEmpty) {
+      rows.add(_buildEmptySpells());
+    } else {
+      for (final entry in _preparedGroupedEntries) {
+        rows.add(_buildLevelSection(entry.key, entry.value));
+      }
+      if (_unpreparedCache.isNotEmpty) {
+        rows.add(_buildUnpreparedHeader());
+        rows.addAll(_unpreparedCache.map(_buildSpellTile));
+        rows.add(const SizedBox(height: 8));
+      }
+    }
 
     return Column(
       children: [
@@ -424,19 +457,10 @@ class SpellTabState extends State<SpellTab>
                   SliverPadding(
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
                     sliver: SliverList(
-                      delegate: SliverChildListDelegate([
-                        if (_spells.isEmpty)
-                          _buildEmptySpells()
-                        else ...[
-                          ...prepared.entries
-                              .map((e) => _buildLevelSection(e.key, e.value)),
-                          if (unprepared.isNotEmpty) ...[
-                            _buildUnpreparedHeader(),
-                            ...unprepared.map((s) => _buildSpellTile(s)),
-                            const SizedBox(height: 8),
-                          ],
-                        ],
-                      ]),
+                      delegate: SliverChildBuilderDelegate(
+                        (_, i) => rows[i],
+                        childCount: rows.length,
+                      ),
                     ),
                   ),
                 ],
@@ -501,7 +525,7 @@ class SpellTabState extends State<SpellTab>
           ),
           const SizedBox(width: 4),
           Text(
-            '(${_unpreparedSpells.length})',
+            '(${_unpreparedCache.length})',
             style: AppTextStyles.bodySmall.copyWith(color: Colors.grey[300]),
           ),
         ],
@@ -533,7 +557,7 @@ class SpellTabState extends State<SpellTab>
             _summaryStat(
               label: 'Angriff',
               value: _isSpellcaster
-                  ? (attackBonus >= 0 ? '+$attackBonus' : '$attackBonus')
+                  ? signedInt(attackBonus)
                   : '—',
               icon: Icons.bolt,
             ),
@@ -670,9 +694,9 @@ class SpellTabState extends State<SpellTab>
                       children: [
                         Text(spell.name, style: AppTextStyles.cardTitle),
                         if (spell.ritual)
-                          _badge('Ritual', Colors.teal),
+                          AppBadge(label: 'Ritual', color: Colors.teal),
                         if (spell.concentration)
-                          _badge('Konzentration', Colors.purple),
+                          AppBadge(label: 'Konzentration', color: Colors.purple),
                       ],
                     ),
                     const SizedBox(height: 2),
@@ -759,20 +783,6 @@ class SpellTabState extends State<SpellTab>
             const SizedBox(height: 8),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _badge(String label, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        label,
-        style: AppTextStyles.labelXs.copyWith(color: color),
       ),
     );
   }

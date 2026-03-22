@@ -1,5 +1,6 @@
 // lib/screens/character_sheet/tabs/inventory_tab.dart
 
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:dnd_app/models/character.dart';
 import 'package:dnd_app/models/item.dart';
@@ -11,6 +12,7 @@ import 'package:dnd_app/repositories/character_repository.dart';
 import 'package:dnd_app/services/compendium_service.dart';
 import 'package:dnd_app/screens/compendium/compendium_detail_sheet.dart';
 import 'package:dnd_app/theme/app_text_styles.dart';
+import 'package:dnd_app/widgets/widget_utils.dart';
 
 const _equippableCategories = {
   ItemCategory.weapon,
@@ -495,6 +497,9 @@ class _CompendiumPickerSheetState extends State<_CompendiumPickerSheet> {
   bool       _loading    = true;
   ItemCategory? _filterCategory;
 
+  // Debounce-Timer: verhindert Filterung bei jedem einzelnen Tastendruck
+  Timer? _debounce;
+
   static const _pickerCategories = [
     ItemCategory.weapon,
     ItemCategory.armor,
@@ -508,12 +513,13 @@ class _CompendiumPickerSheetState extends State<_CompendiumPickerSheet> {
   void initState() {
     super.initState();
     _load();
-    _searchCtrl.addListener(_onSearch);
+    _searchCtrl.addListener(_onSearchDebounced);
   }
 
   @override
   void dispose() {
-    _searchCtrl.removeListener(_onSearch);
+    _debounce?.cancel();
+    _searchCtrl.removeListener(_onSearchDebounced);
     _searchCtrl.dispose();
     super.dispose();
   }
@@ -521,6 +527,13 @@ class _CompendiumPickerSheetState extends State<_CompendiumPickerSheet> {
   Future<void> _load() async {
     await _service.load();
     _onSearch();
+  }
+
+  void _onSearchDebounced() {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 150), () {
+      if (mounted) _onSearch();
+    });
   }
 
   void _onSearch() {
@@ -705,6 +718,8 @@ class _InventoryTabState extends State<InventoryTab>
   bool _isLoading = true;
 
   final Map<ItemCategory, bool> _categoryExpanded = {};
+  // Gecacht – wird nur in _load() neu berechnet, nicht bei jedem build()
+  List<MapEntry<ItemCategory, List<_InventoryEntry>>> _groupedEntries = [];
 
   @override
   bool get wantKeepAlive => true;
@@ -729,6 +744,7 @@ class _InventoryTabState extends State<InventoryTab>
       for (final qi in qItems) {
         _categoryExpanded.putIfAbsent(qi.category, () => true);
       }
+      _groupedEntries = _buildGroupedEntries(items, qItems);
     });
   }
 
@@ -761,19 +777,21 @@ class _InventoryTabState extends State<InventoryTab>
 
   bool get _isEmpty => _items.isEmpty && _quickItems.isEmpty;
 
-  Map<ItemCategory, List<_InventoryEntry>> get _grouped {
+  /// Berechnet die nach Enum-Reihenfolge sortierten Kategorie-Gruppen.
+  /// Ergebnis wird in _groupedEntries gecacht und nur bei _load() neu berechnet.
+  List<MapEntry<ItemCategory, List<_InventoryEntry>>> _buildGroupedEntries(
+      List<CharacterItem> items, List<QuickItem> quickItems) {
     final map = <ItemCategory, List<_InventoryEntry>>{};
-    for (final ci in _items) {
+    for (final ci in items) {
       map.putIfAbsent(ci.item.category, () => []).add(_CiEntry(ci));
     }
-    for (final qi in _quickItems) {
+    for (final qi in quickItems) {
       map.putIfAbsent(qi.category, () => []).add(_QiEntry(qi));
     }
-    // Reihenfolge laut Enum
-    return {
+    return [
       for (final cat in ItemCategory.values)
-        if (map.containsKey(cat)) cat: map[cat]!,
-    };
+        if (map.containsKey(cat)) MapEntry(cat, map[cat]!),
+    ];
   }
 
   // ── Aktionen ─────────────────────────────────────────────────────────────
@@ -957,10 +975,13 @@ class _InventoryTabState extends State<InventoryTab>
                     SliverPadding(
                       padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
                       sliver: SliverList(
-                        delegate: SliverChildListDelegate([
-                          ..._grouped.entries
-                              .map((e) => _buildCategorySection(e.key, e.value)),
-                        ]),
+                        delegate: SliverChildBuilderDelegate(
+                          (_, i) => _buildCategorySection(
+                            _groupedEntries[i].key,
+                            _groupedEntries[i].value,
+                          ),
+                          childCount: _groupedEntries.length,
+                        ),
                       ),
                     ),
                 ],
@@ -1215,11 +1236,11 @@ class _InventoryTabState extends State<InventoryTab>
                       children: [
                         Text(item.name, style: AppTextStyles.cardTitle),
                         if (ci.isEquipped)
-                          _badge('Ausgerüstet', widget.themeColor),
+                          AppBadge(label: 'Ausgerüstet', color: widget.themeColor),
                         if (ci.isOnBody)
-                          _badge('Am Körper', Colors.teal),
+                          AppBadge(label: 'Am Körper', color: Colors.teal),
                         if (ci.isAttuned)
-                          _badge('Eingestimmt', Colors.purple),
+                          AppBadge(label: 'Eingestimmt', color: Colors.purple),
                       ],
                     ),
                     const SizedBox(height: 2),
@@ -1401,20 +1422,6 @@ class _InventoryTabState extends State<InventoryTab>
   }
 
   // ── Shared Widgets ────────────────────────────────────────────────────────
-
-  Widget _badge(String label, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        label,
-        style: AppTextStyles.labelXs.copyWith(color: color),
-      ),
-    );
-  }
 
   Widget _quantityControls({
     required int qty,
