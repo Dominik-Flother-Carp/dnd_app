@@ -214,9 +214,10 @@ class _InitiativeTrackerScreenState extends State<InitiativeTrackerScreen> {
               ? _buildEmptySetup()
               : _buildSetupList(),
         ),
-        // Manuell hinzufügen
+        // Manuell hinzufügen – dynamisches Padding für Navigationsleiste
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 120),
+          padding: EdgeInsets.fromLTRB(16, 0, 16,
+              MediaQuery.of(context).padding.bottom + 88),
           child: OutlinedButton.icon(
             onPressed: () => _showAddParticipantSheet(duringCombat: false),
             icon: const Icon(Icons.add),

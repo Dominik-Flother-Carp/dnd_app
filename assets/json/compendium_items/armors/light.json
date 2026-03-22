@@ -28,7 +28,7 @@
     "weight": 10.0,
     "valueInCopper": 1000,
     "armorClassBonus": 11,
-    "armorType": "medium",
+    "armorType": "light",
     "minStrength": 0,
     "stealthDisadvantage": false,
     "maxDexBonusOverride": null
@@ -45,7 +45,7 @@
     "weight": 13.0,
     "valueInCopper": 4500,
     "armorClassBonus": 12,
-    "armorType": "medium",
+    "armorType": "light",
     "minStrength": 0,
     "stealthDisadvantage": false,
     "maxDexBonusOverride": null

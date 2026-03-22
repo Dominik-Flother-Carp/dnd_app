@@ -109,7 +109,7 @@
         "id": "item_krummsaebel",
         "itemType": "weapon",
         "weaponCategory": "martial",
-        "name": "Krummäbel",
+        "name": "Krummsäbel",
         "description": "Eine leicht gebogene Klinge, die für schnelle, fließende Angriffe ausgelegt ist.",
         "rarity": "common",
         "requiresAttunement": false,

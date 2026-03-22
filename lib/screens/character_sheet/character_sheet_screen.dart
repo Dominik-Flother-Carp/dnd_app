@@ -429,7 +429,12 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      body: Column(
+      body: SafeArea(
+        // top: true  → schützt vor Statusleiste (oben)
+        // bottom: true → schützt vor Navigationsleiste / Home-Indicator (unten)
+        top: true,
+        bottom: true,
+        child: Column(
         children: [
           // ── AppBar als normales Widget ─────────────────────────────
           _buildAppBar(),
@@ -471,7 +476,8 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
             ),
           ),
         ],
-      ),
+        ), // Column
+      ), // SafeArea
     );
   }
 
@@ -479,6 +485,7 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
     return Container(
       color: _themeColor,
       child: SafeArea(
+        top: false,   // Wird von der äußeren SafeArea im Scaffold-body übernommen
         bottom: false,
         child: Row(
           children: [
@@ -807,7 +814,8 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
         borderRadius:
             BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (context) => Padding(
+      builder: (context) => SafeArea(
+        child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -840,6 +848,7 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
             ),
             const SizedBox(height: 16),
           ],
+        ),
         ),
       ),
     );
