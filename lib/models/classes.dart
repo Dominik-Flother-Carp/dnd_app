@@ -36,10 +36,27 @@ class CharacterSubclass {
 }
 
 const List<CharacterSubclass> characterSubclasses = [
+  // ── Barbar ─────────────────────────────────────────────────────────────────
+  CharacterSubclass(name: 'Pfad des Berserkers',    className: 'Barbar', unlocksAtLevel: 3),
+  CharacterSubclass(name: 'Pfad des Totemkriegers', className: 'Barbar', unlocksAtLevel: 3),
+
+  // ── Barde ──────────────────────────────────────────────────────────────────
+  CharacterSubclass(name: 'Schule des Wissens',   className: 'Barde', unlocksAtLevel: 3),
+  CharacterSubclass(name: 'Schule des Wagemuts',  className: 'Barde', unlocksAtLevel: 3),
+
+  // ── Druide ─────────────────────────────────────────────────────────────────
+  CharacterSubclass(name: 'Zirkel des Landes', className: 'Druide', unlocksAtLevel: 2),
+  CharacterSubclass(name: 'Zirkel des Mondes', className: 'Druide', unlocksAtLevel: 2),
+
+  // ── Hexenmeister ───────────────────────────────────────────────────────────
+  CharacterSubclass(name: 'Der Unhold',       className: 'Hexenmeister', unlocksAtLevel: 1),
+  CharacterSubclass(name: 'Der Grosse Alte',  className: 'Hexenmeister', unlocksAtLevel: 1),
+  CharacterSubclass(name: 'Erzfee',           className: 'Hexenmeister', unlocksAtLevel: 1),
+
   // ── Kämpfer ────────────────────────────────────────────────────────────────
-  CharacterSubclass(name: 'Champion',          className: 'Kämpfer',  unlocksAtLevel: 3),
-  CharacterSubclass(name: 'Kampfmeister',      className: 'Kämpfer',  unlocksAtLevel: 3),
-  CharacterSubclass(name: 'Mystischer Ritter', className: 'Kämpfer',  unlocksAtLevel: 3),
+  CharacterSubclass(name: 'Champion',          className: 'Kämpfer', unlocksAtLevel: 3),
+  CharacterSubclass(name: 'Kampfmeister',      className: 'Kämpfer', unlocksAtLevel: 3),
+  CharacterSubclass(name: 'Mystischer Ritter', className: 'Kämpfer', unlocksAtLevel: 3),
 
   // ── Kleriker ───────────────────────────────────────────────────────────────
   CharacterSubclass(name: 'Domäne des Krieges', className: 'Kleriker', unlocksAtLevel: 1),
@@ -60,6 +77,11 @@ const List<CharacterSubclass> characterSubclasses = [
   CharacterSubclass(name: 'Schule der Verwandlung',  className: 'Magier', unlocksAtLevel: 2),
   CharacterSubclass(name: 'Schule der Verzauberung', className: 'Magier', unlocksAtLevel: 2),
 
+  // ── Mönch ──────────────────────────────────────────────────────────────────
+  CharacterSubclass(name: 'Weg der offenen Hand',  className: 'Mönch', unlocksAtLevel: 3),
+  CharacterSubclass(name: 'Weg des Schattens',     className: 'Mönch', unlocksAtLevel: 3),
+  CharacterSubclass(name: 'Weg der vier Elemente', className: 'Mönch', unlocksAtLevel: 3),
+
   // ── Paladin ────────────────────────────────────────────────────────────────
   CharacterSubclass(name: 'Schwur der Alten',   className: 'Paladin', unlocksAtLevel: 3),
   CharacterSubclass(name: 'Schwur der Hingabe', className: 'Paladin', unlocksAtLevel: 3),
@@ -69,6 +91,14 @@ const List<CharacterSubclass> characterSubclasses = [
   CharacterSubclass(name: 'Arkaner Betrüger', className: 'Schurke', unlocksAtLevel: 3),
   CharacterSubclass(name: 'Assassine',        className: 'Schurke', unlocksAtLevel: 3),
   CharacterSubclass(name: 'Dieb',             className: 'Schurke', unlocksAtLevel: 3),
+
+  // ── Waldläufer ─────────────────────────────────────────────────────────────
+  CharacterSubclass(name: 'Herr der Tiere', className: 'Waldläufer', unlocksAtLevel: 3),
+  CharacterSubclass(name: 'Jäger',          className: 'Waldläufer', unlocksAtLevel: 3),
+
+  // ── Zauberer ───────────────────────────────────────────────────────────────
+  CharacterSubclass(name: 'Drachenblutlinie', className: 'Zauberer', unlocksAtLevel: 1),
+  CharacterSubclass(name: 'Wilde Magie',      className: 'Zauberer', unlocksAtLevel: 1),
 ];
 
 /// Gibt alle verfügbaren Unterklassen für eine Klasse bei gegebenem Level zurück.

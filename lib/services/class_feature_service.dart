@@ -19,22 +19,85 @@ class ClassFeatureService {
   final Map<String, String> _fluffCache = {};
 
   // Mapping: Klassenname → explizite Asset-Pfade
+  // Reihenfolge: erst Basisklasse, dann Unterklassen alphabetisch.
+  // Unterklassen ohne Features (nur fluff) können trotzdem eingetragen werden –
+  // der Service ignoriert JSON-Dateien ohne 'features'-Array fehlerfrei.
   static const _classPaths = {
+    'Barbar': [
+      'assets/json/class_features/barbarian/barbarian.json',
+      'assets/json/class_features/barbarian/berserker.json',
+      'assets/json/class_features/barbarian/totem.json',
+    ],
+    'Barde': [
+      'assets/json/class_features/bard/bard.json',
+      'assets/json/class_features/bard/lore.json',
+      'assets/json/class_features/bard/valor.json',
+    ],
+    'Druide': [
+      'assets/json/class_features/druid/druid.json',
+      'assets/json/class_features/druid/land.json',
+      'assets/json/class_features/druid/moon.json',
+    ],
+    'Hexenmeister': [
+      'assets/json/class_features/warlock/warlock.json',
+      'assets/json/class_features/warlock/archfey.json',
+      'assets/json/class_features/warlock/fiend.json',
+      'assets/json/class_features/warlock/great_old_one.json',
+    ],
+    'Kämpfer': [
+      'assets/json/class_features/fighter/fighter.json',
+      'assets/json/class_features/fighter/battle_master.json',
+      'assets/json/class_features/fighter/champion.json',
+      'assets/json/class_features/fighter/eldritch_knight.json',
+    ],
     'Kleriker': [
       'assets/json/class_features/cleric/cleric.json',
+      'assets/json/class_features/cleric/knowledge.json',
       'assets/json/class_features/cleric/life.json',
-    ],
-    'Paladin': [
-      'assets/json/class_features/paladin/paladin.json',
-      'assets/json/class_features/paladin/devotion.json',
-    ],
-    'Schurke': [
-      'assets/json/class_features/rogue/rogue.json',
-      'assets/json/class_features/rogue/thief.json',
+      'assets/json/class_features/cleric/light.json',
+      'assets/json/class_features/cleric/nature.json',
+      'assets/json/class_features/cleric/tempest.json',
+      'assets/json/class_features/cleric/trickery.json',
+      'assets/json/class_features/cleric/war.json',
     ],
     'Magier': [
       'assets/json/class_features/wizard/wizard.json',
+      'assets/json/class_features/wizard/abjuration.json',
+      'assets/json/class_features/wizard/conjuration.json',
+      'assets/json/class_features/wizard/divination.json',
+      'assets/json/class_features/wizard/enchantment.json',
       'assets/json/class_features/wizard/evocation.json',
+      'assets/json/class_features/wizard/illusion.json',
+      'assets/json/class_features/wizard/necromancy.json',
+      'assets/json/class_features/wizard/transmutation.json',
+    ],
+    'Mönch': [
+      'assets/json/class_features/monk/monk.json',
+      'assets/json/class_features/monk/elements.json',
+      'assets/json/class_features/monk/open_hand.json',
+      'assets/json/class_features/monk/shadow.json',
+    ],
+    'Paladin': [
+      'assets/json/class_features/paladin/paladin.json',
+      'assets/json/class_features/paladin/ancients.json',
+      'assets/json/class_features/paladin/devotion.json',
+      'assets/json/class_features/paladin/vengeance.json',
+    ],
+    'Schurke': [
+      'assets/json/class_features/rogue/rogue.json',
+      'assets/json/class_features/rogue/arcane_trickster.json',
+      'assets/json/class_features/rogue/assassin.json',
+      'assets/json/class_features/rogue/thief.json',
+    ],
+    'Waldläufer': [
+      'assets/json/class_features/ranger/ranger.json',
+      'assets/json/class_features/ranger/beast_master.json',
+      'assets/json/class_features/ranger/hunter.json',
+    ],
+    'Zauberer': [
+      'assets/json/class_features/sorcerer/sorcerer.json',
+      'assets/json/class_features/sorcerer/draconic.json',
+      'assets/json/class_features/sorcerer/wild_magic.json',
     ],
   };
 

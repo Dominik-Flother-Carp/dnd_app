@@ -1,4 +1,35 @@
 {
     "className": "Barbar",
-    "fluff": "Barbaren, so unterschiedlich sie auch sein mögen, definieren sich durch ihre Wut und ihre ungezügelte, unstillbare und gedankenlose Raserei, die in ihrer Wildheit der eines in die Enge getriebenen Raubtiers entspricht, des unablässigen Anbrausens eines Sturms, des aufgewühlten Durcheinanders des Meeres.\n\nFür manche entspringt diese Wut der Zwiesprache mit wilden Tiergeistern, andere ziehen Energie aus einem sich anstauenden Groll, genährt durch das Leben in einer Welt voller Schmerz. Für jeden Barbar ist die Wut eine Kraft, die ihn nicht nur in den Kampfrausch treibt, sondern die auch unglaubliche Reflexe, Ausdauer und Stärke ermöglicht."
+    "fluff": "Barbaren, so unterschiedlich sie auch sein mögen, definieren sich durch ihre Wut und ihre ungezügelte, unstillbare und gedankenlose Raserei, die in ihrer Wildheit der eines in die Enge getriebenen Raubtiers entspricht, des unablässigen Anbrausens eines Sturms, des aufgewühlten Durcheinanders des Meeres.\n\nFür manche entspringt diese Wut der Zwiesprache mit wilden Tiergeistern, andere ziehen Energie aus einem sich anstauenden Groll, genährt durch das Leben in einer Welt voller Schmerz. Für jeden Barbar ist die Wut eine Kraft, die ihn nicht nur in den Kampfrausch treibt, sondern die auch unglaubliche Reflexe, Ausdauer und Stärke ermöglicht.",
+    "features": [
+        {
+            "id": "barbarian_rage",
+            "name": "Kampfrausch",
+            "unlocksAtLevel": 1,
+            "description": "Auf dem Schlachtfeld kämpfst du mit urtümlicher Wildheit. In deinem Zug kannst du dich mit einer Bonusaktion in einen Kampfrausch versetzen. Während du dich in diesem befindest, erhältst du die folgenden Vorteile, solange du keine schwere Rüstung trägst:\n\n• Du bist bei Stärkewürfen und Rettungswürfen, die auf Stärke basieren, im Vorteil.\n• Führst du einen Nahkampfangriff mit einer Waffe durch, die deinen Stärkemodifikator verwendet, erhältst du auf deinen Schadenswurf den Bonus, der in der Tabelle unter Kampfrausch-Schaden angegeben ist. Dieser Wert erhöht sich, wenn du weiter als Barbar aufsteigst.\n• Du besitzt eine Resistenz gegen Hieb-, Stich- und Wuchtschaden.\n\nFalls du in der Lage bist, Zauber zu wirken, kannst du dies nicht während des Kampfrausches. Auch ist es in diesem nicht möglich, sich auf Zauber zu konzentrieren.\nDein Kampfrausch dauert 1 Minute. Er endet vorzeitig, wenn du bewusstlos wirst oder in deinem Zug keine feindliche Kreatur angegriffen hast oder in diesem keinen Schaden erhalten hast. Du kannst den Kampfrausch auch selbst als Bonusaktion in deinem Zug beenden.\nBist du so viele Male in Kampfrausch verfallen, wie es in der Tabelle angegeben ist, musst du eine lange Rast einlegen, um erneut auf diese Fähigkeit zurückgreifen zu können.",
+            "resource": {
+                "label": "Nutzungen",
+                "maxFormula": "",
+                "restType": "rage_uses"
+            }
+        },
+        {
+            "id": "barbarian_unarmored_defense",
+            "name": "Ungerüstete Verteidigung",
+            "unlocksAtLevel": 1,
+            "description": "Solange du keine Rüstung trägst, entspricht deine Rüstungsklasse 10 + Geschicklichkeitsmodifikator + Konstitutionsmodifikator. Du kannst einen Schild verwenden und trotzdem von diesem Vorzug profitieren."
+        },
+        {
+            "id": "barbarian_reckless_attack",
+            "name": "Rücksichtsloser Angriff",
+            "unlocksAtLevel": 2,
+            "description": "Du bist in der Lage, deine Verteidigung völlig außer Acht zu lassen und Angriffe mit wilder Entschlossenheit auszuführen. Beim ersten Angriff in deinem Zug kannst du dich dazu entscheiden, rücksichtslos anzugreifen. Du bist dann in diesem Zug bei allen Nahkampfangriffen im Vorteil, auf die dein Stärkemodifikator angewendet wird. Im Gegenzug sind Angriffswürfe gegen dich bis zu deinem nächsten Zug ebenfalls im Vorteil."
+        },
+        {
+            "id": "barbarian_danger_sense",
+            "name": "Gefahrengespür",
+            "unlocksAtLevel": 2,
+            "description": "Du hast einen untrügerischen Sinn dafür, wenn die Dinge um dich herum nicht so sind, wie sie sein sollten. Dies lässt dich Gefahren besser ausweichen. Du bist bei Geschicklichkeitsrettungswürfen gegen sichtbare Gefahren wie Fallen oder Zaubersprüche im Vorteil. Um diesen Vorzug zu erhalten, darfst du nicht blind, taub oder kampfunfähig sein."
+        }
+    ]
 }

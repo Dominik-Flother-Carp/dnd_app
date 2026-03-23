@@ -189,8 +189,18 @@ class ClassFeature {
   // ── Formel-Auswertung ──────────────────────────────────────────────────────
 
   static int evaluateFormula(String formula, Character c) {
+    final trimmed = formula.trim();
+
+    // ── Lookup-Tabellen ──────────────────────────────────────────────────────
+    // Benannte Token für Werte, die sich nicht per Formel berechnen lassen,
+    // sondern einer klassenspezifischen Stufentabelle folgen.
+    // Neue Token hier eintragen sobald weitere Klassen implementiert werden.
+    final lookup = _lookupTable(trimmed, c.level);
+    if (lookup != null) return lookup;
+
+    // ── Arithmetische Formel ─────────────────────────────────────────────────
     // Token-Ersetzung
-    String expr = formula
+    String expr = trimmed
         .replaceAll('charisma_modifier',    '${c.chaModifier}')
         .replaceAll('strength_modifier',    '${c.strModifier}')
         .replaceAll('dexterity_modifier',   '${c.dexModifier}')
@@ -204,6 +214,42 @@ class ClassFeature {
 
     // Einfache Arithmetik auswerten (nur +, -, *)
     return _evalArithmetic(expr);
+  }
+
+  /// Wertet benannte Lookup-Token aus.
+  /// Gibt null zurück wenn der Token unbekannt ist (→ arithmetische Auswertung).
+  static int? _lookupTable(String token, int level) {
+    switch (token) {
+
+      // ── Barbar: Kampfrausch-Nutzungen ──────────────────────────────────────
+      // Stufe 1–2: 2, 3–5: 3, 6–11: 4, 12–19: 5, 20: unbegrenzt (999)
+      case 'rage_uses':
+        if (level >= 20) return 999;
+        if (level >= 12) return 5;
+        if (level >= 6)  return 4;
+        if (level >= 3)  return 3;
+        return 2;
+
+      // ── Mönch: Ki-Punkte = Stufe ───────────────────────────────────────────
+      // Einfach level, aber als benannter Token für Lesbarkeit in der JSON.
+      case 'ki_points':
+        return level;
+
+      // ── Kämpfer/Kampfmeister: Kampfüberlegenheitswürfel ───────────────────
+      // Stufe 3–6: 4, 7–14: 5, 15–20: 6
+      case 'superiority_dice':
+        if (level >= 15) return 6;
+        if (level >= 7)  return 5;
+        return 4;
+
+      // ── Schurke: Hinterhältiger Angriff (Würfelanzahl) ────────────────────
+      // Steigt jede ungerade Stufe: Stufe 1→1, 3→2, 5→3 ... 19→10
+      case 'sneak_attack_dice':
+        return (level + 1) ~/ 2;
+
+      default:
+        return null;
+    }
   }
 
   static String _resolveRounding(String expr) {
