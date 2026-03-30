@@ -30,6 +30,84 @@
             "name": "Gefahrengespür",
             "unlocksAtLevel": 2,
             "description": "Du hast einen untrügerischen Sinn dafür, wenn die Dinge um dich herum nicht so sind, wie sie sein sollten. Dies lässt dich Gefahren besser ausweichen. Du bist bei Geschicklichkeitsrettungswürfen gegen sichtbare Gefahren wie Fallen oder Zaubersprüche im Vorteil. Um diesen Vorzug zu erhalten, darfst du nicht blind, taub oder kampfunfähig sein."
+        },
+        {
+            "id": "barbarian_attribute_4",
+            "name": "Attributswerterhöhung",
+            "unlocksAtLevel": 4,
+            "description": "Erhöhe einen Attributswert deiner Wahl um 2 Punkte. Du kannst stattdessen auch zwei Attributswerte um jeweils 1 Punkt erhöhen. Kein Attribut darf auf diese Weise über einen Wert von 20 steigen."
+        },
+        {
+            "id": "barbarian_attribute_8",
+            "name": "Attributswerterhöhung",
+            "unlocksAtLevel": 8,
+            "description": "Erhöhe einen Attributswert deiner Wahl um 2 Punkte. Du kannst stattdessen auch zwei Attributswerte um jeweils 1 Punkt erhöhen. Kein Attribut darf auf diese Weise über einen Wert von 20 steigen."
+        },
+        {
+            "id": "barbarian_attribute_12",
+            "name": "Attributswerterhöhung",
+            "unlocksAtLevel": 12,
+            "description": "Erhöhe einen Attributswert deiner Wahl um 2 Punkte. Du kannst stattdessen auch zwei Attributswerte um jeweils 1 Punkt erhöhen. Kein Attribut darf auf diese Weise über einen Wert von 20 steigen."
+        },
+        {
+            "id": "barbarian_attribute_16",
+            "name": "Attributswerterhöhung",
+            "unlocksAtLevel": 16,
+            "description": "Erhöhe einen Attributswert deiner Wahl um 2 Punkte. Du kannst stattdessen auch zwei Attributswerte um jeweils 1 Punkt erhöhen. Kein Attribut darf auf diese Weise über einen Wert von 20 steigen."
+        },
+        {
+            "id": "barbarian_attribute_19",
+            "name": "Attributswerterhöhung",
+            "unlocksAtLevel": 19,
+            "description": "Erhöhe einen Attributswert deiner Wahl um 2 Punkte. Du kannst stattdessen auch zwei Attributswerte um jeweils 1 Punkt erhöhen. Kein Attribut darf auf diese Weise über einen Wert von 20 steigen."
+        },
+        {
+            "id": "barbarian_additional_attack",
+            "name": "Zusätzlicher Angriff",
+            "unlocksAtLevel": 5,
+            "description": "Führst du in deinem Zug die Angriffaktion aus, kannst du zweimal angreifen."
+        },
+        {
+            "id": "barbarian_fast_movement",
+            "name": "Schnelle Bewegung",
+            "unlocksAtLevel": 5,
+            "description": "Deine Bewegungsrate erhht sich um 3 m, wenn du keine schwere Rüstung trägst."
+        },
+        {
+            "id": "barbarian_feral_instinct",
+            "name": "Wilder Instinkt",
+            "unlocksAtLevel": 7,
+            "description": "Deine Instinkte sind dermaßen geschärft, dass du bei Initiativewürfen im Vorteil bist.\nZusätzlich kannst, solltest du überrascht werden, in deiner ersten Runde normal handeln, wenn deine erste Aktion im Kampf der Kampfrausch ist."
+        },
+        {
+            "id": "barbarian_brutal_critical",
+            "name": "Brutale kritische Treffer",
+            "unlocksAtLevel": 9,
+            "description": "Erzielst du einen kritischen Nahkampftreffer, kannst du einen zusätzlichen Schadenswürfel deiner Waffe nutzen."
+        },
+        {
+            "id": "barbarian_relentless_rage",
+            "name": "Unerbittlicher Kampfrausch",
+            "unlocksAtLevel": 11,
+            "description": "Während du dich im Kampfrausch befindest, kannst du trotz schwerster Verletzungen weiterkämpfen. Werden deine Trefferpunkte auf 0 reduziert kannst du einen Konstitutionsrettungswurf mit SG 10 ablegen. Bei Erfolg werden deine Trefferpunkte nur auf 1 reduziert.\nJedes Mal, wenn du dies nutzt, steigt der SG um 5, bis zu deiner nächsten Rast."
+        },
+        {
+            "id": "barbarian_persistent_rage",
+            "name": "Anhaltender Kampfrausch",
+            "unlocksAtLevel": 15,
+            "description": "Dein Kampfrausch wird so wild, dass er nur endet, wenn du dich dazu entscheidest oder bewusstlos wirst."
+        },
+        {
+            "id": "barbarian_indomitable_might",
+            "name": "Unbändige Stärke",
+            "unlocksAtLevel": 18,
+            "description": "Ist das Gesamtergebnis einer deiner Stärkewürfe niedriger als dein Stärkewert, kannst du stattdessen deinen Attributswert als Gesamtergebnis nutzen."
+        },
+        {
+            "id": "barbarian_primal_champion",
+            "name": "Meister der Wildnis",
+            "unlocksAtLevel": 20,
+            "description": "Du bist die Verkörperung der Wildnis. Dein Stärke- und Konstitutionswert steigen um jeweils 4 Punkte. Das Maximum für beide Werte ist nun 24."
         }
     ]
 }
