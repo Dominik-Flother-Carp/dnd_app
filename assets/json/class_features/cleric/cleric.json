@@ -38,8 +38,12 @@
             "id": "cleric_divine_intervention",
             "name": "Göttliche Intervention",
             "unlocksAtLevel": 10,
-            "description": "Bist du in großer Not, kannst du deine Gottheit bitten, dir beizustehen und in die Welt der Sterblichen einzugreifen. Verwende deine Aktion dafür, deine Gottheit um Hilfe anzuflehen. Beschreibe anschließend die Unterstützung, um die du ersuchst, und würfle mit einem Wl 00. Ist das Ergebnis gleich oder niedriger deiner Klerikerstufe, greift deine Gottheit ein. Der SL wählt die Art der Intervention, etwa wäre der Effekt eines beliebigen Kleriker- oder Domänenzaubers angemessen.\nFalls deine Gottheit interveniert, kannst du dieses Merkmal für die nächsten 7 Tage nicht verwenden. Andernfalls darfst du es nach Abschluss einer langen Rast erneut einsetzen.\nAuf der 20. Stufe gelingen deine Bitten um Intervention automatisch und es wird kein Wurf mehr benötigt."
+            "description": "Bist du in großer Not, kannst du deine Gottheit bitten, dir beizustehen und in die Welt der Sterblichen einzugreifen. Verwende deine Aktion dafür, deine Gottheit um Hilfe anzuflehen. Beschreibe anschließend die Unterstützung, um die du ersuchst, und würfle mit einem Wl 00. Ist das Ergebnis gleich oder niedriger deiner Klerikerstufe, greift deine Gottheit ein. Der SL wählt die Art der Intervention, etwa wäre der Effekt eines beliebigen Kleriker- oder Domänenzaubers angemessen.\nFalls deine Gottheit interveniert, kannst du dieses Merkmal für die nächsten 7 Tage nicht verwenden. Andernfalls darfst du es nach Abschluss einer langen Rast erneut einsetzen.\nAuf der 20. Stufe gelingen deine Bitten um Intervention automatisch und es wird kein Wurf mehr benötigt.",
+            "resource": {
+                "label": "Nutzungen",
+                "maxFormula": "1",
+                "restType": "long"
+            }
         }
-
     ]
 }
