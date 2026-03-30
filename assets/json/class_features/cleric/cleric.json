@@ -15,12 +15,31 @@
             "id": "cleric_channel_divinity",
             "name": "Göttliche Macht fokussieren",
             "unlocksAtLevel": 2,
-            "description": "Du kannst göttliche Macht fokussieren um folgenden Effekt zu beschwören:\nUntote vertreiben: Du kannst deine göttliche Macht fokussieren, um die Mächte des Bösen zu vertreiben. Als Aktion zeigst du dein heiliges Symbol und sprichst ein Gebet. Alle Untoten, die dich sehen oder hören können und sich innerhalb von 9 m befinden, müssen einen Weisheitsrettungswurf ablegen. Bei einem Misserfolg ist die entsprechende Kreatur für 1 Minute oder bis sie Schaden erleidet vertrieben.\nEine vertriebene Kreatur muss ihren Zug dafür aufwenden, sich so weit wie möglich von dir wegzubewegen, und darf dir nicht absichtlich näher kommen als 9 m. Außerdem kann die Kreatur keine Reaktionen nutzen. Als Aktion kann sie nur spurten oder sich aus einem Effekt befreien, der sie an der Bewegung hindert. Sollte es keinen Ort geben, zu dem sie gelangen kann, darf die Kreatur die Ausweichaktion nutzen.",
+            "description": "Du kannst göttliche Macht fokussieren um folgenden Effekt zu beschwören:\n\n**Untote vertreiben:** Du kannst deine göttliche Macht fokussieren, um die Mächte des Bösen zu vertreiben. Als Aktion zeigst du dein heiliges Symbol und sprichst ein Gebet. Alle Untoten, die dich sehen oder hören können und sich innerhalb von 9 m befinden, müssen einen Weisheitsrettungswurf ablegen. Bei einem Misserfolg ist die entsprechende Kreatur für 1 Minute oder bis sie Schaden erleidet vertrieben.\nEine vertriebene Kreatur muss ihren Zug dafür aufwenden, sich so weit wie möglich von dir wegzubewegen, und darf dir nicht absichtlich näher kommen als 9 m. Außerdem kann die Kreatur keine Reaktionen nutzen. Als Aktion kann sie nur spurten oder sich aus einem Effekt befreien, der sie an der Bewegung hindert. Sollte es keinen Ort geben, zu dem sie gelangen kann, darf die Kreatur die Ausweichaktion nutzen.",
             "resource": {
                 "label": "Nutzungen",
                 "maxFormula": "1",
                 "restType": "short"
             }
+        },
+        {
+            "id": "cleric_attribute_increase",
+            "name": "Attributswerterhöhung",
+            "unlocksAtLevel": 4,
+            "description": "Erhöhe einen Attributswert deiner Wahl um 2 Punkte. Du kannst stattdessen auch zwei Attributswerte um jeweils 1 Punkt erhöhen. Kein Attribut darf auf diese Weise über einen Wert von 20 steigen. Du darfst dies auf den Stufen 8, 12, 16 und 19 wiederholen."
+        },
+        {
+            "id": "cleric_destroy_undead",
+            "name": "Untote zerstören",
+            "unlocksAtLevel": 5,
+            "description": "Deine Fähigkeit **Göttliche Macht fokussieren: Untote vertreiben** wird stärker. Misslingt einem Untoten von nun an der entsprechende Rettungswurf, wird er sofort zerstört, falls sein Herausforderungsgrad (HG) gleich oder niedriger als eine bestimmte Schwelle ist."
+        },
+        {
+            "id": "cleric_divine_intervention",
+            "name": "Göttliche Intervention",
+            "unlocksAtLevel": 10,
+            "description": "Bist du in großer Not, kannst du deine Gottheit bitten, dir beizustehen und in die Welt der Sterblichen einzugreifen. Verwende deine Aktion dafür, deine Gottheit um Hilfe anzuflehen. Beschreibe anschließend die Unterstützung, um die du ersuchst, und würfle mit einem Wl 00. Ist das Ergebnis gleich oder niedriger deiner Klerikerstufe, greift deine Gottheit ein. Der SL wählt die Art der Intervention, etwa wäre der Effekt eines beliebigen Kleriker- oder Domänenzaubers angemessen.\nFalls deine Gottheit interveniert, kannst du dieses Merkmal für die nächsten 7 Tage nicht verwenden. Andernfalls darfst du es nach Abschluss einer langen Rast erneut einsetzen.\nAuf der 20. Stufe gelingen deine Bitten um Intervention automatisch und es wird kein Wurf mehr benötigt."
         }
+
     ]
 }
