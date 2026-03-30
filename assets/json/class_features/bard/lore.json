@@ -1,5 +1,31 @@
 {
     "className": "Barde",
     "subclassName": "Schule des Wissens",
-    "fluff": "Barden, die sich dem Studium des Wissens widmen, verfügen über mannigfaltige Kenntnisse, die sie ihm Laufe ihrer Reisen aus der ganzen Welt zusammentragen. Dabei greifen sie auf alle nur möglichen Quellen zurück, vom akademischen Wälzer bis zum mündlich überlieferten Bauernmärchen.\nOb sie nun eine volkstümliche Ballade in einer Taverne oder eine sorgfältig ausgearbeitete Komposition am königlichen Hof vortragen - diese Barden vermögen das Publikum mit ihrer Begabung in den Bann zu ziehen. Während der Applaus abebbt, finden sich die Zuhörer nicht selten in der Situation wieder, alles zu hinterfragen, was sie bisher für wahr gehalten haben, sei es ihr Glaube an die Priesterschaft des ortsansässigen Tempels oder ihre Loyalität gegenüber dem König.\n\nDie Treue des Barden gilt weder einer Krone noch den Lehren einer Gottheit, sie gilt allein der Beschäftigung mit dem Schönen und Wahren. Ein Adeliger, der solch einen Barden als Herold oder Berater beschäftigt, weiß, dass dieser sich eher aufrecht und ehrlich als diplomatisch verhalten wird.\n\nDie Anhänger dieser Schule versammeln sich in Bibliotheken und manchmal in richtigen Universitäten, in Hörsälen und Klassenzimmern, um ihr Wissen miteinander zu teilen. Sie treffen sich auch bei Staatsakten oder auf Festen, bei denen sie Korruption offenlegen, Lügen aufdecken und sich über wichtigtuerische Menschen und Autoritäten lustig machen können."
+    "fluff": "Barden, die sich dem Studium des Wissens widmen, verfügen über mannigfaltige Kenntnisse, die sie ihm Laufe ihrer Reisen aus der ganzen Welt zusammentragen. Dabei greifen sie auf alle nur möglichen Quellen zurück, vom akademischen Wälzer bis zum mündlich überlieferten Bauernmärchen.\nOb sie nun eine volkstümliche Ballade in einer Taverne oder eine sorgfältig ausgearbeitete Komposition am königlichen Hof vortragen - diese Barden vermögen das Publikum mit ihrer Begabung in den Bann zu ziehen. Während der Applaus abebbt, finden sich die Zuhörer nicht selten in der Situation wieder, alles zu hinterfragen, was sie bisher für wahr gehalten haben, sei es ihr Glaube an die Priesterschaft des ortsansässigen Tempels oder ihre Loyalität gegenüber dem König.\n\nDie Treue des Barden gilt weder einer Krone noch den Lehren einer Gottheit, sie gilt allein der Beschäftigung mit dem Schönen und Wahren. Ein Adeliger, der solch einen Barden als Herold oder Berater beschäftigt, weiß, dass dieser sich eher aufrecht und ehrlich als diplomatisch verhalten wird.\n\nDie Anhänger dieser Schule versammeln sich in Bibliotheken und manchmal in richtigen Universitäten, in Hörsälen und Klassenzimmern, um ihr Wissen miteinander zu teilen. Sie treffen sich auch bei Staatsakten oder auf Festen, bei denen sie Korruption offenlegen, Lügen aufdecken und sich über wichtigtuerische Menschen und Autoritäten lustig machen können.",
+    "features": [
+        {
+            "id": "bard_lore_bonus_proficiencies",
+            "name": "Zusätzliche Übung",
+            "unlocksAtLevel": 3,
+            "description": "Mit dem Beitritt zur Schule des Wissens erhältst du Übung in drei Fertigkeiten deiner Wahl."
+        },
+        {
+            "id": "bard_lore_cutting_words",
+            "name": "Schneidende Worte",
+            "unlocksAtLevel": 3,
+            "description": "Mit dem Beitritt in die Schule des Wissens lernst du, mit Verstand und Schlagfertigkeit für Ablenkung und Verwirrung zu sorgen oder auf anderen Wegen Einfluss und Selbstsicherheit anderer zu schwächen. Führt eine Kreatur, die du sehen kannst, innerhalb von 18 meinen Angriffs-, Attributs- oder Schadenswurf aus, kannst du als Reaktion eine Anwendung deiner Bardischen Inspiration einsetzen. Würfle mit deinem Inspirationswürfel und ziehe das Ergebnis vom Wurf der Kreatur ab. Dies kannst du tun, nachdem die Kreatur ihren Wurf ausgeführt hat, musst es jedoch bevor der SL dessen Erfolg oder Misserfolg bekannt gibt oder verursachter Schaden angewendet wird. Die Kreatur ist immun gegen dieses Merkmal, falls sie dich nicht hören kann oder immun gegen Bezauberungen ist."
+        },
+        {
+            "id": "bard_lore_additional_magical_secrets",
+            "name": "Zusätzliche magische Geheminisse",
+            "unlocksAtLevel": 6,
+            "description": "Wähle zwei Zauber beliebiger Klassen, einschließlich des Barden. Du musst in der Lage sein, Zauber des gewählten Grades zu wirken, vergleiche dazu die Aufstiegstabelle für Barden. Es ist auch möglich, sich für Zaubertricks zu entscheiden.\nDie ausgesuchten Sprüche gelten für dich als Bardenzauber und zählen diesmal nicht in Bezug auf die maximale Anzahl deiner bekannten Zauber."
+        },
+        {
+            "id": "bard_lore_peerless_skill",
+            "name": "Grenzenlose Begabung",
+            "unlocksAtLevel": 14,
+            "description": "Beim Ablegen eines Attributswurfs kannst du eine Anwendung von Bardische Inspriation nutzen. Würfle mit deinem Inspirationswürfel und addiere das Ergebnis zu deinem Wurf. Du kannst dich nach deinem Attributswurf dazu entscheiden, allerdings bevor der Spielleiter angibt, ob es Erfolg oder Misserfolg ist."
+        }
+    ]
 }
