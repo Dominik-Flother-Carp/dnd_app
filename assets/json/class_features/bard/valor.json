@@ -1,5 +1,31 @@
 {
     "className": "Barde",
     "subclassName": "Schule des Wagemuts",
-    "fluff": "Barden der Schule des Wagemuts sind verwegene Skalden, deren Erzählungen die Erinnerung an die größten Helden der Vergangenheit lebendig halten und dabei eine neue Generation von Abenteurern inspirieren. Diese Barden versammeln sich in Metstuben und um große Lagerfeuer, um von den Taten berühmter Recken zu singen. Ihre Lieder handeln ebenso von der Vergangenheit wie von der Gegenwart. Sie bereisen die Lande, um Zeuge von großen Ereignissen zu werden und sicherzustellen, dass diese Geschehnisse nicht vergessen werden. Mit ihren Liedern inspirieren sie andere dazu, sich in die gleichen Höhen aufzuschwingen wie die großen Helden der Vergangenheit."
+    "fluff": "Barden der Schule des Wagemuts sind verwegene Skalden, deren Erzählungen die Erinnerung an die größten Helden der Vergangenheit lebendig halten und dabei eine neue Generation von Abenteurern inspirieren. Diese Barden versammeln sich in Metstuben und um große Lagerfeuer, um von den Taten berühmter Recken zu singen. Ihre Lieder handeln ebenso von der Vergangenheit wie von der Gegenwart. Sie bereisen die Lande, um Zeuge von großen Ereignissen zu werden und sicherzustellen, dass diese Geschehnisse nicht vergessen werden. Mit ihren Liedern inspirieren sie andere dazu, sich in die gleichen Höhen aufzuschwingen wie die großen Helden der Vergangenheit.",
+    "features": [
+        {
+            "id": "bard_valor_bonus_proficiencies",
+            "name": "Zusätzliche Übung",
+            "unlocksAtLevel": 3,
+            "description": "Mit dem Beginn deines Studiums des Wagemuts erhältst du Übung im Umgang mit mittelschweren Rüstungen, Schilden und Kriegswaffen."
+        },
+        {
+            "id": "bard_valor_combat_inspiration",
+            "name": "Kampfinspiration",
+            "unlocksAtLevel": 3,
+            "description": "Du lernst, wie man andere im Kampf zu großen Taten beflügelt. Eine Kreatur kann den von dir erhaltenen bardischen Inspirationswürfel dazu verwenden, einen gerade ausgeführten Schadenswurf mit einer Waffe um das Ergebnis des Inspirationswürfels zu erhöhen. Wird ein Angriffswurf gegen sie ausgeführt, kann sie alternativ auch ihre Reaktion verwenden, um den bardischen Inspirationswürfel zu nutzen und das Würfelergebnis für diesen Angriff zu ihrer Rüstungsklasse zu addieren. Dies kann sie tun, nachdem sie das Ergebnis des Angriffswurfs gesehen hat, muss es jedoch bevor feststeht, ob der Angriff trifft oder verfehlt."
+        },
+        {
+            "id": "bard_valor_extra_attack",
+            "name": "Zusätzlicher Angriff",
+            "unlocksAtLevel": 6,
+            "description": "Führst du in deinem Zug die Angriffaktion aus, kannst du zweimal angreifen."
+        },
+        {
+            "id": "bard_valor_battle_magic",
+            "name": "Kampfmagie",
+            "unlocksAtLevel": 14,
+            "description": "Du hast es vollbracht, die Kunst zu zaubern und die eine Waffe zu führen zu einer einzigen harmonischen Handlung zu verweben. Wenn du deine Aktion einsetzt, um einen Bardenzauber zu wirken, kannst du einen Waffenangriff als Bonusaktion ausführen."
+        }
+    ]
 }
