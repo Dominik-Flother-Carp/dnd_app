@@ -14,16 +14,40 @@
                     "atLevel": 1
                 },
                 {
-                    "spellId": "spell_wundenHeilen",
+                    "spellId": "spell_wunden_heilen",
                     "atLevel": 1
                 },
                 {
-                    "spellId": "spell_schwacheGenesung",
+                    "spellId": "spell_schwache_genesung",
                     "atLevel": 3
                 },
                 {
-                    "spellId": "spell_waffeDesGlaubens",
+                    "spellId": "spell_waffe_des_glaubens",
                     "atLevel": 3
+                },
+                {
+                    "spellId": "spell_leuchtfeuer_der_hoffnung",
+                    "atLevel": 5
+                },
+                {
+                    "spellId": "spell_wiederbeleben",
+                    "atLevel": 5
+                },
+                {
+                    "spellId": "spell_dodesschutz",
+                    "atLevel": 7
+                },
+                {
+                    "spellId": "spell_hueter_des_glaubens",
+                    "atLevel": 7
+                },
+                {
+                    "spellId": "spell_massen-wunden_heilen",
+                    "atLevel": 9
+                },
+                {
+                    "spellId": "spell_tote_erwecken",
+                    "atLevel": 9
                 }
             ]
         },
