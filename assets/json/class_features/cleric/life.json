@@ -5,7 +5,7 @@
     "features": [
         {
             "id": "cleric_life_domain_spells",
-            "name": "Domänenzauber",
+            "name": "Domänenzauber (Leben)",
             "unlocksAtLevel": 1,
             "description": "Deine Domäne gewährt dir weitere Zauber.",
             "grantedSpells": [

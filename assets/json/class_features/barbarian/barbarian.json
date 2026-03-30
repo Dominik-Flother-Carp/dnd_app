@@ -9,8 +9,8 @@
             "description": "Auf dem Schlachtfeld kämpfst du mit urtümlicher Wildheit. In deinem Zug kannst du dich mit einer Bonusaktion in einen Kampfrausch versetzen. Während du dich in diesem befindest, erhältst du die folgenden Vorteile, solange du keine schwere Rüstung trägst:\n\n• Du bist bei Stärkewürfen und Rettungswürfen, die auf Stärke basieren, im Vorteil.\n• Führst du einen Nahkampfangriff mit einer Waffe durch, die deinen Stärkemodifikator verwendet, erhältst du auf deinen Schadenswurf den Bonus, der in der Tabelle unter Kampfrausch-Schaden angegeben ist. Dieser Wert erhöht sich, wenn du weiter als Barbar aufsteigst.\n• Du besitzt eine Resistenz gegen Hieb-, Stich- und Wuchtschaden.\n\nFalls du in der Lage bist, Zauber zu wirken, kannst du dies nicht während des Kampfrausches. Auch ist es in diesem nicht möglich, sich auf Zauber zu konzentrieren.\nDein Kampfrausch dauert 1 Minute. Er endet vorzeitig, wenn du bewusstlos wirst oder in deinem Zug keine feindliche Kreatur angegriffen hast oder in diesem keinen Schaden erhalten hast. Du kannst den Kampfrausch auch selbst als Bonusaktion in deinem Zug beenden.\nBist du so viele Male in Kampfrausch verfallen, wie es in der Tabelle angegeben ist, musst du eine lange Rast einlegen, um erneut auf diese Fähigkeit zurückgreifen zu können.",
             "resource": {
                 "label": "Nutzungen",
-                "maxFormula": "",
-                "restType": "rage_uses"
+                "maxFormula": "rage_uses",
+                "restType": "long"
             }
         },
         {
