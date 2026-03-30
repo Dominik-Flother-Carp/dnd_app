@@ -50,7 +50,7 @@
             "id": "bard_font_of_inspiration",
             "name": "Quelle der Inspiration",
             "unlocksAtLevel": 5,
-            "description": "Von nun an erhältst du all deine Nutzungen von Bardische Inspiration schon bei einer kurzen Rast zurück."
+            "description": "Von nun an erhältst du all deine Anwendungen von Bardische Inspiration schon bei einer kurzen Rast zurück."
         },
         {
             "id": "bard_countercharm",
