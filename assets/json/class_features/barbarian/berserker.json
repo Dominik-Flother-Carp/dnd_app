@@ -1,5 +1,31 @@
 {
     "className": "Barbar",
     "subclassName": "Pfad des Berserkers",
-    "fluff": "Manche Barbaren zieht der Kampfrausch in einen Strudel der Gewalt, der nur ein Ende kennt: einen blutigen, glorreichen Tod. Der Pfad des Berserkers ist der Pfad ungezügelter Wut. Sobald du in den Kampfrausch verfällst, bist du so begeistert vom Chaos der Schlacht, dass du keine Rücksicht mehr auf deine Gesundheit und dein Wohlergehen nimmst."
+    "fluff": "Manche Barbaren zieht der Kampfrausch in einen Strudel der Gewalt, der nur ein Ende kennt: einen blutigen, glorreichen Tod. Der Pfad des Berserkers ist der Pfad ungezügelter Wut. Sobald du in den Kampfrausch verfällst, bist du so begeistert vom Chaos der Schlacht, dass du keine Rücksicht mehr auf deine Gesundheit und dein Wohlergehen nimmst.",
+    "features": [
+        {
+            "id": "barbarian_berserker_frenzy",
+            "name": "Raserei",
+            "unlocksAtLevel": 3,
+            "description": "Entfesselst du deinen Kampfrausch, kannst du dich dazu entscheiden in Raserei zu verfallen. Während Raserei aktiv ist, kannst du deine Bonusaktion nutzen, um einen zusätzlichen Nahkampfangriff auszuführen. Endet die Raserei erhältst du einen Punkt Erschöpfung."
+        },
+        {
+            "id": "barbarian_berserker_mindless_rage",
+            "name": "Geistloser Kampfrausch",
+            "unlocksAtLevel": 6,
+            "description": "Solange du dich im Kampfrausch befindest, kannst du nicht mehr bezaubert oder verängstigt werden."
+        },
+        {
+            "id": "barbarian_berserker_intimidating_presence",
+            "name": "Einschüchternde Präsenz",
+            "unlocksAtLevel": 10,
+            "description": "Du kannst deine Aktion nutzen, um jemand mit deiner bloßen Präsenz einzuschüchtern. Bestimmte eine Kreatur innerhalb von 9 m, die du sehen kannst und die dich ebenfalls sehen und hören kann. Sie muss einen Weisheitsrettungswurf (SG 8 + dein Übungsbonus + dein Charismamodifikator) bestehen, ansonsten ist sie bis zum Ende deines nächsten Zuges verängstigt.\nDu kannst deine Aktion nutzen, um den Effekt bis zum Ende deines nächsten Zuges zu verlängern.\nBeendet die betroffene Kreatur ihren Zug außerhalb deiner Sichtweite oder 18 m Reichweite, endet der Effekt.\n\nEine Kreatur, die den Rettungswurf geschafft hat, kann für 24 Stunden nicht wieder als Ziel gewählt werden."
+        },
+        {
+            "id": "barbarian_berserker_retaliation",
+            "name": "Vergeltung",
+            "unlocksAtLevel": 14,
+            "description": "Erleidest du Schaden von einer Kreatur in Nahkampfreichweite, kannst du deine Reaktion nutzen, um einen Nahkampfangriff gegen sie auszuführen."
+        }
+    ]
 }
