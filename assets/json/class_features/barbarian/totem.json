@@ -1,5 +1,53 @@
 {
     "className": "Barbar",
     "subclassName": "Pfad des Totemkriegers",
-    "fluff": "Der Pfad des Totemkriegers stellt eine spirituelle Reise dar, zu deren Beginn der Barbar einen Tiergeist als Führer und Beschützer erwählt. Im Kampf erfüllt dich dein Totem mit übernatürlicher Kraft und befeuert auf magische Weise deinen Kampfrausch. Für die meisten barbarischen Stämme gehört ein Totemtier zu einem bestimmten Klan. In solchen Fällen ist es ungewöhnlich, dass jemand mehr als ein Totem besitzt, obwohl es Ausnahmen gibt."
+    "fluff": "Der Pfad des Totemkriegers stellt eine spirituelle Reise dar, zu deren Beginn der Barbar einen Tiergeist als Führer und Beschützer erwählt. Im Kampf erfüllt dich dein Totem mit übernatürlicher Kraft und befeuert auf magische Weise deinen Kampfrausch. Für die meisten barbarischen Stämme gehört ein Totemtier zu einem bestimmten Klan. In solchen Fällen ist es ungewöhnlich, dass jemand mehr als ein Totem besitzt, obwohl es Ausnahmen gibt.",
+    "features": [
+        {
+            "id": "barbarian_totem_spirit_seeker",
+            "name": "Geistsucher",
+            "unlocksAtLevel": 3,
+            "description": "Du wandelst auf einem Pfad, der den Einklang mit der Natur anstrebt, was dir eine gewisse Nähe zu Tieren verschafft. Mit deiner Entscheidung für den Totemkrieger erhältst du die Fähigkeit, die Zauber **Mit Tieren sprechen** und **Tiersinn** als Rituale auszuführen",
+            "grantedSpells": [
+                {
+                    "spellId": "spell_tiersinn",
+                    "atLevel": 3
+                },
+                {
+                    "spellId": "spell_mit_tieren_sprechen",
+                    "atLevel": 3
+                }
+            ]
+        },
+        {
+            "id": "barbarian_totem_totem_spirit",
+            "name": "Totemgeist",
+            "unlocksAtLevel": 3,
+            "description": "Wähle einen Totemgeist aus und erhalt seine Merkmale. Du musst ein stoffliches Totemobjekt herstellen oder erlangen, etwa ein Amulett oder ein ähnliches Schmuckstück, in das Fell, Federn, Klauen, Zähne oder Knochen des Totemtiers eingearbeitet sind. Wenn du willst, kann dein Körper auch gewisse Eigenschaften annehmen, die für dein Totemtier typisch sind. Hast du beispielsweise den Bären gewählt, könnte dein Haarwuchs stark zunehmen oder deine Haut besonders ledrig werden. Ist dein Totemtier der Adler, färben sich deine Augen vielleicht strahlend gelb.\nDein Totemtier sollte einem der hier aufgeführten ähneln und an dein Heimatland angepasst sein. Zum Beispiel könntest du anstatt des Adlers einen Falken oder einen Geier wählen.\n\n**Bär:** Im Kampfrausch erhältst du eine Resistenz gegen alle Schadensarten außer psychischem Schaden. Der Geist des Bären macht dich so zäh, dass du jedwedes Leid ertragen kannst.\n\n**Adler:** Wenn du im Kampfrausch bist und keine schwere Rüstung trägst, sind andere Kreaturen bei Gelegenheitsangriffen gegen dich im Nachteil. Außerdem kannst du in deinem Zug die Spurtaktion als Bonusaktion verwenden. Der Geist des Adlers macht dich zu einem Raubtier, das mit Leichtigkeit einen Weg durch das Kampfgetümmel findet.\n\n**Wolf:** Während deines Kampfrausches sind deine Verbündeten im Vorteil bei Nahkampfangriffen auf jede feindliche Kreatur, die sich innerhalb von 1,50 m um dich befindet. Der Geist des Wolfes macht dich zum Anführer des Jagdrudels."
+        },
+        {
+            "id": "barbarian_totem_aspect_of_the_beast",
+            "name": "Tieraspekt",
+            "unlocksAtLevel": 6,
+            "description": "Auf Stufe 6 erhältst du einen magischen Vorzug, der auf einem Totemtier deiner Wahl basiert. Du kannst dich für dasselbe wie auf Stufe 3 entscheiden oder dir ein anderes aussuchen.\n\n**Bär:** Du besitzt jetzt die Stärke des Bären. Deine Traglast (einschließlich Maximalgewicht und Höchstlast beim Anheben) wird verdoppelt und du bist im Vorteil bei Stärkewürfen um Gegenstände zu schieben, zu ziehen, hochzuheben oder zu zerschmettern.\n\n**Adler:** Du kannst jetzt sehen wie ein Adler. Du bist problemlos in der Lage, bis zu 1,5 km weit zu schauen, und kannst dabei Details erkennen, als ob die Dinge 30 m von dir entfernt wären. Außerdem bist du in dämmrigem Licht nicht mehr im Nachteil bei Würfen auf Weisheit (Wahrnehmung).\n\n**Wolf:** Du verfügst jetzt über dasJagdgespür eines Wolfes. Du kannst andere Kreaturen aufspüren, während du dich schnell fortbewegst, und dich auch mit normalem Reisetempo heimlich bewegen."
+        },
+        {
+            "id": "barbarian_totem_spirit_walker",
+            "name": "Geistwandler",
+            "unlocksAtLevel": 10,
+            "description": "Du kannst den Zauber **Einswerden mit der Natur** als Ritual abhalten. Wenn du das tust, erscheint dir eine geisterhafte Version eines deiner Totemtiere und lässt dir Informationen zuteilwerden, nach denen du suchst.",
+            "grantedSpells": [
+                {
+                    "spellId": "spell_einswerden_mit_der_natur",
+                    "atLevel": 10
+                }
+            ]
+        },
+        {
+            "id": "barbarian_totem_totemic_attunement",
+            "name": "Einklang mit dem Totem",
+            "unlocksAtLevel": 14,
+            "description": "Auf Stufe 14 erhältst du einen weiteren magischen Vorzug, der auf einem Totemtier deiner Wahl basiert. Du kannst dich für eines entscheiden, das du bereits zuvor gewählt hast, oder dir ein anderes aussuchen.\n\n**Bär:** Solange du dich im Kampfrausch befindest, sind alle feindlichen Kreaturen im Nachteil, wenn sie jemand anderes als dich oder einen Charakter mit diesem Merkmal angreifen. Ein Gegner, der dich nicht sehen oder hören kann oder nicht verängstigt werden kann, ist immun gegen diesen Effekt.\n\n**Adler:** Solange du im Kampfrausch bist, besitzt du während deines Zuges eine Flugbewegungsrate in Höhe deiner derzeitigen Schrittbewegungsrate. Du kannst auf diese Weise nur in kurzen Schüben fliegen. Solltest du dich am Ende deines Zuges in der Luft befinden und dich nichts anderes halten fällst du zu Boden.\n\n**Wolf:** Solange du im Kampfrausch bist, kannst du deine Bonusaktion verwenden, um eine einzelne Kreatur der Größenkategorie groß (oder kleiner) mit einem Nahkampfangriff zu Fall zu bringen und sie in den Zustand liegend zu versetzen."
+        }
+    ]
 }
