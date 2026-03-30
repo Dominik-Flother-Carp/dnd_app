@@ -1,4 +1,74 @@
 {
     "className": "Barde",
-    "fluff": "Ob Gelehrter, Skalde oder Halunke - ein Barde webt Magie in seine Musik und seine Worte ein, um Verbündete zu inspirieren, Feinde zu entmutigen, das Bewusstsein zu beeinflussen, Illusionen zu erschaffen und sogar um Wunden zu heilen."
+    "fluff": "Ob Gelehrter, Skalde oder Halunke - ein Barde webt Magie in seine Musik und seine Worte ein, um Verbündete zu inspirieren, Feinde zu entmutigen, das Bewusstsein zu beeinflussen, Illusionen zu erschaffen und sogar um Wunden zu heilen.",
+    "features": [
+        {
+            "id": "bard_spellcasting",
+            "name": "Zauberwirken",
+            "unlocksAtLevel": 1,
+            "description": "Du hast gelernt, das Gewebe der Realität mit Hilfe deines Willens und deiner Musik zu entwirren und zu formen. Deine Zaubersprüche sind Teil eines gewaltigen Repertoires, mit dem du deine Magie auf unterschiedliche Situationen einstimmen kannst.\n\nAls Zauberfokus kannst du ein Musikinstrument nutzen und dein Zauberwirken-Modifikator ist Charisma.",
+            "spellcasting": {
+                "type": "known"
+            }
+        },
+        {
+            "id": "bard_bardic_inspiration",
+            "name": "Bardische Inspiration",
+            "unlocksAtLevel": 1,
+            "description": "Du vermagst andere zu inspirieren, indem du eine bewegende Rede hältst oder ermutigende Musik erklingen lässt. Als Bonusaktion kannst du in deinem Zug innerhalb von 18 m Reichweite eine Kreatur außer dir selbst bestimmen, die in der Lage sein muss, dich zu hören. Diese Kreatur erhält einen bardischen Inspirationswürfel, auf der 1. Stufe einen W6.\nEinmal innerhalb der nächsten 10 Minuten kann die Kreatur diesen Würfel nutzen und das gewürfelte Ergebnis auf einen Attributs-, Angriffs- oder Rettungswurf addieren. Sie kann auch nach diesem Wurf entscheiden, ob sie den bardischen lnspirationswürfel einsetzen möchte. Allerdings muss sie ihre Entscheidung treffen, bevor der SL bekannt gibt, ob das Ergebnis ein Erfolg oder Misserfolg ist. Wurde der bardische Inspirationswürfel benutzt, ist er verbraucht. Jede Kreatur darf nur über einen Inspirationswürfel gleichzeitig verfügen. Du kannst dieses Merkmal so oft einsetzen, wie es der Höhe deines Charismamodifikators entspricht (mindestens 1). Nach einer langen Rast erhältst du alle verbrauchten Anwendungen zurück.\nDer Inspirationswürfel ändert sich, wenn du bestimmte Stufen als Barde erreichst: Auf der 5. Stufe wird er zu einem W8, auf der 10. zu einem WlO und auf der 15. zu einem W12.",
+            "resource": {
+                "label": "Nutzungen",
+                "maxFormula": "charisma_modifier",
+                "restType": "long"
+            }
+        },
+        {
+            "id": "bard_jack_of_all_trades",
+            "name": "Alleskönner",
+            "unlocksAtLevel": 2,
+            "description": "Du kannst deinen halben Übungsbonus (abgerundet) auf jeden Attributswurf addieren, der nicht bereits durch deinen Übungsbonus verbessert wird."
+        },
+        {
+            "id": "bard_song_of_rest",
+            "name": "Lied der Erholung",
+            "unlocksAtLevel": 2,
+            "description": "Während einer kurzen Rast kannst du mit sanfter Musik oder Gesängen den Heilungsprozess deiner verwundeten Verbündeten beschleunigen. Wenn du oder eine befreundete Kreatur durch das Ausgeben von Trefferwürfeln zum Ende einer kurzen Rast Trefferpunkte wiedererlangt, erhält der Betroffene 1 W6 zusätzliche Trefferpunkte zurück. Die befreundete Kreatur muss deine Darbietung hören können, um von diesem Effekt zu profitieren.\nDie zusätzlichen Trefferpunkte erhöhen sich mit dem Aufstieg in dieser Klasse: ab der 9. Stufe auf 1 W8, ab der 13. Stufe auf lWlO und ab der 17. Stufe auf 1Wl2."
+        },
+        {
+            "id": "bard_expertise",
+            "name": "Expertise",
+            "unlocksAtLevel": 3,
+            "description": "Wähle zwei deiner Fertigkeiten aus, in denen du geübt bist. Dein Übungsbonus wird bei allen Attributswürfen verdoppelt, bei denen diese Fertigkeiten zur Anwendung kommen.\nAuf der 10. Stufe kannst du dir zwei weitere deiner geübten Fertigkeiten aussuchen, in denen du den gleichen Vorzug erhältst."
+        },
+        {
+            "id": "bard_attribute_increase",
+            "name": "Attributswerterhöhung",
+            "unlocksAtLevel": 4,
+            "description": "Erhöhe einen Attributswert deiner Wahl um 2 Punkte. Du kannst stattdessen auch zwei Attributswerte um jeweils 1 Punkt erhöhen. Kein Attribut darf auf diese Weise über einen Wert von 20 steigen. Du darfst dies auf den Stufen 8, 12, 16 und 19 wiederholen."
+        },
+        {
+            "id": "bard_font_of_inspiration",
+            "name": "Quelle der Inspiration",
+            "unlocksAtLevel": 5,
+            "description": "Von nun an erhältst du all deine Nutzungen von Bardische Inspiration schon bei einer kurzen Rast zurück."
+        },
+        {
+            "id": "bard_countercharm",
+            "name": "Bannlied",
+            "unlocksAtLevel": 6,
+            "description": "Du erlangst die Fähigkeit, mit Zaubern gewobene Musik und Worte der Macht zu nutzen, um geistesbeeinflussende Effekte abzuwenden. Als Aktion kannst du eine Darbietung geben, die bis zum Ende deines nächsten Zuges andauert. Während dieser Zeit sind du und deine verbündeten Kreaturen im Umkreis von 9 m im Vorteil bei Rettungswürfen, um nicht bezaubert oder verängstigt zu sein. Die betroffene Kreatur muss in der Lage sein, dich zu hören, damit sie in den Genuss dieses Vorzugs kommt. Die Darbietung endet vorzeitig, falls du zum Schweigen gebracht wirst oder kampfunfähig wirst. Du kannst sie auch freiwillig beenden, wozu keine Aktion notwendig ist."
+        },
+        {
+            "id": "bard_magical_secrets",
+            "name": "Magische Geheminisse",
+            "unlocksAtLevel": 10,
+            "description": "Du hast bereits aus einem breiten Spektrum an Disziplinen magisches Wissen zusammengetragen. Wähle zwei Zauber beliebiger Klassen, einschließlich des Barden. Du musst in der Lage sein, Zauber des gewählten Grades zu wirken, vergleiche dazu die Aufstiegstabelle für Barden. Es ist auch möglich, sich für Zaubertricks zu entscheiden.\nDie ausgesuchten Sprüche gelten für dich als Bardenzauber und zählen in Bezug auf die maximale Anzahl deiner bekannten Zauber. Du lernst zwei weitere Zauber beliebiger Klassen auf Stufe 14 und erneut auf Stufe 18."
+        },
+        {
+            "id": "bard_superior_inspiration",
+            "name": "Überlegene Inspiration",
+            "unlocksAtLevel": 20,
+            "description": "Sind zum Zeitpunkt eines Initiativewurfs all deine Anwendungen von Bardische Inspiration aufgebraucht, erhältst du eine Anwendung zurück."
+        }
+    ]
 }
