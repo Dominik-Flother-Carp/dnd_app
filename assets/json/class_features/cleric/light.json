@@ -1,5 +1,92 @@
 {
     "className": "Kleriker",
     "subclassName": "Domäne des Lichts",
-    "fluff": "Götter des Lichts (wie Helm, Lathander, Pholtus, Branchala, Die Silberne Flamme, Belenus, Apollo und Re-Horachti) verkörpern die Ideale der Wiedergeburt und der Erneuerung, der Wahrheit, der Wachsamkeit und der Schönheit, wobei sie oft das Symbol der Sonne verwenden. Manche dieser Götter werden als die Sonne selbst dargestellt oder als Wagenlenker, der diese auf ihrem Weg über den Himmel führt. Andere sind unermüdliche Wächter, deren Blick jeden Schatten durchdringt und jede Täuschung durchschaut. Einige sind Beschützer der Schönheit und der Kunstfertigkeit und lehren, dass die Künste ein Weg zur Verbesserung der Seele sind. Kleriker eines Gottes des Lichts sind erleuchtete Seelen, die durchdrungen sind vom Glanz und der Kraft der scharfsichtigen Vision ihres Gottes, damit beauftragt, Lügen aufzudecken und die Dunkelheit mit leuchtender Flamme zu vertreiben."
+    "fluff": "Götter des Lichts (wie Helm, Lathander, Pholtus, Branchala, Die Silberne Flamme, Belenus, Apollo und Re-Horachti) verkörpern die Ideale der Wiedergeburt und der Erneuerung, der Wahrheit, der Wachsamkeit und der Schönheit, wobei sie oft das Symbol der Sonne verwenden. Manche dieser Götter werden als die Sonne selbst dargestellt oder als Wagenlenker, der diese auf ihrem Weg über den Himmel führt. Andere sind unermüdliche Wächter, deren Blick jeden Schatten durchdringt und jede Täuschung durchschaut. Einige sind Beschützer der Schönheit und der Kunstfertigkeit und lehren, dass die Künste ein Weg zur Verbesserung der Seele sind. Kleriker eines Gottes des Lichts sind erleuchtete Seelen, die durchdrungen sind vom Glanz und der Kraft der scharfsichtigen Vision ihres Gottes, damit beauftragt, Lügen aufzudecken und die Dunkelheit mit leuchtender Flamme zu vertreiben.",
+    "features": [
+        {
+            "id": "cleric_light_domain_spells",
+            "name": "Domänenzauber (Licht)",
+            "unlocksAtLevel": 1,
+            "description": "Deine Domäne gewährt dir weitere Zauber.",
+            "grantedSpells": [
+                {
+                    "spellId": "spell_brennende_haende",
+                    "atLevel": 1
+                },
+                {
+                    "spellId": "spell_feenfeuer",
+                    "atLevel": 1
+                },
+                {
+                    "spellId": "spell_sengender_strahl",
+                    "atLevel": 3
+                },
+                {
+                    "spellId": "spell_flammenkugel",
+                    "atLevel": 3
+                },
+                {
+                    "spellId": "spell_tageslicht",
+                    "atLevel": 5
+                },
+                {
+                    "spellId": "spell_feuerball",
+                    "atLevel": 5
+                },
+                {
+                    "spellId": "spell_feuerwand",
+                    "atLevel": 7
+                },
+                {
+                    "spellId": "spell_hueter_des_glaubens",
+                    "atLevel": 7
+                },
+                {
+                    "spellId": "spell_ausspaehung",
+                    "atLevel": 9
+                },
+                {
+                    "spellId": "spell_flammenschlag",
+                    "atLevel": 9
+                }
+            ]
+        },
+        {
+            "id": "cleric_light_warding_flare",
+            "name": "Schützendes Flackern",
+            "unlocksAtLevel": 1,
+            "description": "Du kannst zwischen dir und einer angreifenden Kreatur ein göttliches Licht erscheinen lassen. Greift dich innerhalb von 9 m eine Kreatur an, die du sehen kannst, darfst du deine Reaktion dazu verwenden, den Angreifer bei seinem Wurf im Nachteil sein zu lassen, indem du ein grelles Licht vor ihm aufflackern lässt. Du kannst diese Fähigkeit vor oder nach dem gegnerischen Angriffswurf ausführen, musst es jedoch bevor die Auswirkungen des Angriffs angewendet werden. Eine Kreatur, die nicht geblendet werden kann, ist gegen diesen Effekt immun.\nDu kannst diese Fähigkeit so viele Male einsetzen, wie es deinem Weisheitsmodifikator entspricht (mindestens 1). Alle verbrauchten Anwendungen dieser Fähigkeit stehen dir nach einer langen Rast wieder zur Verfügung."
+        },
+        {
+            "id": "cleric_light_bonus_cantrip",
+            "name": "Zusätzlicher Zaubertrick",
+            "unlocksAtLevel": 1,
+            "description": "Falls du ihn noch nicht kennst, erlernst du den Zaubertrick **Licht**."
+        },
+        {
+            "id": "cleric_light_channel_divinity_radiance_of_the_dawn",
+            "name": "Göttliche Macht fokussieren: Strahlen des Sonnenaufgangs",
+            "unlocksAtLevel": 2,
+            "description": "Du lässt Sonnenlicht erstrahlen und vertreibst damit Dunkelheit und fügst Feinden gleißenden Schaden zu. Als Aktion zeigst du dein heiliges Symbol und setzt dein Merkmal Göttliche Macht fokussieren ein, um jegliche magische Dunkelheit innerhalb von 9 m zu bannen. Zusätzlich muss jede feindliche Kreatur in diesem Umkreis einen Konstitutionsrettungswurf ablegen. Bei einem Misserfolg erleidet die Kreatur gleißenden Schaden in Höhe von 2WlO + deiner Stufe als Kleriker, oder die Hälfte bei einem erfolgreichen Rettungswurf. Eine Kreatur in vollständiger Deckung ist von diesem Effekt nicht betroffen.",
+            "extends": "cleric_channel_divinity"
+        },
+        {
+            "id": "cleric_light_improved_flare",
+            "name": "Verbessertes Flackern",
+            "unlocksAtLevel": 6,
+            "description": "Du kannst dein Schützendes Flackern nun auch auf andere Kreaturen innerhalb von 9 m wirken."
+        },
+        {
+            "id": "cleric_light_potent_spellcasting",
+            "name": "Verstärkte Zaubertricks",
+            "unlocksAtLevel": 8,
+            "description": "Du darfst auf den Schaden, den du mit Klerikerzaubertricks zufügst deinen Weisheitsmodifikator anrechnen."
+        },
+        {
+            "id": "cleric_light_corona_of_light",
+            "name": "Korona des Lichts",
+            "unlocksAtLevel": 17,
+            "description": "Du kannst deine Aktion verwenden, um eine Aura aus Sonnenlicht hervorzurufen, die für 1 Minute bestehen bleibt oder bis du sie mit einer weiteren Aktion auflöst. Du strahlst in einem Radius von 18 m helles Licht aus und verbreitest 9 m darüber hinaus dämmriges Licht. Deine Gegner, die sich im hellen Licht befinden, sind im Nachteil bei ihren Rettungswürfen gegen alle Zauber, die gleißenden Schaden oder Feuerschaden verursachen."
+        }
+    ]
 }
