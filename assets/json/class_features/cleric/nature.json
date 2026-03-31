@@ -55,7 +55,7 @@
             "id": "cleric_nature_acolyte_of_nature",
             "name": "Gefolgsmann der Natur",
             "unlocksAtLevel": 1,
-            "description": "Du  lernst du einen Druidenzaubertrick deiner Wahl. Du bist außerdem geübt in einer der folgenden Fertigkeiten: Mit Tieren umgehen, Naturkunde oder Überlebenskunst."
+            "description": "Du lernst du einen Druidenzaubertrick deiner Wahl. Du bist außerdem geübt in einer der folgenden Fertigkeiten: Mit Tieren umgehen, Naturkunde oder Überlebenskunst."
         },
         {
             "id": "cleric_nature_bonus_proficiency",

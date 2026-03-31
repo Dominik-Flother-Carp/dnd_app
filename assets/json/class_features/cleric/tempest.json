@@ -1,5 +1,97 @@
 {
     "className": "Kleriker",
     "subclassName": "Domäne des Sturms",
-    "fluff": "Götter, deren Portfolio die Domäne des Sturms beinhaltet, (wie Talos, Umberlee, Kord, Zeboim, Der Verschlinger, Zeus und Thor) herrschen über Gewitter, das Meer und den Himmel. Dazu gehören Götter des Blitzes und des Donners, Götter der Erdbeben, einige Feuergötter und bestimmte Gottheiten der physischen Stärke und des Mutes. In einigen Pantheons herrscht ein Gott dieser Domäne über die anderen Gottheiten und ist für seine schlagkräftige Gerechtigkeit bekannt, die er durch einen Donnerkeil vollstreckt. Bei seefahrenden Völkern sind Götter dieser Domäne die Beherrscher der Fluten und Schutzherren der Matrosen. Sturmgötter schicken ihre Kleriker, um das gemeine Volk in Furcht zu versetzen, entweder um es auf dem rechten Pfad zu halten oder um es zu Opfergaben zu ermutigen, mit denen der göttliche Zorn abgewendet werden kann."
+    "fluff": "Götter, deren Portfolio die Domäne des Sturms beinhaltet, (wie Talos, Umberlee, Kord, Zeboim, Der Verschlinger, Zeus und Thor) herrschen über Gewitter, das Meer und den Himmel. Dazu gehören Götter des Blitzes und des Donners, Götter der Erdbeben, einige Feuergötter und bestimmte Gottheiten der physischen Stärke und des Mutes. In einigen Pantheons herrscht ein Gott dieser Domäne über die anderen Gottheiten und ist für seine schlagkräftige Gerechtigkeit bekannt, die er durch einen Donnerkeil vollstreckt. Bei seefahrenden Völkern sind Götter dieser Domäne die Beherrscher der Fluten und Schutzherren der Matrosen. Sturmgötter schicken ihre Kleriker, um das gemeine Volk in Furcht zu versetzen, entweder um es auf dem rechten Pfad zu halten oder um es zu Opfergaben zu ermutigen, mit denen der göttliche Zorn abgewendet werden kann.",
+    "features": [
+        {
+            "id": "cleric_tempest_domain_spells",
+            "name": "Domänenzauber (Sturm)",
+            "unlocksAtLevel": 1,
+            "description": "Deine Domäne gewährt dir weitere Zauber.",
+            "grantedSpells": [
+                {
+                    "spellId": "spell_nebelwolke",
+                    "atLevel": 1
+                },
+                {
+                    "spellId": "spell_donnerwoge",
+                    "atLevel": 1
+                },
+                {
+                    "spellId": "spell_windstoß",
+                    "atLevel": 3
+                },
+                {
+                    "spellId": "spell_zerbersten",
+                    "atLevel": 3
+                },
+                {
+                    "spellId": "spell_blitze_herbeirufen",
+                    "atLevel": 5
+                },
+                {
+                    "spellId": "spell_schneesturm",
+                    "atLevel": 5
+                },
+                {
+                    "spellId": "spell_eissturm",
+                    "atLevel": 7
+                },
+                {
+                    "spellId": "spell_wasser_kontrollieren",
+                    "atLevel": 7
+                },
+                {
+                    "spellId": "spell_zerstoererische_woge",
+                    "atLevel": 9
+                },
+                {
+                    "spellId": "spell_insektenplage",
+                    "atLevel": 9
+                }
+            ]
+        },
+        {
+            "id": "cleric_tempest_wrath_of_the_storm",
+            "name": "Zorn des Sturm",
+            "unlocksAtLevel": 1,
+            "description": "Du kannst deine Angreifer mit einem Donnergrollen in die Schranken weisen. Trifft dich der Angriff einer Kreatur, die du sehen kannst und die sich innerhalb von 1,50 m befindet, kannst du deine Reaktion verwenden, um die Kreatur einen Geschicklichkeitsrettungswurf ablegen zu lassen. Bei einem Misserfolg erleidet sie 2W8 Schall- oder Blitzschaden (frei wählbar), oder die Hälfte des Schadens bei einem erfolgreichen Rettungswurf. Du kannst diese Fähigkeit so oft einsetzen, wie es deinem Weisheitsmodifikator (mindestens 1) entspricht. Alle verbrauchten Anwendungen dieser Fähigkeit stehen dir nach einer langen Rast wieder zur Verfügung.",
+            "resource": {
+                "label": "Nutzungen",
+                "maxFormula": "wisdom_modifier",
+                "restType": "long"
+            }
+        },
+        {
+            "id": "cleric_tempest_bonus_proficiencies",
+            "name": "Zusätzliche Übung",
+            "unlocksAtLevel": 1,
+            "description": "Du bist geübt im Umgang mit schweren Rüstungen und Kriegswaffen."
+        },
+        {
+            "id": "cleric_tempest_channel_divinity_destructive_wrath",
+            "name": "Göttliche Macht fokussieren: Vernichtender Zorn",
+            "unlocksAtLevel": 2,
+            "description": "Du kannst die Macht deines Gottes einsetzen, um die Kraft des Sturms mit hemmungslosem Zorn zuschlagen zu lassen. Wenn du Blitz- oder Schallschaden auswürfelst, kannst du **Göttliche Macht fokussieren** dazu verwenden, um den höchstmöglichen Schaden zu verursachen, anstatt zu würfeln.",
+            "extends": "cleric_channel_divinity"
+        },
+        {
+            "id": "cleric_tempest_thunderbolt_strike",
+            "name": "Blitzeinschlag",
+            "unlocksAtLevel": 6,
+            "description": "Fügst du einer Kreatur der Größenkategorie groß oder kleiner Blitzschaden zu, kannst du sie zusätzlich 3 m von dir wegstoßen."
+        },
+        {
+            "id": "cleric_tempest_divine_strike",
+            "name": "Göttlicher Schlag",
+            "unlocksAtLevel": 8,
+            "description": "Du erhältst die Fähigkeit, die Schläge deiner Waffe mit göttlicher Energie aufzuladen. Einmal pro Zug kannst du mit einem erfolgreichen Waffenangriff 1W8 zusätzlichen Schallschaden verursachen. Mit Erreichen der 14. Stufe erhöht sich der zusätzliche Schaden auf 2W8."
+        },
+        {
+            "id": "cleric_tempest_stormborn",
+            "name": "Sturmgeboren",
+            "unlocksAtLevel": 17,
+            "description": "Dein Sturmgott verleiht dir die Fähigkeit, dich mit den Winden in die Luft zu erheben.\nImmer wenn du dich unter freiem Himmel befindest, darfst du dich mit deiner Bewegungsrate fliegend bewegen."
+        }
+    ]
 }

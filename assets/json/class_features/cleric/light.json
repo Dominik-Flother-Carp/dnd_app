@@ -55,7 +55,12 @@
             "id": "cleric_light_warding_flare",
             "name": "Schützendes Flackern",
             "unlocksAtLevel": 1,
-            "description": "Du kannst zwischen dir und einer angreifenden Kreatur ein göttliches Licht erscheinen lassen. Greift dich innerhalb von 9 m eine Kreatur an, die du sehen kannst, darfst du deine Reaktion dazu verwenden, den Angreifer bei seinem Wurf im Nachteil sein zu lassen, indem du ein grelles Licht vor ihm aufflackern lässt. Du kannst diese Fähigkeit vor oder nach dem gegnerischen Angriffswurf ausführen, musst es jedoch bevor die Auswirkungen des Angriffs angewendet werden. Eine Kreatur, die nicht geblendet werden kann, ist gegen diesen Effekt immun.\nDu kannst diese Fähigkeit so viele Male einsetzen, wie es deinem Weisheitsmodifikator entspricht (mindestens 1). Alle verbrauchten Anwendungen dieser Fähigkeit stehen dir nach einer langen Rast wieder zur Verfügung."
+            "description": "Du kannst zwischen dir und einer angreifenden Kreatur ein göttliches Licht erscheinen lassen. Greift dich innerhalb von 9 m eine Kreatur an, die du sehen kannst, darfst du deine Reaktion dazu verwenden, den Angreifer bei seinem Wurf im Nachteil sein zu lassen, indem du ein grelles Licht vor ihm aufflackern lässt. Du kannst diese Fähigkeit vor oder nach dem gegnerischen Angriffswurf ausführen, musst es jedoch bevor die Auswirkungen des Angriffs angewendet werden. Eine Kreatur, die nicht geblendet werden kann, ist gegen diesen Effekt immun.\nDu kannst diese Fähigkeit so viele Male einsetzen, wie es deinem Weisheitsmodifikator entspricht (mindestens 1). Alle verbrauchten Anwendungen dieser Fähigkeit stehen dir nach einer langen Rast wieder zur Verfügung.",
+            "resource": {
+                "label": "Nutzungen",
+                "maxFormula": "wisdom_modifier",
+                "restType": "long"
+            }
         },
         {
             "id": "cleric_light_bonus_cantrip",
