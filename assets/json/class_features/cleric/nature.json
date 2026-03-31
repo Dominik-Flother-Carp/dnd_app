@@ -1,5 +1,92 @@
 {
     "className": "Kleriker",
     "subclassName": "Domäne der Natur",
-    "fluff": "Gottheiten der Natur sind so unterschiedlich wie die natürliche Welt selbst, von den undurchschaubaren Göttern der dichten Wälder (wie Silvanus, Obad-Hai, Chislev, Balinor und Pan) bis zu freundlichen Gottheiten, die insbesondere mit Quellen und Hainen in Verbindung gebracht werden (wie Eldath). Druiden verehren die Natur als Ganzes und könnten einer dieser Gottheiten dienen, indem sie mysteriöse Riten durchführen und uralte Gebete in ihrer eigenen Geheimsprache rezitieren. Doch viele dieser Götter haben in ihren Diensten auch Kleriker, Helden, welche die Interessen ihrer Gottheit aktiver vorantreiben. Diese Kleriker könnten böse Monstrositäten jagen, welche plündernd ein Waldgebiet verwüsten, die Ernte der Gläubigen segnen oder die Felder derer verdorren lassen, die den Zorn der Götter auf sich gezogen haben."
+    "fluff": "Gottheiten der Natur sind so unterschiedlich wie die natürliche Welt selbst, von den undurchschaubaren Göttern der dichten Wälder (wie Silvanus, Obad-Hai, Chislev, Balinor und Pan) bis zu freundlichen Gottheiten, die insbesondere mit Quellen und Hainen in Verbindung gebracht werden (wie Eldath). Druiden verehren die Natur als Ganzes und könnten einer dieser Gottheiten dienen, indem sie mysteriöse Riten durchführen und uralte Gebete in ihrer eigenen Geheimsprache rezitieren. Doch viele dieser Götter haben in ihren Diensten auch Kleriker, Helden, welche die Interessen ihrer Gottheit aktiver vorantreiben. Diese Kleriker könnten böse Monstrositäten jagen, welche plündernd ein Waldgebiet verwüsten, die Ernte der Gläubigen segnen oder die Felder derer verdorren lassen, die den Zorn der Götter auf sich gezogen haben.",
+    "features": [
+        {
+            "id": "cleric_nature_domain_spells",
+            "name": "Domänenzauber (Natur)",
+            "unlocksAtLevel": 1,
+            "description": "Deine Domäne gewährt dir weitere Zauber.",
+            "grantedSpells": [
+                {
+                    "spellId": "spell_tierfreundschaft",
+                    "atLevel": 1
+                },
+                {
+                    "spellId": "spell_mit_tieren_sprechen",
+                    "atLevel": 1
+                },
+                {
+                    "spellId": "spell_dornenwuchs",
+                    "atLevel": 3
+                },
+                {
+                    "spellId": "spell_rindenhaut",
+                    "atLevel": 3
+                },
+                {
+                    "spellId": "spell_pflanzenwachstum",
+                    "atLevel": 5
+                },
+                {
+                    "spellId": "spell_windwall",
+                    "atLevel": 5
+                },
+                {
+                    "spellId": "spell_tiere_beherrschen",
+                    "atLevel": 7
+                },
+                {
+                    "spellId": "spell_schlingranke",
+                    "atLevel": 7
+                },
+                {
+                    "spellId": "spell_hoelzerner_weg",
+                    "atLevel": 9
+                },
+                {
+                    "spellId": "spell_insektenplage",
+                    "atLevel": 9
+                }
+            ]
+        },
+        {
+            "id": "cleric_nature_acolyte_of_nature",
+            "name": "Gefolgsmann der Natur",
+            "unlocksAtLevel": 1,
+            "description": "Du  lernst du einen Druidenzaubertrick deiner Wahl. Du bist außerdem geübt in einer der folgenden Fertigkeiten: Mit Tieren umgehen, Naturkunde oder Überlebenskunst."
+        },
+        {
+            "id": "cleric_nature_bonus_proficiency",
+            "name": "Zusätzliche Übung",
+            "unlocksAtLevel": 1,
+            "description": "Du bist geübt im Umgang mit schweren Rüstungen."
+        },
+        {
+            "id": "cleric_nature_channel_divinity_charm_animals_and_plants",
+            "name": "Göttliche Macht fokussieren: Tiere und Pflanzen bezaubern",
+            "unlocksAtLevel": 2,
+            "description": "Du kannst deine göttliche Macht nutzen, um Tiere und Pflanzen zu bezaubern. Als Aktion kannst du dein heiliges Symbol zeigen, den Namen deiner Gottheit anrufen und **Göttliche Macht fokussieren** einsetzen. Jedes Tier und jede Pflanze im Umkreis von 9 m muss daraufhin einen Weisheitsrettungswurf ablegen. Bei einem Misserfolg ist die Kreatur für 1 Minute oder bis sie Schaden erleidet von dir bezaubert. Während sie von dir bezaubert ist, reagiert sie freundlich auf dich und andere Kreaturen, die du bestimmst.",
+            "extends": "cleric_channel_divinity"
+        },
+        {
+            "id": "cleric_nature_dampen_elements",
+            "name": "Elementarkräfte mässigen",
+            "unlocksAtLevel": 6,
+            "description": "Du kannst deine Reaktion dazu verwenden, um dir oder einer Kreatur innerhalb von 9 meine Resistenz gegen Säure-, Kälte-, Feuer-, Blitz- oder Schallschaden zu verleihen, sobald sie diesen erleidet. Die Resistenz gilt nur für die Dauer der Schadensabwicklung."
+        },
+        {
+            "id": "cleric_nature_divine_strike",
+            "name": "Göttlicher Schlag",
+            "unlocksAtLevel": 8,
+            "description": "Du erhältst die Fähigkeit, die Schläge deiner Waffe mit göttlicher Energie aufzuladen. Einmal pro Zug kannst du mit einem erfolgreichen Waffenangriff 1W8 zusätzlichen Kälte-, Feuer- oder Blitzschaden (frei wählbar) verursachen. Mit Erreichen der 14. Stufe erhöht sich der zusätzliche Schaden auf 2W8."
+        },
+        {
+            "id": "cleric_nature_master_of_nature",
+            "name": "Herr der Natur",
+            "unlocksAtLevel": 17,
+            "description": "Du bist in der Lage, Pflanzen und Tiere zu befehligen, die von **Göttliche Macht fokussieren: Tiere und Pflanzen bezaubern** betroffen sind. Du kannst in deinem Zug eine Bonusaktion ausführen, um jeder bezauberten Kreatur verbal zu befehlen, welche Handlung sie in ihrem nächsten Zug ausführen soll."
+        }
+    ]
 }
