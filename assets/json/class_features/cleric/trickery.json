@@ -1,5 +1,87 @@
 {
     "className": "Kleriker",
     "subclassName": "Domäne der List",
-    "fluff": "Götter der List (wie Tymora, Beshaba, Olidammara, Der Reisende, Garl Glittergold und Loki) sind Unruhestifter und Aufwiegler, die in einem ständigen Wettstreit mit der anerkannten Ordnung der Götter und der Sterblichen stehen. Sie sind die Schutzherren der Diebe, der Spieler, der Rebellen, der Freigeister und der Halunken. Ihre Kleriker sind eine störende Macht in der zivilisierten Welt. Sie verspotten die Stolzen, stürzen Tyrannen, bestehlen die Reichen, befreien Gefangene und missachten sinnbefreite Traditionen. Sie ziehen List, Streiche, Täuschung und Diebstahl einer direkten Konfrontation vor."
+    "fluff": "Götter der List (wie Tymora, Beshaba, Olidammara, Der Reisende, Garl Glittergold und Loki) sind Unruhestifter und Aufwiegler, die in einem ständigen Wettstreit mit der anerkannten Ordnung der Götter und der Sterblichen stehen. Sie sind die Schutzherren der Diebe, der Spieler, der Rebellen, der Freigeister und der Halunken. Ihre Kleriker sind eine störende Macht in der zivilisierten Welt. Sie verspotten die Stolzen, stürzen Tyrannen, bestehlen die Reichen, befreien Gefangene und missachten sinnbefreite Traditionen. Sie ziehen List, Streiche, Täuschung und Diebstahl einer direkten Konfrontation vor.",
+    "features": [
+        {
+            "id": "cleric_trickery_domain_spells",
+            "name": "Domänenzauber (List)",
+            "unlocksAtLevel": 1,
+            "description": "Deine Domäne gewährt dir weitere Zauber.",
+            "grantedSpells": [
+                {
+                    "spellId": "spell_person_bezaubern",
+                    "atLevel": 1
+                },
+                {
+                    "spellId": "spell_selbstverkleidung",
+                    "atLevel": 1
+                },
+                {
+                    "spellId": "spell_spiegelbilder",
+                    "atLevel": 3
+                },
+                {
+                    "spellId": "spell_spurloses_gehen",
+                    "atLevel": 3
+                },
+                {
+                    "spellId": "spell_flimmern",
+                    "atLevel": 5
+                },
+                {
+                    "spellId": "spell_magie_bannen",
+                    "atLevel": 5
+                },
+                {
+                    "spellId": "spell_dimensionstür",
+                    "atLevel": 7
+                },
+                {
+                    "spellId": "spell_verwandlung",
+                    "atLevel": 7
+                },
+                {
+                    "spellId": "spell_person_beherrschen",
+                    "atLevel": 9
+                },
+                {
+                    "spellId": "spell_erinnerung_verändern",
+                    "atLevel": 9
+                }
+            ]
+        },
+        {
+            "id": "cleric_trickery_blessing_of_the_trickster",
+            "name": "Segen der List",
+            "unlocksAtLevel": 1,
+            "description": "Du kannst als Aktion eine bereitwillige Kreatur berühren, die nicht du selbst bist, und ihr Vorteil bei Würfen auf Geschicklichkeit (Heimlichkeit) verleihen. Der Segen hält eine Stunde und kann nur auf einer Kreatur gleichzeitig wirken."
+        },
+        {
+            "id": "cleric_trickery_channel_divinity_invoke_duplicity",
+            "name": "Göttliche Macht fokussieren: Abbild beschwören",
+            "unlocksAtLevel": 2,
+            "description": "Du kannst deine Fähigkeit **Göttliche Macht fokussieren** dazu verwenden, um ein illusionäres Abbild deiner selbst zu erschaffen. Als Aktion rufst du eine perfekte Illusion von dir hervor, die für 1 Minute bestehen bleibt oder bis du dich nicht mehr konzentrierst (als ob du dich auf einen Zauber konzentrieren würdest). Die Illusion erscheint in einem freien Bereich, den du sehen kannst, innerhalb eines 9-m-Radius um dich. Als Bonusaktion in deinem Zug kannst du die Illusion bis zu 9 m an einen Ort bewegen, den du sehen kannst, der sich aber nicht weiter als 36 m von dir entfernt befindet. Für die Dauer der Illusion kannst du Zauber wirken, als ob du an der Stelle der Illusion stehen würdest, doch du musst deine eigenen Sinne verwenden. Außerdem bist du im Vorteil bei Angriffswürfen auf eine Kreatur, die 1,50 m von dir und der Illusion entfernt ist, da diese das Ziel ablenkt.",
+            "extends": "cleric_channel_divinity"
+        },
+        {
+            "id": "cleric_trickery_channel_divinity_cloak_of_shadows",
+            "name": "Göttliche Macht fokussieren: Schattenmantel",
+            "unlocksAtLevel": 6,
+            "description": "Du kannst deine Fähigkeit **Göttliche Macht fokussieren** dazu verwenden, um mit den Schatten zu verschmelzen. Als Aktion wirst du bis zum Ende deines nächsten Zuges unsichtbar. Du wirst wieder sichtbar, wenn du angreifst oder zauberst.",
+            "extends": "cleric_channel_divinity"
+        },
+        {
+            "id": "cleric_trickery_divine_strike",
+            "name": "Göttlicher Schlag",
+            "unlocksAtLevel": 8,
+            "description": "Du erhältst die Fähigkeit, die Schläge deiner Waffe mit göttlicher Energie aufzuladen. Einmal pro Zug kannst du bei einem erfolgreichen Waffenangriff 1W8 zusätzlichen Giftschaden verursachen. Mit Erreichen der 14. Stufe erhöht sich der zusätzliche Schaden auf 2W8."
+        },
+        {
+            "id": "cleric_trickery_improved_duplicity",
+            "name": "Verbessertes Spiegelbild",
+            "unlocksAtLevel": 17,
+            "description": "Du kannst bis zu vier Abbilder deiner selbst erschaffen (anstatt nur einem), wenn du **Göttliche Macht fokussieren: Abbild beschwören** anwendest. Als Bonusaktion kannst du jedes einzelne bis zu 9 m bewegen. Keins der Abbilder darf sich weiter als 36 m von dir entfernen."
+        }
+    ]
 }
