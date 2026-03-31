@@ -1,5 +1,92 @@
 {
     "className": "Kleriker",
     "subclassName": "Domäne des Wissens",
-    "fluff": "Die Götter des Wissens (wie Oghma, Boccob, Gilean, Aureon und Thoth) schätzen Gelehrsamkeit und Verstand über alles. Manche lehren, dass man Wissen sammeln und an Universitäten und in Bibliotheken teilen soll, andere horten es und behalten dessen Geheimnisse für sich. Einige Gottheiten versprechen ihren Anhängern ungeheure Macht, wenn sie die Rätsel des Multiversums entschlüsseln. Kleriker dieser Götter studieren geheimes Wissen, sammeln alte Folianten, stoßen an die verborgenen Orte der Welt vor und lernen, so viel sie können. Manche Götter des Wissens fördern die praktischen Kenntnisse des Handwerks und den Erfindungsreichtum (wie die Schmiedegottheiten Gond, Reorx, Onatar, Moradin, Hephaistos und Goibniu)."
+    "fluff": "Die Götter des Wissens (wie Oghma, Boccob, Gilean, Aureon und Thoth) schätzen Gelehrsamkeit und Verstand über alles. Manche lehren, dass man Wissen sammeln und an Universitäten und in Bibliotheken teilen soll, andere horten es und behalten dessen Geheimnisse für sich. Einige Gottheiten versprechen ihren Anhängern ungeheure Macht, wenn sie die Rätsel des Multiversums entschlüsseln. Kleriker dieser Götter studieren geheimes Wissen, sammeln alte Folianten, stoßen an die verborgenen Orte der Welt vor und lernen, so viel sie können. Manche Götter des Wissens fördern die praktischen Kenntnisse des Handwerks und den Erfindungsreichtum (wie die Schmiedegottheiten Gond, Reorx, Onatar, Moradin, Hephaistos und Goibniu).",
+    "features": [
+        {
+            "id": "cleric_knowledge_domain_spells",
+            "name": "Domänenzauber (Wissen)",
+            "unlocksAtLevel": 1,
+            "description": "Deine Domäne gewährt dir weitere Zauber.",
+            "grantedSpells": [
+                {
+                    "spellId": "spell_befehl",
+                    "atLevel": 1
+                },
+                {
+                    "spellId": "spell_identifizieren",
+                    "atLevel": 1
+                },
+                {
+                    "spellId": "spell_einfluesterung",
+                    "atLevel": 3
+                },
+                {
+                    "spellId": "spell_vorahnung",
+                    "atLevel": 3
+                },
+                {
+                    "spellId": "spell_mit_toten_sprechen",
+                    "atLevel": 5
+                },
+                {
+                    "spellId": "spell_unauffindbarkeit",
+                    "atLevel": 5
+                },
+                {
+                    "spellId": "spell_arkanes_auge",
+                    "atLevel": 7
+                },
+                {
+                    "spellId": "spell_verwirrung",
+                    "atLevel": 7
+                },
+                {
+                    "spellId": "spell_ausspaehung",
+                    "atLevel": 9
+                },
+                {
+                    "spellId": "spell_sagenkunde",
+                    "atLevel": 9
+                }
+            ]
+        },
+        {
+            "id": "cleric_knowledge_blessings_of_knowledge",
+            "name": "Segen des Wissens",
+            "unlocksAtLevel": 1,
+            "description": "Du lernst zwei Sprachen deiner Wahl. Außerdem bist du geübt in zwei der folgenden Fertigkeiten:\nArkane Kunde, Geschichte, Naturkunde und Religion.\nDer Übungsbonus der gewählten Fertigkeiten wird verdoppelt."
+        },
+        {
+            "id": "cleric_knowledge_channel_divinity_knowledge_of_the_ages",
+            "name": "Göttliche Macht fokussieren: Wissen der Zeitalter",
+            "unlocksAtLevel": 2,
+            "description": "Du kannst aus der göttlichen Quelle des Wissens schöpfen. Als Aktion wählst du eine Fertigkeit oder ein Werkzeug und setzt **Göttliche Macht fokussieren** ein. Für die folgenden 10 Minuten bist du geübt in der gewählten Fertigkeit oder im Umgang mit dem Werkzeug.",
+            "extends": "cleric_channel_divinity"
+        },
+        {
+            "id": "cleric_knowledge_channel_divinity_read_thoughts",
+            "name": "Göttliche Macht fokussieren: Gedanken lesen",
+            "unlocksAtLevel": 6,
+            "description": "Du kannst **Göttliche Macht fokussieren** einsetzen, um die Gedanken einer Kreatur zu lesen. Du kannst diesen Zugang zum Bewusstsein der Kreatur auch nutzen, um sie zu befehligen. Wähle als Aktion eine Kreatur innerhalb von 18 m, die du sehen kannst. Diese muss einen Weisheitsrettungswurf ablegen. Gelingt ihr der Rettungswurf, kannst du die Fähigkeit bis zum Abschluss einer langen Rast nicht mehr auf diese Kreatur anwenden. Bei einem Misserfolg bist du in der Lage, die oberflächlichen Gedanken der Kreatur zu lesen (ihre Gefühle und worüber sie im Augenblick aktiv nachdenkt), solange sie nicht weiter als 18 m von dir entfernt ist. Dieser Effekt hält für 1 Minute an. Während dieser Zeit kannst du deine Aktion aufwenden, um den Effekt zu beenden und den Zauber Einflüsterung auf die Kreatur zu wirken, ohne dass du dafür einen Zauberplatz verbrauchen musst. Dem Ziel misslingt der Rettungswurf gegen den Zauber automatisch.",
+            "extends": "cleric_channel_divinity"
+        },
+        {
+            "id": "cleric_knowledge_potent_spellcasting",
+            "name": "Verstärkte Zaubertricks",
+            "unlocksAtLevel": 8,
+            "description": "Du darfst auf den Schaden, den du mit Klerikerzaubertricks zufügst deinen Weisheitsmodifikator anrechnen."
+        },
+        {
+            "id": "cleric_knowledge_visions_of_the_past",
+            "name": "Visionen der Vergangenheit",
+            "unlocksAtLevel": 17,
+            "description": "Du kannst einen schemenhaften Blick in die Vergangenheit werfen, die mit deiner unmittelbaren Umgebung in Verbindung steht oder mit einem Objekt, das du in der Hand hältst. Verbringst du mindestens 1 Minute in Meditation oder im Gebet, empfängst du traumartige, schattenhafte Bilder vergangener Ereignisse. Du kannst so viele Minuten in dieser Einkehr verharren, wie es der Höhe deines Weisheitsmodifikators entspricht. Während der gesamten Dauer musst du konzentriert bleiben (als ob du dich auf einen Zauber konzentrieren würdest). Hast du diese Fähigkeit eingesetzt, steht sie dir erst wieder nach einer kurzen oder langen Rast zur Verfügung.\n\n**Objekt lesen:** Hältst du ein Objekt, während du meditierst, hast du Visionen zu dessen früheren Besitzern. Nach 1 Minute Meditation erfährst du, wie der Besitzer an das Objekt gelangt ist und wie er es verloren hat. Außerdem siehst du das jüngste und einschneidenste Ereignis, bei dem Objekt und Besitzer involviert waren. Falls das Objekt in der jüngeren Vergangenheit von weiteren Kreaturen besessen wurde (innerhalb von Tagen in Höhe deines Weisheitsmodifikators), kannst du 1 zusätzliche Minute je weiterem Besitzer meditieren, um das Gleiche über sie zu erfahren.\n\n**Gebiet lesen:** Während du meditierst, siehst du Visionen von Ereignissen, die sich kürzlich in deiner direkten Umgebung abgespielt haben (einem Raum, einer Straße, einem Tunnel, einer Lichtung oder dergleichen, im Umfang eines 15-m-Würfels). Die Vision reicht eine Anzahl von Tagen zurück, die der Höhe deines Weisheitsmodifikators entspricht. Für jede Minute, die du meditierst, erfährst du ein wichtiges Ereignis, angefangen mit dem jüngsten. Wichtige Ereignisse sind solche, bei denen starke Emotionen involviert waren, etwa ein Kampf oder ein Verrat, eine Hochzeit, ein Mord, eine Geburt oder eine Beerdigung. Es kann sich allerdings auch um alltäglichere Ereignisse handeln, die trotzdem wichtig für deine derzeitige Situation sind.",
+            "resource": {
+                "label": "Nutzungen",
+                "maxFormula": "1",
+                "restType": "long"
+            }
+        }
+    ]
 }
