@@ -58,11 +58,29 @@
             "description": "Deine Heilzauber sind effektiver. Immer wenn du einen Zauber wirkst, der bei einer Kreatur Trefferpunkte wiederherstellt, erhält sie zusätzliche Punkte in Höhe von 2 + dem Grad des Zaubers."
         },
         {
+            "id": "cleric_life_bonus_proficiencies",
+            "name": "Zusätzliche Übung",
+            "unlocksAtLevel": 1,
+            "description": "Du bist geübt im Umgang mit schweren Rüstungen."
+        },
+        {
             "id": "cleric_life_channel_divinity_preserve_life",
             "name": "Göttliche Macht fokussieren: Leben erhalten",
             "unlocksAtLevel": 2,
             "description": "Du kannst eine Welle göttlicher Macht hervorrufen, die schwerste Verletzungen zu heilen vermag. Als Aktion zeigst du dein heiliges Symbol und setzt dein Merkmal Göttliche Macht fokussieren ein, um eine Anzahl von Trefferpunkten in Höhe deiner Stufe als Kleriker mal 5 wiederherzustellen. Als Ziel bestimmst du innerhalb von 9 m beliebig viele Kreaturen, unter denen du die Trefferpunkte aufteilst. Diese Fähigkeit kann keine Trefferpunkte über die Hälfte des Trefferpunktemaximums hinaus zurückgeben und wirkt nicht bei Konstrukten und Untoten.",
             "extends": "cleric_channel_divinity"
+        },
+        {
+            "id": "cleric_life_blessed_healer",
+            "name": "Gesegneter Heiler",
+            "unlocksAtLevel": 6,
+            "description": "Wirkst du einen Heilzauber auf eine andere Kreatur, wirken seine Kräfte auch auf dich. Du erhältst nach dem Wirken Trefferpunkte in Höhe von 2 + dem Grad des Heilzaubers zurück."
+        },
+        {
+            "id": "cleric_life_supreme_healing",
+            "name": "Überlegene Heilung",
+            "unlocksAtLevel": 17,
+            "description": "Sollst du normalerweise mit einem oder mehreren Würfeln bestimmen, wie viele Trefferpunkte du mit einem Zauber wiederherstellst, kannst du nun stattdessen das höchstmögliche Ergebnis für jeden Würfel verwenden. Beispielsweise heilst du bei einer Kreatur anstatt 2W6 Trefferpunkte nun 12 Trefferpunkte."
         }
     ]
 }
