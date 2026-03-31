@@ -51,7 +51,7 @@
     ]
   },
   {
-    "id": "spell_heilendesWort",
+    "id": "spell_heilendes_wort",
     "name": "Heilendes Wort",
     "school": "conjuration",
     "level": 1,
@@ -101,7 +101,7 @@
     ]
   },
   {
-    "id": "spell_lenkendesGeschoss",
+    "id": "spell_lenkendes_geschoss",
     "name": "Lenkendes Geschoss",
     "school": "evocation",
     "level": 1,
@@ -125,7 +125,7 @@
     ]
   },
   {
-    "id": "spell_magieEntdecken",
+    "id": "spell_magie_entdecken",
     "name": "Magie entdecken",
     "school": "divination",
     "level": 1,
@@ -179,7 +179,7 @@
     ]
   },
   {
-    "id": "spell_magischesGeschoss",
+    "id": "spell_magisches_geschoss",
     "name": "Magisches Geschoss",
     "school": "evocation",
     "level": 1,
@@ -229,7 +229,7 @@
     ]
   },
   {
-    "id": "spell_schildDesGlaubens",
+    "id": "spell_schild_des_glaubens",
     "name": "Schild des Glaubens",
     "school": "abjuration",
     "level": 1,
@@ -280,7 +280,7 @@
     ]
   },
   {
-    "id": "spell_schutzGutUndBoese",
+    "id": "spell_schutz_vor_gut_und_boese",
     "name": "Schutz vor Gut und Böse",
     "school": "abjuration",
     "level": 1,
@@ -331,7 +331,7 @@
     ]
   },
   {
-    "id": "spell_sprachenVerstehen",
+    "id": "spell_sprachen_verstehen",
     "name": "Sprachen verstehen",
     "school": "divination",
     "level": 1,
@@ -358,7 +358,7 @@
     ]
   },
   {
-    "id": "spell_strahlDerUebelkeit",
+    "id": "spell_strahl_der_uebelkeit",
     "name": "Strahl der Übelkeit",
     "school": "necromancy",
     "level": 1,
@@ -382,7 +382,7 @@
     ]
   },
   {
-    "id": "spell_wundenHeilen",
+    "id": "spell_wunden_heilen",
     "name": "Wunden heilen",
     "school": "evocation",
     "level": 1,

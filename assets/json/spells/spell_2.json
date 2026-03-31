@@ -51,7 +51,7 @@
         ]
     },
     {
-        "id": "spell_personFesthalten",
+        "id": "spell_person_festhalten",
         "name": "Person festhalten",
         "school": "enchantment",
         "level": 2,
@@ -79,7 +79,7 @@
         ]
     },
     {
-        "id": "spell_schwacheGenesung",
+        "id": "spell_schwache_genesung",
         "name": "Schwache Genesung",
         "school": "abjuration",
         "level": 2,
@@ -133,7 +133,7 @@
         ]
     },
     {
-        "id": "spell_waffeDesGlaubens",
+        "id": "spell_waffe_des_glaubens",
         "name": "Waffe des Glaubens",
         "school": "evocation",
         "level": 2,
