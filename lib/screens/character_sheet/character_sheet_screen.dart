@@ -846,8 +846,13 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
               description: 'Trefferwürfel können ausgegeben werden.',
               color: Colors.orange,
               onTap: () {
-                Navigator.pop(context);
-                _showUseHitDiceDialog();
+                  Navigator.pop(context);
+                  _showUseHitDiceDialog();
+                  if (_character!.characterClass == "Hexenmeister") {
+                    for (final slot in _character!.spellSlots.values) {
+                      slot.current = slot.max;
+                    }
+                  }
                 _featuresTabKey.currentState?.resetForRest('short');
               },
             ),
