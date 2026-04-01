@@ -41,15 +41,19 @@ int _calcPreparedLimit(Character c) {
 class _SpellPickerSheet extends StatefulWidget {
   final Color themeColor;
   final String characterClass;
-  final Set<String> alreadyAdded; // IDs aller bereits hinzugefügten Zauber
-  final int maxSpellLevel;           // Höchster erlaubter Zaubergrad
+  final Set<String> alreadyAdded;   // IDs aller bereits hinzugefügten Zauber (für ✓-Anzeige)
+  final int maxSpellLevel;          // Höchster erlaubter Zaubergrad
+  final int? maxCount;              // Maximale Anzahl (null = unbegrenzt)
+  final Set<String> alreadyForLimit; // IDs die gegen das Limit zählen (z.B. ohne Zaubertricks)
 
   const _SpellPickerSheet({
     required this.themeColor,
     required this.characterClass,
     required this.alreadyAdded,
     required this.maxSpellLevel,
-  });
+    this.maxCount,
+    Set<String>? alreadyForLimit,
+  }) : alreadyForLimit = alreadyForLimit ?? alreadyAdded;
 
   @override
   State<_SpellPickerSheet> createState() => _SpellPickerSheetState();
@@ -64,6 +68,10 @@ class _SpellPickerSheetState extends State<_SpellPickerSheet> {
 
   // Debounce-Timer: verhindert Filterung bei jedem einzelnen Tastendruck
   Timer? _debounce;
+
+  bool get _isFull =>
+      widget.maxCount != null &&
+      widget.alreadyForLimit.length >= widget.maxCount!;
 
   @override
   void initState() {
@@ -134,6 +142,26 @@ class _SpellPickerSheetState extends State<_SpellPickerSheet> {
                 children: [
                   Text('Zauberauswahl', style: AppTextStyles.sectionTitle),
                   const Spacer(),
+                  if (widget.maxCount != null) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: _isFull
+                            ? Colors.red.withValues(alpha: 0.12)
+                            : widget.themeColor.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        '${widget.alreadyForLimit.length} / ${widget.maxCount}',
+                        style: AppTextStyles.labelXs.copyWith(
+                          color: _isFull ? Colors.red : widget.themeColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                  ],
                   if (widget.characterClass.isNotEmpty)
                     Chip(
                       label: Text(widget.characterClass,
@@ -146,6 +174,25 @@ class _SpellPickerSheetState extends State<_SpellPickerSheet> {
                 ],
               ),
             ),
+            if (_isFull)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                        color: Colors.red.withValues(alpha: 0.3)),
+                  ),
+                  child: Text(
+                    'Zauberbuch voll. Auf dieser Stufe können keine weiteren Zauber eingetragen werden.',
+                    style: AppTextStyles.bodySmall
+                        .copyWith(color: Colors.red[700]),
+                  ),
+                ),
+              ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: TextField(
@@ -198,13 +245,17 @@ class _SpellPickerSheetState extends State<_SpellPickerSheet> {
 
   Widget _buildSpellTile(Spell spell) {
     final alreadyAdded = widget.alreadyAdded.contains(spell.id);
+    final blocked      = !alreadyAdded && _isFull;
     return Card(
       margin: EdgeInsets.zero,
       child: ListTile(
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         leading: _levelBadge(spell.level, widget.themeColor),
-        title: Text(spell.name, style: AppTextStyles.cardTitle),
+        title: Text(spell.name,
+            style: AppTextStyles.cardTitle.copyWith(
+              color: blocked ? Colors.grey[400] : null,
+            )),
         subtitle: Text(
           [
             spell.school.label,
@@ -216,8 +267,12 @@ class _SpellPickerSheetState extends State<_SpellPickerSheet> {
         trailing: alreadyAdded
             ? Icon(Icons.check_circle,
                 color: widget.themeColor, size: 22)
-            : const Icon(Icons.add_circle_outline, size: 22),
-        onTap: alreadyAdded ? null : () => Navigator.pop(context, spell),
+            : Icon(Icons.add_circle_outline,
+                size: 22,
+                color: blocked ? Colors.grey[300] : null),
+        onTap: (alreadyAdded || blocked)
+            ? null
+            : () => Navigator.pop(context, spell),
       ),
     );
   }
@@ -371,24 +426,39 @@ class SpellTabState extends State<SpellTab>
   // ── Zauber hinzufügen / entfernen ─────────────────────────────────────────
 
   Future<void> _showSpellPicker() async {
-    // Maximal erlaubter Zaubergrad = höchster vorhandener Slot-Grad (mind. 0 für Zaubertricks)
     final maxLevel = widget.character.spellSlots.isEmpty
         ? 0
         : widget.character.spellSlots.keys.reduce((a, b) => a > b ? a : b);
+
+    // Zauberbuchlimit für Magier: Stufe 1 → 6 Zauber, jede weitere Stufe +2.
+    // Zaubertricks (Grad 0) zählen nicht gegen das Limit.
+    final cls = characterClasses
+        .where((c) => c.name == widget.character.characterClass)
+        .firstOrNull;
+    int? maxCount;
+    Set<String> alreadyForLimit = _spells.map((s) => s.id).toSet();
+    if (cls?.casterType == 'spellbook') {
+      final lvl = widget.character.level;
+      maxCount = 6 + (lvl - 1) * 2;
+      // Nur Nicht-Zaubertricks zählen gegen das Limit
+      alreadyForLimit =
+          _spells.where((s) => s.level > 0).map((s) => s.id).toSet();
+    }
+
     final spell = await showModalBottomSheet<Spell>(
       context: context,
       isScrollControlled: true,
       builder: (_) => _SpellPickerSheet(
-        themeColor:      widget.themeColor,
-        characterClass:  widget.character.characterClass,
-        alreadyAdded: _spells.map((s) => s.id).toSet(),
-        maxSpellLevel:   maxLevel,
+        themeColor:     widget.themeColor,
+        characterClass: widget.character.characterClass,
+        alreadyAdded:   _spells.map((s) => s.id).toSet(),
+        maxSpellLevel:  maxLevel,
+        maxCount:       maxCount,
+        alreadyForLimit: alreadyForLimit,
       ),
     );
     if (spell == null || !mounted) return;
-    // Zuerst Zauber in die spells-Tabelle schreiben (falls noch nicht vorhanden)
     await _repo.upsertSpell(spell);
-    // Dann Charakter-Verknüpfung anlegen
     await _repo.addSpellToCharacter(
         widget.character.id, spell.id,
         isPrepared: false);

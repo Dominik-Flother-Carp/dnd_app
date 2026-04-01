@@ -1,5 +1,43 @@
 {
     "className": "Druide",
     "subclassName": "Zirkel des Mondes",
-    "fluff": "Druiden des Zirkels des Mondes sind entschlossene Beschützer der ungezähmten Natur. Ihr Orden versammelt sich bei Vollmond, um Neuigkeiten und Warnungen auszutauschen. Sie hausen in den dichtesten Teilen der Wildnis, wo sie wochenlang umherwandern können, ohne auf eine andere humanoide Kreatur zu treffen, geschweige denn auf einen anderen Druiden.\n\nVeränderlich wie der Mond, kann ein Druide dieses Zirkels eine Nacht als Großkatze durch den Dschungel streifen, am nächsten Tag als Adler über die Baumkronen segeln und dann wieder in Bärengestalt aus dem Unterholz krachend ein schändliches Monster verjagen. Die Wildheit liegt diesen Druiden im Blut."
+    "fluff": "Druiden des Zirkels des Mondes sind entschlossene Beschützer der ungezähmten Natur. Ihr Orden versammelt sich bei Vollmond, um Neuigkeiten und Warnungen auszutauschen. Sie hausen in den dichtesten Teilen der Wildnis, wo sie wochenlang umherwandern können, ohne auf eine andere humanoide Kreatur zu treffen, geschweige denn auf einen anderen Druiden.\n\nVeränderlich wie der Mond, kann ein Druide dieses Zirkels eine Nacht als Großkatze durch den Dschungel streifen, am nächsten Tag als Adler über die Baumkronen segeln und dann wieder in Bärengestalt aus dem Unterholz krachend ein schändliches Monster verjagen. Die Wildheit liegt diesen Druiden im Blut.",
+    "features": [
+        {
+            "id": "druid_moon_combat_wild_shape",
+            "name": "Instinktive Tiergestalt",
+            "unlocksAtLevel": 2,
+            "description": "Wählst du diesen Zirkel, kannst du die Tiergestalt in deinem Zug als Bonusaktion annehmen anstatt als Aktion. Zusätzlich kannst du, während du in Tiergestalt bist, als Bonusaktion einen Zauberplatz aufgeben, um 1W8 Trefferpunkte pro aufgegebenem Grad des Zauberplatzes zu heilen."
+        },
+        {
+            "id": "druid_moon_circle_forms",
+            "name": "Tiergestalten des Zirkels",
+            "unlocksAtLevel": 2,
+            "description": "Die Riten deines Zirkels verleihen dir die Fähigkeit, die Gestalt von gefährlicheren Tieren anzunehmen. Du kannst dich mit **Tiergestalt** in ein Tier mit einem Herausforderungsgrad von bis zu 1 verwandeln (du ignorierst die entsprechenden Angaben zur Höhe des HG in der Tiergestalttabelle, musst allerdings die Einschränkungen einhalten).\nAb der 6. Stufe kannst du dich in Tiere mit einem maximalen HG entsprechend deiner Druidenstufe geteilt durch 3 verwandeln (abgerundet)."
+        },
+        {
+            "id": "druid_land_lands_stride",
+            "name": "Sicherer Schritt",
+            "unlocksAtLevel": 6,
+            "description": "Es kostet dich keine zusätzliche Bewegung mehr, nicht-magisches schwieriges Gelände zu durchqueren. Du kannst dich auch durch nicht-magische Pflanzen bewegen, ohne von ihnen verlangsamt oder verletzt zu werden, wie es etwa bei Dornen, Stacheln oder ähnlichen Gefahren der Fall wäre.\nDarüber hinaus bist du im Vorteil bei Rettungswürfen gegen Pflanzen, die magisch erschaffen oder manipuliert wurden, um deine Bewegung einzuschränken, wie etwa durch den Zauber **Verstricken**."
+        },
+        {
+            "id": "druid_moon_primal_strike",
+            "name": "Urschlag",
+            "unlocksAtLevel": 6,
+            "description": "Deine Angriffe in Tiergestalt gelten nun als magisch."
+        },
+        {
+            "id": "druid_moon_elemental_wild_shape",
+            "name": "Elementargstalt",
+            "unlocksAtLevel": 10,
+            "description": "Du kannst gleichzeitig zwei Anwendungen deiner Tiergestalt aufwenden, um dich in einen Luft-, Feuer-, Erd- oder Wasserelementar zu verwandeln."
+        },
+        {
+            "id": "druid_moon_thousand_forms",
+            "name": "Tausende Gestalten",
+            "unlocksAtLevel": 14,
+            "description": "Du lernst deine körperliche Form mit Hilfe der Magie auf tiefgreifendere Weise zu verändern. Du kannst den Zauberspruch Gestalt verändern beliebig oft anwenden und musst auch keine Zauberplätze dafür verbrauchen."
+        }
+    ]
 }

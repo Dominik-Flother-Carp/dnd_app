@@ -43,6 +43,83 @@ class CombatParticipant {
   );
 }
 
+// ── Combat-State (Singleton, überlebt Navigation) ─────────────────────────────
+
+class CombatState extends ChangeNotifier {
+  static final CombatState _instance = CombatState._internal();
+  factory CombatState() => _instance;
+  CombatState._internal();
+
+  List<CombatParticipant> participants = [];
+  bool combatStarted = false;
+  int round = 1;
+
+  // Sortierung: höchste Initiative zuerst, Gleichstand → alphabetisch
+  void _sort() {
+    participants.sort((a, b) {
+      final cmp = b.initiative.compareTo(a.initiative);
+      return cmp != 0 ? cmp : a.name.compareTo(b.name);
+    });
+  }
+
+  void startCombat() {
+    if (participants.isEmpty) return;
+    _sort();
+    combatStarted = true;
+    round = 1;
+    notifyListeners();
+  }
+
+  void endTurn() {
+    if (participants.isEmpty) return;
+    final first = participants.removeAt(0);
+    participants.add(first);
+    // Neue Runde wenn wir wieder beim höchsten Initiative-Wert angekommen sind
+    if (participants.first.initiative ==
+        participants.reduce((a, b) =>
+            a.initiative >= b.initiative ? a : b).initiative) {
+      round++;
+    }
+    notifyListeners();
+  }
+
+  void addParticipant(CombatParticipant p) {
+    participants.add(p);
+    if (combatStarted) {
+      // Einsortieren ohne Runde zurückzusetzen
+      participants.sort((a, b) {
+        final cmp = b.initiative.compareTo(a.initiative);
+        return cmp != 0 ? cmp : a.name.compareTo(b.name);
+      });
+    }
+    notifyListeners();
+  }
+
+  void removeParticipant(CombatParticipant p) {
+    participants.remove(p);
+    if (participants.isEmpty) {
+      combatStarted = false;
+      round = 1;
+    }
+    notifyListeners();
+  }
+
+  void updateParticipant(CombatParticipant updated) {
+    final idx = participants.indexWhere((p) => p.id == updated.id);
+    if (idx != -1) {
+      participants[idx] = updated;
+      notifyListeners();
+    }
+  }
+
+  void reset() {
+    participants.clear();
+    combatStarted = false;
+    round = 1;
+    notifyListeners();
+  }
+}
+
 // ── Hauptscreen ───────────────────────────────────────────────────────────────
 
 class InitiativeTrackerScreen extends StatefulWidget {
@@ -58,15 +135,24 @@ class _InitiativeTrackerScreenState extends State<InitiativeTrackerScreen> {
   static const accent     = Color(0xFF8B0000);
   static const cream      = Color(0xFFF5DEB3);
 
-  List<Character> _pcList   = [];
-  List<CombatParticipant> _participants = [];
-  bool _combatStarted = false;
-  int _round = 1;
+  final _combat = CombatState();
+  List<Character> _pcList = [];
 
   @override
   void initState() {
     super.initState();
+    _combat.addListener(_onCombatChanged);
     _loadCharacters();
+  }
+
+  @override
+  void dispose() {
+    _combat.removeListener(_onCombatChanged);
+    super.dispose();
+  }
+
+  void _onCombatChanged() {
+    if (mounted) setState(() {});
   }
 
   Future<void> _loadCharacters() async {
@@ -76,63 +162,13 @@ class _InitiativeTrackerScreenState extends State<InitiativeTrackerScreen> {
     setState(() => _pcList = chars);
   }
 
-  // Sortierung: höchste Initiative zuerst, Gleichstand → alphabetisch
-  void _sortParticipants() {
-    _participants.sort((a, b) {
-      final cmp = b.initiative.compareTo(a.initiative);
-      return cmp != 0 ? cmp : a.name.compareTo(b.name);
-    });
-  }
+  void _startCombat()                          => _combat.startCombat();
+  void _endTurn()                              => _combat.endTurn();
+  void _removeParticipant(CombatParticipant p) => _combat.removeParticipant(p);
+  void _resetCombat()                          => _combat.reset();
 
-  void _startCombat() {
-    if (_participants.isEmpty) return;
-    setState(() {
-      _sortParticipants();
-      _combatStarted = true;
-      _round = 1;
-    });
-  }
-
-  void _endTurn() {
-    // Ersten Teilnehmer ans Ende schieben
-    setState(() {
-      final first = _participants.removeAt(0);
-      _participants.add(first);
-      // Wenn wir wieder beim ursprünglichen Anfang sind → neue Runde
-      // Einfache Heuristik: Runde erhöhen wenn der erste Eintrag wieder
-      // die höchste Initiative hat (sortierte Ordnung wiederhergestellt)
-      if (_participants.first.initiative ==
-          _participants.reduce((a, b) =>
-              a.initiative >= b.initiative ? a : b).initiative) {
-        _round++;
-      }
-    });
-  }
-
-  void _addParticipantDuringCombat(_AddParticipantResult result) {
-    setState(() {
-      _participants.add(result.participant);
-      _sortParticipants();
-    });
-  }
-
-  void _removeParticipant(CombatParticipant p) {
-    setState(() => _participants.remove(p));
-    if (_participants.isEmpty) {
-      setState(() {
-        _combatStarted = false;
-        _round = 1;
-      });
-    }
-  }
-
-  void _resetCombat() {
-    setState(() {
-      _participants.clear();
-      _combatStarted = false;
-      _round = 1;
-    });
-  }
+  void _addParticipantDuringCombat(_AddParticipantResult result) =>
+      _combat.addParticipant(result.participant);
 
   // ── Build ─────────────────────────────────────────────────────────────────
 
@@ -143,7 +179,7 @@ class _InitiativeTrackerScreenState extends State<InitiativeTrackerScreen> {
       appBar: AppBar(
         backgroundColor: themeColor,
         foregroundColor: cream,
-        title: _combatStarted
+        title: _combat.combatStarted
             ? Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -158,7 +194,7 @@ class _InitiativeTrackerScreenState extends State<InitiativeTrackerScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      'Runde $_round',
+                      'Runde $_combat.round',
                       style: AppTextStyles.bodySmall
                           .copyWith(color: Colors.white),
                     ),
@@ -168,19 +204,19 @@ class _InitiativeTrackerScreenState extends State<InitiativeTrackerScreen> {
             : Text('Initiative', style: AppTextStyles.cardTitle
                 .copyWith(color: cream)),
         actions: [
-          if (_combatStarted)
+          if (_combat.combatStarted)
             IconButton(
               icon: const Icon(Icons.stop_circle_outlined),
               tooltip: 'Kampf beenden',
               onPressed: () => _showEndCombatDialog(),
             ),
-          if (_combatStarted)
+          if (_combat.combatStarted)
             IconButton(
               icon: const Icon(Icons.person_add_outlined),
               tooltip: 'Teilnehmer hinzufügen',
               onPressed: () => _showAddParticipantSheet(duringCombat: true),
             ),
-          if (!_combatStarted && _participants.isNotEmpty)
+          if (!_combat.combatStarted && _combat.participants.isNotEmpty)
             IconButton(
               icon: const Icon(Icons.delete_sweep_outlined),
               tooltip: 'Alle entfernen',
@@ -188,13 +224,13 @@ class _InitiativeTrackerScreenState extends State<InitiativeTrackerScreen> {
             ),
         ],
       ),
-      body: _combatStarted ? _buildCombatView() : _buildSetupView(),
-      floatingActionButton: _combatStarted
+      body: _combat.combatStarted ? _buildCombatView() : _buildSetupView(),
+      floatingActionButton: _combat.combatStarted
           ? null
           : FloatingActionButton.extended(
               backgroundColor: accent,
               foregroundColor: Colors.white,
-              onPressed: _participants.isEmpty ? null : _startCombat,
+              onPressed: _combat.participants.isEmpty ? null : _startCombat,
               icon: const Icon(Icons.sports_martial_arts),
               label: Text('Kampf beginnen', style: AppTextStyles.body
                   .copyWith(color: Colors.white)),
@@ -211,7 +247,7 @@ class _InitiativeTrackerScreenState extends State<InitiativeTrackerScreen> {
         if (_pcList.isNotEmpty) _buildPcChips(),
         // Teilnehmerliste
         Expanded(
-          child: _participants.isEmpty
+          child: _combat.participants.isEmpty
               ? _buildEmptySetup()
               : _buildSetupList(),
         ),
@@ -248,7 +284,7 @@ class _InitiativeTrackerScreenState extends State<InitiativeTrackerScreen> {
             runSpacing: 6,
             children: _pcList.map((pc) {
               final alreadyAdded =
-                  _participants.any((p) => p.id == pc.id);
+                  _combat.participants.any((p) => p.id == pc.id);
               return FilterChip(
                 label: Text(pc.name, style: AppTextStyles.bodySmall),
                 selected: alreadyAdded,
@@ -290,7 +326,7 @@ class _InitiativeTrackerScreenState extends State<InitiativeTrackerScreen> {
   }
 
   Widget _buildSetupList() {
-    final sorted = [..._participants]
+    final sorted = [..._combat.participants]
       ..sort((a, b) => b.initiative.compareTo(a.initiative));
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
@@ -331,7 +367,7 @@ class _InitiativeTrackerScreenState extends State<InitiativeTrackerScreen> {
   // ── Kampf-Ansicht ─────────────────────────────────────────────────────────
 
   Widget _buildCombatView() {
-    if (_participants.isEmpty) {
+    if (_combat.participants.isEmpty) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -350,14 +386,14 @@ class _InitiativeTrackerScreenState extends State<InitiativeTrackerScreen> {
     return Column(
       children: [
         // Aktiver Teilnehmer (oben prominent)
-        _buildActiveCard(_participants.first),
+        _buildActiveCard(_combat.participants.first),
         // Restliche Reihenfolge
         Expanded(
           child: ListView.builder(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-            itemCount: _participants.length - 1,
+            itemCount: _combat.participants.length - 1,
             itemBuilder: (_, i) =>
-                _buildQueueTile(_participants[i + 1], i + 1),
+                _buildQueueTile(_combat.participants[i + 1], i + 1),
           ),
         ),
       ],
@@ -575,12 +611,7 @@ class _InitiativeTrackerScreenState extends State<InitiativeTrackerScreen> {
       onTap: () {
         final current = p.currentHp ?? p.maxHp!;
         final newHp = (current + delta).clamp(0, p.maxHp!);
-        setState(() {
-          final idx = _participants.indexOf(p);
-          if (idx >= 0) {
-            _participants[idx] = p.copyWith(currentHp: newHp);
-          }
-        });
+        _combat.updateParticipant(p.copyWith(currentHp: newHp));
       },
       child: Container(
         width: size,
@@ -623,7 +654,7 @@ class _InitiativeTrackerScreenState extends State<InitiativeTrackerScreen> {
     if (duringCombat) {
       _addParticipantDuringCombat(result);
     } else {
-      setState(() => _participants.add(result.participant));
+      _combat.addParticipant(result.participant);
     }
   }
 

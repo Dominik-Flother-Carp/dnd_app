@@ -1,5 +1,360 @@
 {
     "className": "Druide",
     "subclassName": "Zirkel des Landes",
-    "fluff": "Der Zirkel des Landes besteht aus Mystikern und Weisen, die uraltes Wissen und Riten durch ihre mündlich überlieferte Tradition erhalten. Diese Druiden treffen sich in heiligen Hainen oder Kreisen aus aufgestellten Steinen, wo sie mystische Geheimnisse der Wildnis miteinander teilen. Die erfahrensten Mitglieder eines Zirkels dienen als Oberpriester von Gemeinschaften, die den Alten Glauben bewahren, und stehen deren Anführern als Berater zur Seite. Als Mitglied dieses Zirkels wird deine Magie von dem Land selbst beeinflusst, in dem du in die mystischen Rituale des Zirkels eingeführt wurdest."
+    "fluff": "Der Zirkel des Landes besteht aus Mystikern und Weisen, die uraltes Wissen und Riten durch ihre mündlich überlieferte Tradition erhalten. Diese Druiden treffen sich in heiligen Hainen oder Kreisen aus aufgestellten Steinen, wo sie mystische Geheimnisse der Wildnis miteinander teilen. Die erfahrensten Mitglieder eines Zirkels dienen als Oberpriester von Gemeinschaften, die den Alten Glauben bewahren, und stehen deren Anführern als Berater zur Seite. Als Mitglied dieses Zirkels wird deine Magie von dem Land selbst beeinflusst, in dem du in die mystischen Rituale des Zirkels eingeführt wurdest.",
+    "features": [
+        {
+            "id": "druid_land_bonus_cantrip",
+            "name": "Zusätzlicher Zaubertrick",
+            "unlocksAtLevel": 2,
+            "description": "Bei der Wahl dieses Zirkels kannst du dir einen beliebigen Zaubertrick aus der Zauberliste des Druiden aussuchen. Dieser zählt nicht zur maximalen Anzahl deiner bekannten Zaubertricks."
+        },
+        {
+            "id": "druid_land_natural_recovery",
+            "name": "Natürliche Erholung",
+            "unlocksAtLevel": 2,
+            "description": "Du kannst ein wenig deiner magischen Energie zurückgewinnen, indem du in Meditation verharrst und deinen Geist mit der Natur vereinst. Im Rahmen einer kurzen Rast kannst du dir eine gewisse Anzahl verbrauchter Zauberplätze aussuchen, die du wiedererlangst. Die Zauberplätze dürfen zusammengenommen höchstens eine Gradzahl besitzen, die kleiner oder gleich der Hälfte deiner Stufe als Druide ist (abgerundet). Darüber hinaus darf keiner der Zauberplätze Grad 6 oder höher sein. Diese Fähigkeit kannst du erst nach einer langen Rast erneut einsetzen.\nBist du beispielsweise ein Druide der 4. Stufe, kannst du bis zu zwei Grade an Zauberplätzen wiedererlangen. Du kannst also entweder zwei Zauberplätze des 1. Grades oder einen Zauberplatz des 2. Grades zurückgewinnen."
+        },
+        {
+            "id": "druid_land_circle_spells",
+            "name": "Zauber des Zirkels",
+            "unlocksAtLevel": 2,
+            "description": "Deine mystische Verbindung mit dem Land verleiht dir die Fähigkeit, bestimmte Zaubersprüche zu wirken. Auf bestimmten Stufen erhältst du Zugang zu Zaubern des Zirkels, die im Zusammenhang mit der Region stehen, in der du zum Druiden geweiht wurdest. Wähle eine der folgenden Landschaftsarten: Arktisch, Gebirge, Grasland, Küste, Sumpf, Unterreich, Wald oder Wüste.\nSobald du Zugang zu einem Zauber des Zirkels hast, ist dieser immer vorbereitet und zählt nicht zur maximalen Anzahl deiner vorbereiteten Zauber. Sprüche, die nicht in der Zauberliste des Druiden enthalten sind, gelten für dich trotzdem als Druidenzauber.",
+            "choice": {
+                "prompt": "Wähle dein Terrain",
+                "options": [
+                    {
+                        "id": "land_arctic",
+                        "name": "Arktisch",
+                        "description": "Eisige Tundra und ewiger Frost prägen deine Magie.",
+                        "grantedSpells": [
+                            {
+                                "spellId": "spell_person_festhalten",
+                                "atLevel": 3
+                            },
+                            {
+                                "spellId": "spell_dornenwuchs",
+                                "atLevel": 3
+                            },
+                            {
+                                "spellId": "spell_verlangsamen",
+                                "atLevel": 5
+                            },
+                            {
+                                "spellId": "spell_schneesturm",
+                                "atLevel": 5
+                            },
+                            {
+                                "spellId": "spell_bewegungsfreiheit",
+                                "atLevel": 7
+                            },
+                            {
+                                "spellId": "spell_eissturm",
+                                "atLevel": 7
+                            },
+                            {
+                                "spellId": "spell_kaeltekegel",
+                                "atLevel": 9
+                            },
+                            {
+                                "spellId": "spell_einswerden_mit_der_natur",
+                                "atLevel": 9
+                            }
+                        ]
+                    },
+                    {
+                        "id": "land_coast",
+                        "name": "Küste",
+                        "description": "Wind und Wellen, Ebbe und Flut fließen durch deine Magie.",
+                        "grantedSpells": [
+                            {
+                                "spellId": "spell_nebelschritt",
+                                "atLevel": 3
+                            },
+                            {
+                                "spellId": "spell_spiegelbilder",
+                                "atLevel": 3
+                            },
+                            {
+                                "spellId": "spell_wasser_atmen",
+                                "atLevel": 5
+                            },
+                            {
+                                "spellId": "spell_auf_wasser_gehen",
+                                "atLevel": 5
+                            },
+                            {
+                                "spellId": "spell_wasser_kontrollieren",
+                                "atLevel": 7
+                            },
+                            {
+                                "spellId": "spell_bewegungsfreiheit",
+                                "atLevel": 7
+                            },
+                            {
+                                "spellId": "spell_ausspaehung",
+                                "atLevel": 9
+                            },
+                            {
+                                "spellId": "spell_elementar_beschwoeren",
+                                "atLevel": 9
+                            }
+                        ]
+                    },
+                    {
+                        "id": "land_desert",
+                        "name": "Wüste",
+                        "description": "Sengende Hitze, weiter Sand und klirrende Kälte der Nacht.",
+                        "grantedSpells": [
+                            {
+                                "spellId": "spell_verschwimmen",
+                                "atLevel": 3
+                            },
+                            {
+                                "spellId": "spell_stille",
+                                "atLevel": 3
+                            },
+                            {
+                                "spellId": "spell_schutz_vor_energie",
+                                "atLevel": 5
+                            },
+                            {
+                                "spellId": "spell_nahrung_und_wasser_erschaffen",
+                                "atLevel": 5
+                            },
+                            {
+                                "spellId": "spell_duerre",
+                                "atLevel": 7
+                            },
+                            {
+                                "spellId": "spell_scheingelaende",
+                                "atLevel": 7
+                            },
+                            {
+                                "spellId": "spell_insektenplage",
+                                "atLevel": 9
+                            },
+                            {
+                                "spellId": "spell_steinwand",
+                                "atLevel": 9
+                            }
+                        ]
+                    },
+                    {
+                        "id": "land_forest",
+                        "name": "Wald",
+                        "description": "Uralte Bäume, verborgene Pfade und das Flüstern der Blätter.",
+                        "grantedSpells": [
+                            {
+                                "spellId": "spell_rindenhaut",
+                                "atLevel": 3
+                            },
+                            {
+                                "spellId": "spell_spinnenklettern",
+                                "atLevel": 3
+                            },
+                            {
+                                "spellId": "spell_blitze_herbeirufen",
+                                "atLevel": 5
+                            },
+                            {
+                                "spellId": "spell_pflanzenwachstum",
+                                "atLevel": 5
+                            },
+                            {
+                                "spellId": "spell_bewegungsfreiheit",
+                                "atLevel": 7
+                            },
+                            {
+                                "spellId": "spell_weissagung",
+                                "atLevel": 7
+                            },
+                            {
+                                "spellId": "spell_einswerden_mit_der_natur",
+                                "atLevel": 9
+                            },
+                            {
+                                "spellId": "spell_hoelzerner_weg",
+                                "atLevel": 9
+                            }
+                        ]
+                    },
+                    {
+                        "id": "land_grassland",
+                        "name": "Grasland",
+                        "description": "Weite Ebenen, offener Horizont und der Wind der Freiheit.",
+                        "grantedSpells": [
+                            {
+                                "spellId": "spell_unsichtbarkeit",
+                                "atLevel": 3
+                            },
+                            {
+                                "spellId": "spell_spurloses_gehen",
+                                "atLevel": 3
+                            },
+                            {
+                                "spellId": "spell_tageslicht",
+                                "atLevel": 5
+                            },
+                            {
+                                "spellId": "spell_tageslicht",
+                                "atLevel": 5
+                            },
+                            {
+                                "spellId": "spell_weissagung",
+                                "atLevel": 7
+                            },
+                            {
+                                "spellId": "spell_bewegungsfreiheit",
+                                "atLevel": 7
+                            },
+                            {
+                                "spellId": "spell_insektenplage",
+                                "atLevel": 9
+                            },
+                            {
+                                "spellId": "spell_traum",
+                                "atLevel": 9
+                            }
+                        ]
+                    },
+                    {
+                        "id": "land_mountain",
+                        "name": "Gebirge",
+                        "description": "Schroffe Gipfel, Sturm und Stein – unerschütterlich wie der Berg.",
+                        "grantedSpells": [
+                            {
+                                "spellId": "spell_spinnenklettern",
+                                "atLevel": 3
+                            },
+                            {
+                                "spellId": "spell_dornenwuchs",
+                                "atLevel": 3
+                            },
+                            {
+                                "spellId": "spell_blitz",
+                                "atLevel": 5
+                            },
+                            {
+                                "spellId": "spell_mit_stein_verschmelzen",
+                                "atLevel": 5
+                            },
+                            {
+                                "spellId": "spell_steinhaut",
+                                "atLevel": 7
+                            },
+                            {
+                                "spellId": "spell_formen",
+                                "atLevel": 7
+                            },
+                            {
+                                "spellId": "spell_steinwand",
+                                "atLevel": 9
+                            },
+                            {
+                                "spellId": "spell_waende_passieren",
+                                "atLevel": 9
+                            }
+                        ]
+                    },
+                    {
+                        "id": "land_swamp",
+                        "name": "Sumpf",
+                        "description": "Trübes Wasser, faulender Grund und verborgene Gefahr.",
+                        "grantedSpells": [
+                            {
+                                "spellId": "spell_melfs_saeurepfeil",
+                                "atLevel": 3
+                            },
+                            {
+                                "spellId": "spell_dunkelheit",
+                                "atLevel": 3
+                            },
+                            {
+                                "spellId": "spell_auf_wasser_gehen",
+                                "atLevel": 5
+                            },
+                            {
+                                "spellId": "spell_stinkende_wolke",
+                                "atLevel": 5
+                            },
+                            {
+                                "spellId": "spell_bewegungsfreiheit",
+                                "atLevel": 7
+                            },
+                            {
+                                "spellId": "spell_kreatur_aufspueren",
+                                "atLevel": 7
+                            },
+                            {
+                                "spellId": "spell_insektenplage",
+                                "atLevel": 9
+                            },
+                            {
+                                "spellId": "spell_ausspaehung",
+                                "atLevel": 9
+                            }
+                        ]
+                    },
+                    {
+                        "id": "land_underdark",
+                        "name": "Unterwelt",
+                        "description": "Die ewige Finsternis der Tiefen, voller fremdartiger Magie.",
+                        "grantedSpells": [
+                            {
+                                "spellId": "spell_spinnennetz",
+                                "atLevel": 3
+                            },
+                            {
+                                "spellId": "spell_spinnenklettern",
+                                "atLevel": 3
+                            },
+                            {
+                                "spellId": "spell_stinkende_wolke",
+                                "atLevel": 5
+                            },
+                            {
+                                "spellId": "spell_gasfoermige_gestalt",
+                                "atLevel": 5
+                            },
+                            {
+                                "spellId": "spell_maechtige_unsichtbarkeit",
+                                "atLevel": 7
+                            },
+                            {
+                                "spellId": "spell_stein_formen",
+                                "atLevel": 7
+                            },
+                            {
+                                "spellId": "spell_insektenplage",
+                                "atLevel": 9
+                            },
+                            {
+                                "spellId": "spell_todeswolke",
+                                "atLevel": 9
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "id": "druid_land_lands_stride",
+            "name": "Sicherer Schritt",
+            "unlocksAtLevel": 6,
+            "description": "Es kostet dich keine zusätzliche Bewegung mehr, nicht-magisches schwieriges Gelände zu durchqueren. Du kannst dich auch durch nicht-magische Pflanzen bewegen, ohne von ihnen verlangsamt oder verletzt zu werden, wie es etwa bei Dornen, Stacheln oder ähnlichen Gefahren der Fall wäre.\nDarüber hinaus bist du im Vorteil bei Rettungswürfen gegen Pflanzen, die magisch erschaffen oder manipuliert wurden, um deine Bewegung einzuschränken, wie etwa durch den Zauber **Verstricken**."
+        },
+        {
+            "id": "druid_land_natures_ward",
+            "name": "Schutz der Natur",
+            "unlocksAtLevel": 10,
+            "description": "Du kannst nicht mehr von Feen oder Elementaren bezaubert oder verängstigt werden. Außerdem bist du immun gegen Gifte und Krankheiten."
+        },
+        {
+            "id": "druid_land_natures_sanctuary",
+            "name": "Heiligtum der Natur",
+            "unlocksAtLevel": 14,
+            "description": "Natürliche Kreaturen spüren deine Verbindung mit dem Land und werden zögern, dich anzugreifen. Sollte ein Tier oder eine Pflanze dich attackieren wollen, muss der Kreatur ein Weisheitsrettungswt1rf gegen einen SG gelingen, als ob es einem deiner Druidenzauber zu widerstehen versucht. Ist der Rettungswurf ein Misserfolg, muss sich die Kreatur ein anderes Ziel suchen oder verfehlt dich automatisch. Bei einem erfolgreichen Rettungswurf ist die Kreatur für die nächsten 24 Stunden immun gegen diesen Effekt.\nDie Kreatur ist sich schon vor ihrem Angriff über diesen Effekt bewusst."
+        }
+    ]
 }
