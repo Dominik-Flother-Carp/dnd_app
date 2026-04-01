@@ -1,4 +1,56 @@
 {
     "className": "Druide",
-    "fluff": "Sei es beim Anrufen elementarer Kräfte oder in Gestalt einer Kreatur der Wildnis - Druiden verkörpern die Widerstandskraft, Wut und Furchtlosigkeit der Natur. Sie beanspruchen keine Herrschaft über diese, sondern sehen sich selbst als Vollstrecker ihres unbeugsamen Willens."
+    "fluff": "Sei es beim Anrufen elementarer Kräfte oder in Gestalt einer Kreatur der Wildnis - Druiden verkörpern die Widerstandskraft, Wut und Furchtlosigkeit der Natur. Sie beanspruchen keine Herrschaft über diese, sondern sehen sich selbst als Vollstrecker ihres unbeugsamen Willens.",
+    "features": [
+        {
+            "id": "druid_spellcasting",
+            "name": "Zauberwirken",
+            "unlocksAtLevel": 1,
+            "description": "Indem du dich der göttlichen Essenz der Natur bedienst, kannst du Zauber wirken und diese Essenz nach deinem Willen formen.\n\nAls Zauberfokus kannst du einen druidischen Fokus nutzen und dein Zauberwirken-Modifikator ist Weisheit.",
+            "spellcasting": {
+                "type": "prepared"
+            }
+        },
+        {
+            "id": "druid_druidic",
+            "name": "Druidisch",
+            "unlocksAtLevel": 1,
+            "description": "Du beherrscht Druidisch, die Geheimsprache der Druiden. Du weißt nicht nur, wie man die Sprache spricht, sondern auch wie man versteckte Botschaften hinterlassen kann. Jeder, der des Druidischen mächtig ist, findet diese Botschaften automatisch. Uneingeweihte erkennen sie nur mit einem erfolgreichen Wurf auf Weisheit (Wahrnehmung) gegen SG 15, können aber ohne magische Hilfe den Inhalt nicht entschlüsseln."
+        },
+        {
+            "id": "druid_wild_shape",
+            "name": "Tiergestalt",
+            "unlocksAtLevel": 2,
+            "description": "Du kannst deine Aktion nutzen, um auf magische Weise die Gestalt jedes Tieres anzunehmen, das du schon einmal gesehen hast. Du kannst diese Fähigkeit zweimal einsetzen, ohne rasten zu müssen. Nach einer kurzen oder langen Rast erhältst du alle verbrauchten Anwendungen zurück. Deine Stufe als Druide bestimmt die Art der Tiere, in die du dich verwandeln kannst. Beispielsweise kannst du dich auf der 2. Stufe in ein Tier mit einem Herausforderungsgrad (HG) von 1/4 oder niedriger verwandeln, das weder eine Flug- noch eine Schwimmbewegungsrate aufweist.\nDu kannst für eine Anzahl an Stunden in Tiergestalt verbleiben, die deiner halben Stufe als Druide entspricht (abgerundet). Anschließend verwandelst du dich in deine normale Gestalt zurück, falls du nicht vorher eine weitere Anwendung der Fähigkeit benutzt. Du kannst auch früher in deine ursprüngliche Form zurückkehren, indem du dafür in deinem Zug eine Bonusaktion aufwendest. Solltest du bewusstlos werden, auf 0 Trefferpunkte sinken oder sterben, verwandelst du dich automatisch zurück.\nFür die Zeit, in der du verwandelt bist, gelten folgende Regeln:\n\n• Deine Spielwerte werden durch die des Tieres ersetzt. Nur deine Gesinnung, deine Persönlichkeit sowie dein Intelligenz-, Weisheits- und Charismawert bleiben unverändert. Du bist weiterhin in deinen Fertigkeiten und Rettungswürfen geübt und darüber hinaus in denen der Kreatur. Sollte es zu Überschneidungen kommen und die Kreatur einen höheren Übungsbonus aufweisen, benutzt du diesen statt deinem. Besitzt die Kreatur legendäre Aktionen oder Hortaktionen, kannst du diese nicht verwenden.\n\nWenn du dich verwandelst, übernimmst du auch die Trefferpunkte und die Trefferwürfel der Kreatur. Kehrst du in deine normale Form zurück, hast du wieder die gleiche Anzahl Trefferpunkte wie vor der Verwandlung. Solltest du in Tiergestalt auf O Trefferpunkte reduziert werden, wird jeglicher überschüssiger Schaden auf deine normale Form übertragen. Erleidest du beispielsweise 10 Schadenspunkte in Tiergestalt und hast nur noch 1 Trefferpunkt übrig, kehrst du in deine normale Form zurück und erleidest 9 Schadenspunkte. Solange der überschüssige Schaden deine Trefferpunkte in deiner normalen Form nicht auf O reduziert, giltst du nicht als bewusstlos.\n\n• Du kannst keine Zauber wirken oder Handlungen ausführen, für die du Hände benötigst, und nicht in menschlicher Sprache sprechen. Diesbezüglich bist du auf die Möglichkeiten deiner Tiergestalt beschränkt. Dich zu verwandeln, stört nicht die Konzentration auf einen Zauber, den du bereits gewirkt hast. Es verhindert auch nicht, dass du Aktionen ausführen kannst, die Teil eines Zaubers sind-wie es etwa bei einem Spruch wie Blitze herbeirufen der Fall ist, wenn du ihn bereits gewirkt hast.\n\n• Du behältst alle Vorzüge jeglicher Merkmale deiner Klasse, deines Volkes oder aus anderen Quellen und kannst sie anwenden, falls deine neue Gestalt körperlich dazu in der Lage ist. Eine Ausnahme bilden spezielle Sinne wie etwa Dunkelsicht. Diese kannst du nur nutzen, wenn deine neue Form sie ebenfalls besitzt.\n\n• Du kannst bei der Verwandlung wählen, ob deine Ausrüstung an Ort und Stelle auf den Boden fällt, mit der neuen Gestalt verschmilzt oder von ihr getragen wird. Getragene Ausrüstung kann normal verwendet werden, doch der SL entscheidet, ob sie der neuen Form nutzt, basierend auf der Größe und Gestalt der Kreatur. Gegenstände verändern sich allerdings nicht und passen sich deiner neuen Form nicht an.Jegliche Ausrüstung, die du in deiner neuen Gestalt nicht tragen kannst, muss entweder auf den Boden fallen oder mit ihr verschmelzen. Verschmolzene Ausrüstung hat keine Auswirkung, bis du die Gestalt erneut wechselst.",
+            "resource": {
+                "label": "Nutzungen",
+                "maxFormula": "2",
+                "restType": "short"
+            }
+        },
+        {
+            "id": "druid_attribute_increase",
+            "name": "Attributswerterhöhung",
+            "unlocksAtLevel": 4,
+            "description": "Erhöhe einen Attributswert deiner Wahl um 2 Punkte. Du kannst stattdessen auch zwei Attributswerte um jeweils 1 Punkt erhöhen. Kein Attribut darf auf diese Weise über einen Wert von 20 steigen. Du darfst dies auf den Stufen 8, 12, 16 und 19 wiederholen."
+        },
+        {
+            "id": "druid_timeless_body",
+            "name": "Zeitloser Körper",
+            "unlocksAtLevel": 18,
+            "description": "Die wilde Magie der Natur lässt dich langsamer altern, Für alle 10 Jahre, die vergehen, altert dein Körper nur um 1 Jahr."
+        },
+        {
+            "id": "druid_beast_spells",
+            "name": "In Tiergestalt zaubern",
+            "unlocksAtLevel": 18,
+            "description": "Du kannst nun viele deiner Druidenzauber in jeder Gestalt wirken, die du annimmst. Verbale und gestische Komponenten eines Druidenzaubers kannst du in Tiergestalt ausführen, jedoch nicht die Materialkomponenten zur Verfügung stellen."
+        },
+        {
+            "id": "druid_archdruid",
+            "name": "Erzdruide",
+            "unlocksAtLevel": 20,
+            "description": "Auf Stufe 20 kannst du die Tiergestalt unbegrenzt oft annehmen. Außerdem darfst du die verbalen und gestischen Komponenten deiner Druidenzauber ignorieren, genau wie Materialkomponenten, für die keine Kosten angegeben sind und die nicht durch den Zauber verbraucht werden. Du genießt diese Vorzüge sowohl in deiner normalen Form als auch in Tiergestalt."
+        }
+    ]
 }

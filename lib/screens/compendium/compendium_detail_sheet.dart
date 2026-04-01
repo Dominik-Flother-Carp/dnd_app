@@ -145,7 +145,7 @@ class _ItemDetailSheet extends StatelessWidget {
               child: Column(
               children: [
                 if (item.weight > 0)
-                  _buildInfoRow('Gewicht', '${item.weight} lb'),
+                  _buildInfoRow('Gewicht', '${item.weight} Pfund'),
                 _buildInfoRow('Wert', item.valueDisplay),
                 if (item.magicBonus > 0)
                   _buildInfoRow('Magischer Bonus', '+${item.magicBonus}'),
