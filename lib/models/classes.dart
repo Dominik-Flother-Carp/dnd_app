@@ -156,7 +156,7 @@ const List<CharacterClass> characterClasses = [
   CharacterClass(
     name: 'Hexenmeister',
     hitDie: 8,
-    casterType: 'full',
+    casterType: 'pact',
     spellcastingAttribute: 'charisma',
     skillChoices: 2,
     availableSkills: [
@@ -325,6 +325,31 @@ const Map<String, Map<int, List<int>>> spellSlotTable = {
   },
 };
 
+// Paktmagie-Tabelle: [slotGrad, anzahlSlots]
+// Der Hexenmeister hat immer nur einen Slot-Grad und lädt bei kurzer Rast auf.
+const Map<int, List<int>> pactSlotTable = {
+   1: [1, 1],   // Grad 1, 1 Slot
+   2: [1, 2],
+   3: [2, 2],
+   4: [2, 2],
+   5: [3, 2],
+   6: [3, 2],
+   7: [4, 2],
+   8: [4, 2],
+   9: [5, 2],
+  10: [5, 2],
+  11: [5, 3],
+  12: [5, 3],
+  13: [5, 3],
+  14: [5, 3],
+  15: [5, 3],
+  16: [5, 3],
+  17: [5, 4],
+  18: [5, 4],
+  19: [5, 4],
+  20: [5, 4],
+};
+
 Map<int, SpellSlot> calculateSpellSlots(String className, int level) {
   final selectedClass = characterClasses
       .where((c) => c.name == className)
@@ -334,6 +359,15 @@ Map<int, SpellSlot> calculateSpellSlots(String className, int level) {
 
   // Kein Zauberer: casterType ist null oder leer
   if (casterType == null || casterType.isEmpty) return {};
+
+  // Paktmagie (Hexenmeister): eigene Tabelle, nur ein Slot-Grad
+  if (casterType == 'pact') {
+    final row = pactSlotTable[level.clamp(1, 20)];
+    if (row == null) return {};
+    final grade = row[0];
+    final count = row[1];
+    return { grade: SpellSlot(max: count, current: count) };
+  }
 
   // 'spellbook' nutzt dieselbe Slot-Tabelle wie 'full'
   final lookupType = casterType == 'spellbook' ? 'full' : casterType;

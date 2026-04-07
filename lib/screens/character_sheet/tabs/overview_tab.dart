@@ -2,6 +2,7 @@ import 'package:dnd_app/widgets/collapsible_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:dnd_app/models/character.dart';
+import 'package:dnd_app/models/classes.dart';
 import 'package:dnd_app/theme/app_text_styles.dart';
 import 'package:dnd_app/theme/app_colors.dart';
 import 'package:dnd_app/models/attributes.dart';
@@ -996,16 +997,45 @@ class _OverviewTabState extends State<OverviewTab>
   // ── Zauberplätze ────────────────────────────────────────────────────────────
 
   Widget _buildSpellSlotsCard() {
+    final isPact = characterClasses
+        .where((cl) => cl.name == c.characterClass)
+        .firstOrNull
+        ?.casterType == 'pact';
     return CollapsibleCard(
-      title: 'Zauberplätze',
+      title: isPact ? 'Paktmagie' : 'Zauberplätze',
       themeColor: widget.themeColor,
-      child: _buildSpellSlotsContent(),
+      child: _buildSpellSlotsContent(isPact: isPact),
     );
   }
 
-  Widget _buildSpellSlotsContent() {
+  Widget _buildSpellSlotsContent({bool isPact = false}) {
     return Column(
       children: [
+        if (isPact) ...[
+          const SizedBox(height: 12),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.orange.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.coffee, size: 14, color: Colors.orange),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Lädt bei kurzer Rast auf',
+                    style: AppTextStyles.bodySmall
+                        .copyWith(color: Colors.orange[800]),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
         const SizedBox(height: 16),
         ...c.spellSlots.entries.map((entry) {
           final grade = entry.key;
@@ -1016,9 +1046,10 @@ class _OverviewTabState extends State<OverviewTab>
               children: [
                 SizedBox(
                   width: 72,
-                  child: Text('Grad $grade',
-                      style: AppTextStyles.bodySmall
-                          .copyWith(color: Colors.grey[600])),
+                  child: Text(
+                    isPact ? 'Grad $grade' : 'Grad $grade',
+                    style: AppTextStyles.bodySmall
+                        .copyWith(color: Colors.grey[600])),
                 ),
                 Expanded(
                   child: Row(

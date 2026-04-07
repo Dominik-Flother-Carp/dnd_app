@@ -804,6 +804,25 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
     );
   }
 
+  bool get _isPactCaster {
+    final cls = characterClasses
+        .where((c) => c.name == (_character?.characterClass ?? ''))
+        .firstOrNull;
+    return cls?.casterType == 'pact';
+  }
+
+  void _shortRest() {
+    if (_isPactCaster) {
+      setState(() {
+        for (final slot in _character!.spellSlots.values) {
+          slot.current = slot.max;
+        }
+      });
+      _saveCharacter();
+    }
+    _featuresTabKey.currentState?.resetForRest('short');
+  }
+
   void _longRest() {
     setState(() {
       _character!.currentHitPoints = _character!.maxHitPoints;
@@ -843,17 +862,13 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
             _buildRestOption(
               icon: Icons.coffee,
               title: 'Kurze Rast',
-              description: 'Trefferwürfel können ausgegeben werden.',
+              description: 'Trefferwürfel können ausgegeben werden.'
+                  '${_isPactCaster ? '\nPaktmagie-Zauberplätze werden wiederhergestellt.' : ''}',
               color: Colors.orange,
               onTap: () {
-                  Navigator.pop(context);
-                  _showUseHitDiceDialog();
-                  if (_character!.characterClass == "Hexenmeister") {
-                    for (final slot in _character!.spellSlots.values) {
-                      slot.current = slot.max;
-                    }
-                  }
-                _featuresTabKey.currentState?.resetForRest('short');
+                Navigator.pop(context);
+                _showUseHitDiceDialog();
+                _shortRest();
               },
             ),
             const SizedBox(height: 12),
