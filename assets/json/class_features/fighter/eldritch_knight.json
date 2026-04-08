@@ -1,5 +1,93 @@
 {
     "className": "Kämpfer",
     "subclassName": "Mystischer Ritter",
-    "fluff": "Der mystische Ritter kombiniert die meisterhafte Kriegskunst, die allen Kämpfern zu eigen ist, mit einem sorgfältigen Studium der Magie. Mystische Ritter wenden ähnliche magische Techniken an wie diejenigen, die von Magiern eingesetzt werden. Sie konzentrieren ihre Studien auf zwei der acht Schulen der Magie: Bannmagie und Hervorrufungen. Bannmagie verschafft dem mystischen Ritter zusätzlichen Schutz im Kampf und Hervorrufungszauber verursachen bei vielen Feinden gleichzeitig Schaden, was die Effektivität des Kämpfers in der Schlacht erhöht. Diese Ritter lernen vergleichsweise wenige Zaubersprüche, die sie jedoch allein ihrem Erinnerungsvermögen anvertrauen, anstatt sie in einem Zauberbuch festzuhalten."
+    "fluff": "Der mystische Ritter kombiniert die meisterhafte Kriegskunst, die allen Kämpfern zu eigen ist, mit einem sorgfältigen Studium der Magie. Mystische Ritter wenden ähnliche magische Techniken an wie diejenigen, die von Magiern eingesetzt werden. Sie konzentrieren ihre Studien auf zwei der acht Schulen der Magie: Bannmagie und Hervorrufungen. Bannmagie verschafft dem mystischen Ritter zusätzlichen Schutz im Kampf und Hervorrufungszauber verursachen bei vielen Feinden gleichzeitig Schaden, was die Effektivität des Kämpfers in der Schlacht erhöht. Diese Ritter lernen vergleichsweise wenige Zaubersprüche, die sie jedoch allein ihrem Erinnerungsvermögen anvertrauen, anstatt sie in einem Zauberbuch festzuhalten.",
+    "features": [
+        {
+            "id": "fighter_fighting_style",
+            "name": "Kampfstil",
+            "unlocksAtLevel": 1,
+            "description": "Du nimmst einen Kampfstil als Spezialgebiet an.",
+            "choice": {
+                "prompt": "Wähle einen Kampfstil",
+                "options": [
+                    {
+                        "id": "fighting_style_archery",
+                        "name": "Bogenschiessen",
+                        "description": "Du erhältst einen Bonus von +2 auf alle Angriffswürfe mit Fernkampfwaffen."
+                    },
+                    {
+                        "id": "fighting_style_defense",
+                        "name": "Verteidigung",
+                        "description": "Solange du eine Rüstung trägst, erhältst du einen Bonus von +1 auf deine Rüstungsklasse."
+                    },
+                    {
+                        "id": "fighting_style_dueling",
+                        "name": "Duell",
+                        "description": "Kämpfst du nur mit einer einhändig geführten Nahkampfwaffe und keiner Waffe in der anderen Hand, erhältst du einen Bonus von +2 auf die Schadenswürfe mit dieser Waffe."
+                    },
+                    {
+                        "id": "fighting_great_weapon_fighting",
+                        "name": "Kampf mit großen Waffen",
+                        "description": "Greifst du mit einer beidhändig geführten Nahkampfwaffe an und würfelst bei deinem Schadenswurf eine 1 oder 2, darfst du den entsprechenden Schadenswürfel erneut würfeln. Das zweite Ergebnis musst du verwenden, auch wenn es wieder eine 1 oder 2 sein sollte. Die Waffe muss die Waffeneigenschaft zweihändig oder vielseitig besitzen, um diesen Vorzug zu gewähren."
+                    },
+                    {
+                        "id": "fighting_protection",
+                        "name": "Leibwache",
+                        "description": "Führt eine Kreatur, die du sehen kannst, einen Angriff auf eine bis zu 1,50 m von dir entfernt stehende Kreatur aus (die nicht du selbst bist), kannst du deine Reaktion verwenden, damit der Angreifer bei seinem Wurf im Nachteil ist. Du musst dafür einen Schild tragen."
+                    },
+                    {
+                        "id": "fighting_style_two_weapon_fighting",
+                        "name": "Verteidigung",
+                        "description": "Wenn du mit zwei Waffen angreifst, kannst du den passenden Attributsmodifikator zum Schaden der zweiten Waffe addieren."
+                    }
+                ]
+            }
+        },
+        {
+            "id": "fighter_second_wind",
+            "name": "Durchschnaufen",
+            "unlocksAtLevel": 1,
+            "description": "Durch deine große Ausdauer bist du in der Lage, während eines Kampfes deine Kräfte zu sammeln und dich dann erholt ins Schlachtgetümmel zu werfen. Du kannst deine Bonusaktion in deinem Zug verwenden, um Trefferpunkte in Höhe von lWl0 + deiner Stufe als Kämpfer wiederzuerlangen.\nHast du die Fähigkeit einmal eingesetzt, steht sie dir erst wieder nach einer kurzen oder langen Rast zur Verfügung.",
+            "resource": {
+                "label": "Nutzungen",
+                "maxFormula": "1",
+                "restType": "short"
+            }
+        },
+        {
+            "id": "fighter_action_surge",
+            "name": "Tatendrang",
+            "unlocksAtLevel": 2,
+            "description": "Du vermagst dich für einen kurzen Augenblick über deine körperlichen Grenzen hinwegzusetzen. In deinem Zug kannst du eine weitere Aktion ausführen, zusätzlich zu deiner regulären Aktion und einer möglichen Bonusaktion.\nHast du die Fähigkeit einmal eingesetzt, steht sie dir erst wieder nach einer kurzen oder langen Rast zur Verfügung. Ab Stufe 17 kannst du dieses Merkmal zweimal nutzen, bevor du rasten musst, darfst es jedoch nur einmal pro Zug anwenden.",
+            "resource": {
+                "label": "Nutzungen",
+                "maxFormula": "1",
+                "restType": "short"
+            }
+        },
+        {
+            "id": "fighter_attribute_increase",
+            "name": "Attributswerterhöhung",
+            "unlocksAtLevel": 4,
+            "description": "Erhöhe einen Attributswert deiner Wahl um 2 Punkte. Du kannst stattdessen auch zwei Attributswerte um jeweils 1 Punkt erhöhen. Kein Attribut darf auf diese Weise über einen Wert von 20 steigen. Du darfst dies auf den Stufen 8, 12, 16 und 19 wiederholen."
+        },
+        {
+            "id": "fighter_additional_attack",
+            "name": "Zusätzlicher Angriff",
+            "unlocksAtLevel": 5,
+            "description": "Führst du in deinem Zug die Angriffaktion aus, kannst du zweimal angreifen."
+        },
+        {
+            "id": "fighter_indomitable",
+            "name": "Unbeugsamkeit",
+            "unlocksAtLevel": 9,
+            "description": "Du kannst einen Rettungswurf, der dir misslingt, wiederholen. Falls du dies tust, musst du das neue Ergebnis verwenden.\nNach ihrem Einsatz steht dir die Fähigkeit erst nach einer langen Rast wieder zur Verfügung. Auf Stufe 13 kannst du dieses Merkmal zweimal einsetzen, bevor eine Rast nötig ist, mit Stufe 17 sogar dreimal.",
+            "resource": {
+                "label": "Nutzungen",
+                "maxFormula": "1",
+                "restType": "long"
+            }
+        }
+    ]
 }

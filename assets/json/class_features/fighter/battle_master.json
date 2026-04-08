@@ -1,5 +1,72 @@
 {
     "className": "Kämpfer",
     "subclassName": "Kampfmeister",
-    "fluff": "Die gelehrten Krieger, die den Archetyp des Kampfmeisters verkörpern, wenden im Gefecht Techniken an, die über Generationen hinweg weitergegeben wurden. Für einen Kampfmeister stellt die Schlacht einen Bereich der akademischen Lehre dar, die manchmal auch das Studium der Waffenschmiedekunst und der Kalligraphie beinhaltet. Nicht jeder Kämpfer nimmt sämtliche Lehrstunden in Geschichte, Theorie und Handwerkskunst, die den Archetyp eines Kampfmeisters ausmachen, in sich auf. Doch jene, denen das gelingt, werden zu vielseitigen Kämpfern mit großem Wissen und hervorragenden Fertigkeiten."
+    "fluff": "Die gelehrten Krieger, die den Archetyp des Kampfmeisters verkörpern, wenden im Gefecht Techniken an, die über Generationen hinweg weitergegeben wurden. Für einen Kampfmeister stellt die Schlacht einen Bereich der akademischen Lehre dar, die manchmal auch das Studium der Waffenschmiedekunst und der Kalligraphie beinhaltet. Nicht jeder Kämpfer nimmt sämtliche Lehrstunden in Geschichte, Theorie und Handwerkskunst, die den Archetyp eines Kampfmeisters ausmachen, in sich auf. Doch jene, denen das gelingt, werden zu vielseitigen Kämpfern mit großem Wissen und hervorragenden Fertigkeiten.",
+    "features": [
+        {
+            "id": "fighter_battle_master_combat_superiority",
+            "name": "Kampfüberlegenheit",
+            "unlocksAtLevel": 3,
+            "description": "Du lernst Manöver, für die du eine spezielle Art von Würfeln benötigst: die Überlegenheitswürfel.",
+            "choice": {
+                "prompt": "Wähle einen Kampfstil",
+                "options": [
+                    {
+                        "id": "fighting_style_archery",
+                        "name": "Bogenschiessen",
+                        "description": "Du erhältst einen Bonus von +2 auf alle Angriffswürfe mit Fernkampfwaffen."
+                    },
+                    {
+                        "id": "fighting_style_defense",
+                        "name": "Verteidigung",
+                        "description": "Solange du eine Rüstung trägst, erhältst du einen Bonus von +1 auf deine Rüstungsklasse."
+                    },
+                    {
+                        "id": "fighting_style_dueling",
+                        "name": "Duell",
+                        "description": "Kämpfst du nur mit einer einhändig geführten Nahkampfwaffe und keiner Waffe in der anderen Hand, erhältst du einen Bonus von +2 auf die Schadenswürfe mit dieser Waffe."
+                    },
+                    {
+                        "id": "fighting_great_weapon_fighting",
+                        "name": "Kampf mit großen Waffen",
+                        "description": "Greifst du mit einer beidhändig geführten Nahkampfwaffe an und würfelst bei deinem Schadenswurf eine 1 oder 2, darfst du den entsprechenden Schadenswürfel erneut würfeln. Das zweite Ergebnis musst du verwenden, auch wenn es wieder eine 1 oder 2 sein sollte. Die Waffe muss die Waffeneigenschaft zweihändig oder vielseitig besitzen, um diesen Vorzug zu gewähren."
+                    },
+                    {
+                        "id": "fighting_protection",
+                        "name": "Leibwache",
+                        "description": "Führt eine Kreatur, die du sehen kannst, einen Angriff auf eine bis zu 1,50 m von dir entfernt stehende Kreatur aus (die nicht du selbst bist), kannst du deine Reaktion verwenden, damit der Angreifer bei seinem Wurf im Nachteil ist. Du musst dafür einen Schild tragen."
+                    },
+                    {
+                        "id": "fighting_style_two_weapon_fighting",
+                        "name": "Verteidigung",
+                        "description": "Wenn du mit zwei Waffen angreifst, kannst du den passenden Attributsmodifikator zum Schaden der zweiten Waffe addieren."
+                    }
+                ]
+            }
+        },
+        {
+            "id": "fighter_battle_master_student_of_war",
+            "name": "Schüler des Krieges",
+            "unlocksAtLevel": 3,
+            "description": "Du wirst geübt in der Anwendung eines Handwerkzeugs deiner Wahl."
+        },
+        {
+            "id": "fighter_battle_master_know_your_enemy",
+            "name": "Kenne deinen Feind",
+            "unlocksAtLevel": 7,
+            "description": "Wenn du für mindestens 1 Minute einen Feind außerhalb des Kampfes beobachtest oder mit ihm interagierst, kannst du bestimmte Informationen über seine Fähigkeiten im Vergleich zu deinen erfahren. Der SL sagt dir, ob du gleichwertig, überlegen oder unterlegen in Bezug auf zwei der folgenden Charakteristika deiner Wahl bist:\n• Stärkewert\n• Geschicklichkeitswert\n• Konstitutionswert\n• Rüstungsklasse\n• aktuelle Trefferpunkte\n• Gesamtzahl der Klassenstufen (falls vorhanden)\n• Klassenstufen als Kämpfer (falls vorhanden)"
+        },
+        {
+            "id": "fighter_battle_master_improved_combat_superiority",
+            "name": "Verbesserte Kampfüberlegenheit",
+            "unlocksAtLevel": 10,
+            "description": "Deine Überlegenheitswürfel werden zu W10. Ab Stufe 18 werden sie zu W12."
+        },
+        {
+            "id": "fighter_battle_master_relentless",
+            "name": "Unermüdlich",
+            "unlocksAtLevel": 15,
+            "description": "Hast du beim Auswürfeln deiner Initiative keine Überlegenheitswürfel mehr zur Verfügung, erhältst du einen Überlegenheitswürfel zurück."
+        }
+    ]
 }

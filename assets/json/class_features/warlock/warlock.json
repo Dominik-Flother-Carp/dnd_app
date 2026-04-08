@@ -1,4 +1,12 @@
 {
     "className": "Hexenmeister",
-    "fluff": "Hexenmeister sind Suchende der Wahrheiten, die im Gewebe des Multiversums versteckt liegen. Durch Pakte, die sie mit mysteriösen Wesen von übernatürlicher Macht schließen, setzen diese Zauberkundigen subtile und spektakuläre magische Kräfte frei. Sie zehren von dem uralten Wissen von Wesen wie Feenadeligen, Dämonen, Teufeln, Hexen und den fremden Entitäten des Femen Reiches, um ihre eigene Macht mit deren arkanen Geheimnissen zu vergrößern."
+    "fluff": "Hexenmeister sind Suchende der Wahrheiten, die im Gewebe des Multiversums versteckt liegen. Durch Pakte, die sie mit mysteriösen Wesen von übernatürlicher Macht schließen, setzen diese Zauberkundigen subtile und spektakuläre magische Kräfte frei. Sie zehren von dem uralten Wissen von Wesen wie Feenadeligen, Dämonen, Teufeln, Hexen und den fremden Entitäten des Femen Reiches, um ihre eigene Macht mit deren arkanen Geheimnissen zu vergrößern.",
+    "features": [
+        {
+            "id": "warlock_pact_magic",
+            "name": "Paktmagie",
+            "unlocksAtLevel": 1,
+            "description": "Du hast einen Pakt mit einem andersweltlichen Wesen deiner Wahl geschlossen: einer Erzfee, einem Unhold oder einem Großen Alten."
+        }
+    ]
 }
