@@ -36,11 +36,13 @@ class ClassFeatureChoiceOption {
   final String id;
   final String name;
   final String description;
+  final List<GrantedSpell> grantedSpells; // optional: Zauber die diese Wahl gewährt
 
   const ClassFeatureChoiceOption({
     required this.id,
     required this.name,
     required this.description,
+    this.grantedSpells = const [],
   });
 
   factory ClassFeatureChoiceOption.fromJson(Map<String, dynamic> j) =>
@@ -48,6 +50,11 @@ class ClassFeatureChoiceOption {
         id:          j['id'] as String,
         name:        j['name'] as String,
         description: j['description'] as String,
+        grantedSpells: j['grantedSpells'] != null
+            ? (j['grantedSpells'] as List)
+                .map((g) => GrantedSpell.fromJson(g as Map<String, dynamic>))
+                .toList()
+            : const [],
       );
 }
 
@@ -128,6 +135,10 @@ class ClassFeature {
   /// dieser ID (z.B. Domänen-Erweiterung von Göttliche Macht fokussieren).
   final String? extendsFeatureId;
 
+  /// Falls gesetzt, überschreibt dieses Feature die Ressource des Features
+  /// mit dieser ID (z.B. zusätzliche Nutzungen bei höheren Stufen).
+  final String? upgradesResourceId;
+
   /// Unterklassen-Features die dieses Feature erweitern (wird beim Mergen
   /// vom Service befüllt, steht nicht in der JSON).
   final List<ClassFeature> extensions;
@@ -143,47 +154,67 @@ class ClassFeature {
     this.spellcasting,
     this.grantedSpells,
     this.extendsFeatureId,
+    this.upgradesResourceId,
     this.extensions = const [],
   });
 
   factory ClassFeature.fromJson(Map<String, dynamic> j) => ClassFeature(
-        id:              j['id'] as String,
-        name:            j['name'] as String,
-        unlocksAtLevel:  j['unlocksAtLevel'] as int,
-        subclassName:    j['subclassName'] as String?,
-        description:     j['description'] as String? ?? '',
-        resource:        j['resource'] != null
+        id:                 j['id'] as String,
+        name:               j['name'] as String,
+        unlocksAtLevel:     j['unlocksAtLevel'] as int,
+        subclassName:       j['subclassName'] as String?,
+        description:        j['description'] as String? ?? '',
+        resource:           j['resource'] != null
             ? ClassFeatureResource.fromJson(
                 j['resource'] as Map<String, dynamic>)
             : null,
-        choice:          j['choice'] != null
+        choice:             j['choice'] != null
             ? ClassFeatureChoice.fromJson(
                 j['choice'] as Map<String, dynamic>)
             : null,
-        spellcasting:    j['spellcasting'] != null
+        spellcasting:       j['spellcasting'] != null
             ? ClassFeatureSpellcasting.fromJson(
                 j['spellcasting'] as Map<String, dynamic>)
             : null,
-        grantedSpells:   j['grantedSpells'] != null
+        grantedSpells:      j['grantedSpells'] != null
             ? (j['grantedSpells'] as List)
                 .map((g) => GrantedSpell.fromJson(g as Map<String, dynamic>))
                 .toList()
             : null,
-        extendsFeatureId: j['extends'] as String?,
+        extendsFeatureId:   j['extends'] as String?,
+        upgradesResourceId: j['upgradesResource'] as String?,
       );
 
   ClassFeature withExtensions(List<ClassFeature> exts) => ClassFeature(
-        id:               id,
-        name:             name,
-        unlocksAtLevel:   unlocksAtLevel,
-        subclassName:     subclassName,
-        description:      description,
-        resource:         resource,
-        choice:           choice,
-        spellcasting:     spellcasting,
-        grantedSpells:    grantedSpells,
-        extendsFeatureId: extendsFeatureId,
-        extensions:       exts,
+        id:                 id,
+        name:               name,
+        unlocksAtLevel:     unlocksAtLevel,
+        subclassName:       subclassName,
+        description:        description,
+        resource:           resource,
+        choice:             choice,
+        spellcasting:       spellcasting,
+        grantedSpells:      grantedSpells,
+        extendsFeatureId:   extendsFeatureId,
+        upgradesResourceId: upgradesResourceId,
+        extensions:         exts,
+      );
+
+  /// Gibt eine Kopie dieses Features mit einer anderen Ressource zurück.
+  /// Wird vom Service genutzt um Resource-Upgrades anzuwenden.
+  ClassFeature withResource(ClassFeatureResource newResource) => ClassFeature(
+        id:                 id,
+        name:               name,
+        unlocksAtLevel:     unlocksAtLevel,
+        subclassName:       subclassName,
+        description:        description,
+        resource:           newResource,
+        choice:             choice,
+        spellcasting:       spellcasting,
+        grantedSpells:      grantedSpells,
+        extendsFeatureId:   extendsFeatureId,
+        upgradesResourceId: upgradesResourceId,
+        extensions:         extensions,
       );
 
   // ── Formel-Auswertung ──────────────────────────────────────────────────────

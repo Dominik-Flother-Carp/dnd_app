@@ -156,16 +156,40 @@ class ClassFeatureService {
   /// Gibt alle für den Charakter relevanten Features zurück:
   /// - Basisklassen-Features bis c.level (subclassName == null)
   /// - Unterklassen-Features falls c.subclass gesetzt und unlocksAtLevel <= c.level
+  /// - Resource-Upgrades werden auf das Basis-Feature angewendet wenn
+  ///   ihr unlocksAtLevel <= c.level (höchstes passendes Upgrade gewinnt)
   Future<List<ClassFeature>> getFeaturesForCharacter(Character c) async {
     await loadForClass(c.characterClass);
     final all = _cache[c.characterClass] ?? [];
 
-    return all.where((f) {
+    // Alle Features die für diesen Charakter relevant sind (Level + Unterklasse)
+    final relevant = all.where((f) {
       if (f.unlocksAtLevel > c.level) return false;
-      if (f.subclassName == null) return true; // Basisklasse
-      return f.subclassName == c.subclass;     // Unterklasse
+      if (f.subclassName == null) return true;
+      return f.subclassName == c.subclass;
     }).toList()
       ..sort((a, b) => a.unlocksAtLevel.compareTo(b.unlocksAtLevel));
+
+    // Resource-Upgrades sammeln: upgradesResourceId → höchstes aktives Upgrade
+    final upgrades = <String, ClassFeature>{};
+    for (final f in relevant) {
+      if (f.upgradesResourceId == null || f.resource == null) continue;
+      final existing = upgrades[f.upgradesResourceId!];
+      if (existing == null ||
+          f.unlocksAtLevel > existing.unlocksAtLevel) {
+        upgrades[f.upgradesResourceId!] = f;
+      }
+    }
+
+    // Upgrades auf Basis-Features anwenden, Upgrade-Features aus Liste entfernen
+    return relevant
+        .where((f) => f.upgradesResourceId == null) // Upgrade-Features ausblenden
+        .map((f) {
+          final upgrade = upgrades[f.id];
+          if (upgrade == null || upgrade.resource == null) return f;
+          return f.withResource(upgrade.resource!);
+        })
+        .toList();
   }
 
   /// Gibt den Fluff-Text einer Unterklasse zurück, oder null.
@@ -181,14 +205,32 @@ class ClassFeatureService {
   }
 
   /// Gibt alle `grantedSpells`-IDs zurück die für den Charakter bei seinem
-  /// aktuellen Level fällig sind.
-  Future<List<String>> getGrantedSpellIds(Character c) async {
+  /// aktuellen Level fällig sind – inklusive Zauber aus gewählten Optionen
+  /// (z.B. Terrain-Zauber des Zirkels des Landes).
+  Future<List<String>> getGrantedSpellIds(
+      Character c, Map<String, String> featureChoices) async {
     final features = await getFeaturesForCharacter(c);
     final ids = <String>[];
     for (final f in features) {
-      if (f.grantedSpells == null) continue;
-      for (final gs in f.grantedSpells!) {
-        if (gs.atLevel <= c.level) ids.add(gs.spellId);
+      // Fest zugewiesene Zauber
+      if (f.grantedSpells != null) {
+        for (final gs in f.grantedSpells!) {
+          if (gs.atLevel <= c.level) ids.add(gs.spellId);
+        }
+      }
+      // Zauber aus der gewählten Option (z.B. Terrain-Wahl)
+      if (f.choice != null) {
+        final chosenId = featureChoices[f.id];
+        if (chosenId != null) {
+          final option = f.choice!.options
+              .where((o) => o.id == chosenId)
+              .firstOrNull;
+          if (option != null) {
+            for (final gs in option.grantedSpells) {
+              if (gs.atLevel <= c.level) ids.add(gs.spellId);
+            }
+          }
+        }
       }
     }
     return ids;

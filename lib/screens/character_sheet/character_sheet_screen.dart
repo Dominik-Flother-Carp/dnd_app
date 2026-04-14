@@ -409,6 +409,26 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
     _syncedForLevel = c.level;
   }
 
+  /// Beim Levelup: wenn das Maximum einer Ressource gestiegen ist,
+  /// werden die verbrauchten Nutzungen auf 0 zurückgesetzt damit der
+  /// Spieler nicht mit einem scheinbar erschöpften Feature startet.
+  Future<void> _syncFeatureResources(Character c) async {
+    final featureService = ClassFeatureService();
+    final features       = await featureService.getFeaturesForCharacter(c);
+    final currentUses    = await _repository.getFeatureUses(c.id);
+
+    for (final f in features) {
+      if (f.resource == null) continue;
+      final newMax  = f.resource!.evaluate(c);
+      final used    = currentUses[f.id] ?? 0;
+      // Wenn das gespeicherte Maximum kleiner war als das neue,
+      // bedeutet das ein Upgrade → verbrauchte Nutzungen zurücksetzen
+      if (used > 0 && used >= newMax) {
+        await _repository.setFeatureUses(c.id, f.id, 0);
+      }
+    }
+  }
+
   Future<void> _saveCharacter() async {
     if (_character == null) return;
     try {
@@ -649,6 +669,7 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
     _updateSpellSlots();
     await _saveCharacter();
     await _syncClassSpells(_character!);
+    await _syncFeatureResources(_character!);
 
     // Neue Features laden und anzeigen
     if (!mounted) return;
