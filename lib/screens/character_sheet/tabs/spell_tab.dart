@@ -4,7 +4,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:dnd_app/models/character.dart';
 import 'package:dnd_app/models/spell.dart';
-import 'package:dnd_app/repositories/character_repository.dart' show CharacterRepository;
+import 'package:dnd_app/repositories/character_repository.dart'
+    show CharacterRepository;
 import 'package:dnd_app/services/compendium_service.dart';
 import 'package:dnd_app/services/class_feature_service.dart';
 import 'package:dnd_app/screens/compendium/compendium_detail_sheet.dart';
@@ -41,10 +42,12 @@ int _calcPreparedLimit(Character c) {
 class _SpellPickerSheet extends StatefulWidget {
   final Color themeColor;
   final String characterClass;
-  final Set<String> alreadyAdded;   // IDs aller bereits hinzugefügten Zauber (für ✓-Anzeige)
-  final int maxSpellLevel;          // Höchster erlaubter Zaubergrad
-  final int? maxCount;              // Maximale Anzahl (null = unbegrenzt)
-  final Set<String> alreadyForLimit; // IDs die gegen das Limit zählen (z.B. ohne Zaubertricks)
+  final Set<String>
+  alreadyAdded; // IDs aller bereits hinzugefügten Zauber (für ✓-Anzeige)
+  final int maxSpellLevel; // Höchster erlaubter Zaubergrad
+  final int? maxCount; // Maximale Anzahl (null = unbegrenzt)
+  final Set<String>
+  alreadyForLimit; // IDs die gegen das Limit zählen (z.B. ohne Zaubertricks)
 
   const _SpellPickerSheet({
     required this.themeColor,
@@ -61,7 +64,7 @@ class _SpellPickerSheet extends StatefulWidget {
 
 class _SpellPickerSheetState extends State<_SpellPickerSheet> {
   final _searchCtrl = TextEditingController();
-  final _service    = CompendiumService();
+  final _service = CompendiumService();
 
   List<Spell> _results = [];
   bool _loading = true;
@@ -145,7 +148,9 @@ class _SpellPickerSheetState extends State<_SpellPickerSheet> {
                   if (widget.maxCount != null) ...[
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 3),
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
                       decoration: BoxDecoration(
                         color: _isFull
                             ? Colors.red.withValues(alpha: 0.12)
@@ -164,10 +169,13 @@ class _SpellPickerSheetState extends State<_SpellPickerSheet> {
                   ],
                   if (widget.characterClass.isNotEmpty)
                     Chip(
-                      label: Text(widget.characterClass,
-                          style: AppTextStyles.labelXs),
-                      backgroundColor:
-                          widget.themeColor.withValues(alpha: 0.12),
+                      label: Text(
+                        widget.characterClass,
+                        style: AppTextStyles.labelXs,
+                      ),
+                      backgroundColor: widget.themeColor.withValues(
+                        alpha: 0.12,
+                      ),
                       side: BorderSide.none,
                       padding: const EdgeInsets.symmetric(horizontal: 4),
                     ),
@@ -184,12 +192,14 @@ class _SpellPickerSheetState extends State<_SpellPickerSheet> {
                     color: Colors.red.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                        color: Colors.red.withValues(alpha: 0.3)),
+                      color: Colors.red.withValues(alpha: 0.3),
+                    ),
                   ),
                   child: Text(
                     'Zauberbuch voll. Auf dieser Stufe können keine weiteren Zauber eingetragen werden.',
-                    style: AppTextStyles.bodySmall
-                        .copyWith(color: Colors.red[700]),
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: Colors.red[700],
+                    ),
                   ),
                 ),
               ),
@@ -219,23 +229,24 @@ class _SpellPickerSheetState extends State<_SpellPickerSheet> {
               child: _loading
                   ? const Center(child: CircularProgressIndicator())
                   : _results.isEmpty
-                      ? Center(
-                          child: Text(
-                            'Keine Zauber gefunden',
-                            style: AppTextStyles.bodySmall
-                                .copyWith(color: Colors.grey),
-                          ),
-                        )
-                      : ListView.separated(
-                          controller: scrollCtrl,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
-                          itemCount: _results.length,
-                          separatorBuilder: (_, _) =>
-                              const SizedBox(height: 4),
-                          itemBuilder: (_, i) =>
-                              _buildSpellTile(_results[i]),
+                  ? Center(
+                      child: Text(
+                        'Keine Zauber gefunden',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: Colors.grey,
                         ),
+                      ),
+                    )
+                  : ListView.separated(
+                      controller: scrollCtrl,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      itemCount: _results.length,
+                      separatorBuilder: (_, _) => const SizedBox(height: 4),
+                      itemBuilder: (_, i) => _buildSpellTile(_results[i]),
+                    ),
             ),
           ],
         );
@@ -245,17 +256,18 @@ class _SpellPickerSheetState extends State<_SpellPickerSheet> {
 
   Widget _buildSpellTile(Spell spell) {
     final alreadyAdded = widget.alreadyAdded.contains(spell.id);
-    final blocked      = !alreadyAdded && _isFull;
+    final blocked = !alreadyAdded && _isFull;
     return Card(
       margin: EdgeInsets.zero,
       child: ListTile(
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         leading: _levelBadge(spell.level, widget.themeColor),
-        title: Text(spell.name,
-            style: AppTextStyles.cardTitle.copyWith(
-              color: blocked ? Colors.grey[400] : null,
-            )),
+        title: Text(
+          spell.name,
+          style: AppTextStyles.cardTitle.copyWith(
+            color: blocked ? Colors.grey[400] : null,
+          ),
+        ),
         subtitle: Text(
           [
             spell.school.label,
@@ -265,11 +277,12 @@ class _SpellPickerSheetState extends State<_SpellPickerSheet> {
           style: AppTextStyles.bodySmall.copyWith(color: Colors.grey[500]),
         ),
         trailing: alreadyAdded
-            ? Icon(Icons.check_circle,
-                color: widget.themeColor, size: 22)
-            : Icon(Icons.add_circle_outline,
+            ? Icon(Icons.check_circle, color: widget.themeColor, size: 22)
+            : Icon(
+                Icons.add_circle_outline,
                 size: 22,
-                color: blocked ? Colors.grey[300] : null),
+                color: blocked ? Colors.grey[300] : null,
+              ),
         onTap: (alreadyAdded || blocked)
             ? null
             : () => Navigator.pop(context, spell),
@@ -316,9 +329,8 @@ class SpellTab extends StatefulWidget {
   State<SpellTab> createState() => SpellTabState();
 }
 
-class SpellTabState extends State<SpellTab>
-    with AutomaticKeepAliveClientMixin {
-  final _repo           = CharacterRepository();
+class SpellTabState extends State<SpellTab> with AutomaticKeepAliveClientMixin {
+  final _repo = CharacterRepository();
   final _featureService = ClassFeatureService();
 
   List<Spell> _spells = [];
@@ -349,8 +361,11 @@ class SpellTabState extends State<SpellTab>
   Future<void> reload() => _load();
 
   Future<void> _load() async {
-    final grantedIds = (await _featureService.getGrantedSpellIds(widget.character))
-        .toSet();
+    final choices = await _repo.getAllFeatureChoices(widget.character.id);
+    final grantedIds = (await _featureService.getGrantedSpellIds(
+      widget.character,
+      choices,
+    )).toSet();
     final rows = await _repo.getSpellsForCharacter(widget.character.id);
     if (!mounted) return;
     setState(() {
@@ -384,13 +399,14 @@ class SpellTabState extends State<SpellTab>
   int get _preparedLimit => _calcPreparedLimit(widget.character);
 
   /// Vorbereitete Zauber (Grad > 0), Zaubertricks und gewährte Zauber zählen nicht
-  int get _preparedCount =>
-      _spells.where((s) =>
-          s.level > 0 &&
-          _preparedSpellIds.contains(s.id) &&
-          !_grantedSpellIds.contains(s.id)).length;
-
-
+  int get _preparedCount => _spells
+      .where(
+        (s) =>
+            s.level > 0 &&
+            _preparedSpellIds.contains(s.id) &&
+            !_grantedSpellIds.contains(s.id),
+      )
+      .length;
 
   bool _isPrepared(Spell s) =>
       s.level == 0 ||
@@ -414,13 +430,16 @@ class SpellTabState extends State<SpellTab>
       ..sort((a, b) => a.key.compareTo(b.key)));
 
     // Bekannte aber nicht vorbereitete Zauber
-    _unpreparedCache = (_spells
-        .where((s) =>
-            s.level > 0 &&
-            !_grantedSpellIds.contains(s.id) &&
-            !_preparedSpellIds.contains(s.id))
-        .toList()
-      ..sort((a, b) => a.name.compareTo(b.name)));
+    _unpreparedCache =
+        (_spells
+            .where(
+              (s) =>
+                  s.level > 0 &&
+                  !_grantedSpellIds.contains(s.id) &&
+                  !_preparedSpellIds.contains(s.id),
+            )
+            .toList()
+          ..sort((a, b) => a.name.compareTo(b.name)));
   }
 
   // ── Zauber hinzufügen / entfernen ─────────────────────────────────────────
@@ -430,47 +449,63 @@ class SpellTabState extends State<SpellTab>
         ? 0
         : widget.character.spellSlots.keys.reduce((a, b) => a > b ? a : b);
 
-    // Zauberbuchlimit für Magier: Stufe 1 → 6 Zauber, jede weitere Stufe +2.
-    // Zaubertricks (Grad 0) zählen nicht gegen das Limit.
     final cls = characterClasses
         .where((c) => c.name == widget.character.characterClass)
         .firstOrNull;
+
     int? maxCount;
     Set<String> alreadyForLimit = _spells.map((s) => s.id).toSet();
+
+    // Zaubertricks zählen nie gegen das Nicht-Zaubertrick-Limit
+    final nonCantrips = _spells
+        .where((s) => s.level > 0)
+        .map((s) => s.id)
+        .toSet();
+
     if (cls?.casterType == 'spellbook') {
-      final lvl = widget.character.level;
-      maxCount = 6 + (lvl - 1) * 2;
-      // Nur Nicht-Zaubertricks zählen gegen das Limit
-      alreadyForLimit =
-          _spells.where((s) => s.level > 0).map((s) => s.id).toSet();
+      // Magier: Stufe 1 → 6 Zauber, jede weitere Stufe +2
+      maxCount = 6 + (widget.character.level - 1) * 2;
+      alreadyForLimit = nonCantrips;
+    } else {
+      // Known-Caster: Limit aus Tabelle holen
+      final limit = knownSpellsLimit(
+        widget.character.characterClass,
+        widget.character.level,
+      );
+      if (limit != null) {
+        maxCount = limit;
+        alreadyForLimit = nonCantrips;
+      }
     }
 
     final spell = await showModalBottomSheet<Spell>(
       context: context,
       isScrollControlled: true,
       builder: (_) => _SpellPickerSheet(
-        themeColor:     widget.themeColor,
+        themeColor: widget.themeColor,
         characterClass: widget.character.characterClass,
-        alreadyAdded:   _spells.map((s) => s.id).toSet(),
-        maxSpellLevel:  maxLevel,
-        maxCount:       maxCount,
+        alreadyAdded: _spells.map((s) => s.id).toSet(),
+        maxSpellLevel: maxLevel,
+        maxCount: maxCount,
         alreadyForLimit: alreadyForLimit,
       ),
     );
     if (spell == null || !mounted) return;
     await _repo.upsertSpell(spell);
     await _repo.addSpellToCharacter(
-        widget.character.id, spell.id,
-        isPrepared: false);
+      widget.character.id,
+      spell.id,
+      isPrepared: false,
+    );
     await _load();
   }
 
   Future<void> _togglePrepared(Spell spell) async {
     if (spell.level == 0) return; // Zaubertricks sind immer "vorbereitet"
-    if (_grantedSpellIds.contains(spell.id)) return; // gewährte Zauber sind immer vorbereitet
+    if (_grantedSpellIds.contains(spell.id))
+      return; // gewährte Zauber sind immer vorbereitet
     final nowPrepared = !_preparedSpellIds.contains(spell.id);
-    await _repo.setSpellPrepared(
-        widget.character.id, spell.id, nowPrepared);
+    await _repo.setSpellPrepared(widget.character.id, spell.id, nowPrepared);
     setState(() {
       if (nowPrepared) {
         _preparedSpellIds.add(spell.id);
@@ -557,27 +592,22 @@ class SpellTabState extends State<SpellTab>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.auto_fix_off_outlined,
-              size: 64, color: Colors.grey[300]),
+          Icon(Icons.auto_fix_off_outlined, size: 64, color: Colors.grey[300]),
           const SizedBox(height: 16),
           Text(
             'Kein Zauberwirker',
-            style: AppTextStyles.sectionTitle
-                .copyWith(color: Colors.grey[400]),
+            style: AppTextStyles.sectionTitle.copyWith(color: Colors.grey[400]),
           ),
           const SizedBox(height: 8),
           Text(
             '${widget.character.characterClass} hat keine Zauberfähigkeiten.',
-            style:
-                AppTextStyles.bodySmall.copyWith(color: Colors.grey),
+            style: AppTextStyles.bodySmall.copyWith(color: Colors.grey),
             textAlign: TextAlign.center,
           ),
         ],
       ),
     );
   }
-
-
 
   Widget _buildUnpreparedHeader() {
     return Padding(
@@ -606,9 +636,9 @@ class SpellTabState extends State<SpellTab>
   // ── Summary-Karte ─────────────────────────────────────────────────────────
 
   Widget _buildSummaryCard() {
-    final cls       = _characterClass;
-    final attr      = cls?.spellcastingAttribute ?? '';
-    final attrMod   = widget.character.spellcastingModifier(attr);
+    final cls = _characterClass;
+    final attr = cls?.spellcastingAttribute ?? '';
+    final attrMod = widget.character.spellcastingModifier(attr);
     final attrLabel = widget.character.spellcastingAttrLabel(attr);
     final profBonus = widget.character.proficiencyBonus;
     final saveDC = attr.isNotEmpty ? 8 + profBonus + attrMod : 0;
@@ -626,9 +656,7 @@ class SpellTabState extends State<SpellTab>
             ),
             _summaryStat(
               label: 'Angriff',
-              value: _isSpellcaster
-                  ? signedInt(attackBonus)
-                  : '—',
+              value: _isSpellcaster ? signedInt(attackBonus) : '—',
               icon: Icons.bolt,
             ),
             _summaryStat(
@@ -636,16 +664,37 @@ class SpellTabState extends State<SpellTab>
               value: _isSpellcaster ? attrLabel : '—',
               icon: Icons.psychology_outlined,
             ),
-            _summaryStat(
-              label: 'Vorbereitet',
-              value: _isSpellcaster
-                  ? '$_preparedCount / $_preparedLimit'
-                  : '—',
-              icon: Icons.checklist,
-              color: _preparedCount > _preparedLimit
-                  ? Colors.orange
-                  : widget.themeColor,
-            ),
+            () {
+              final knownLimit = knownSpellsLimit(
+                widget.character.characterClass,
+                widget.character.level,
+              );
+              final isKnown =
+                  knownLimit != null ||
+                  (_characterClass?.casterType == 'spellbook');
+              if (isKnown) {
+                final limit = _characterClass?.casterType == 'spellbook'
+                    ? 6 + (widget.character.level - 1) * 2
+                    : knownLimit!;
+                final count = _spells.where((s) => s.level > 0).length;
+                return _summaryStat(
+                  label: 'Bekannt',
+                  value: _isSpellcaster ? '$count / $limit' : '—',
+                  icon: Icons.menu_book_outlined,
+                  color: count > limit ? Colors.red : widget.themeColor,
+                );
+              }
+              return _summaryStat(
+                label: 'Vorbereitet',
+                value: _isSpellcaster
+                    ? '$_preparedCount / $_preparedLimit'
+                    : '—',
+                icon: Icons.checklist,
+                color: _preparedCount > _preparedLimit
+                    ? Colors.orange
+                    : widget.themeColor,
+              );
+            }(),
           ],
         ),
       ),
@@ -678,13 +727,11 @@ class SpellTabState extends State<SpellTab>
       mainAxisSize: MainAxisSize.min,
       children: [
         const SizedBox(height: 32),
-        Icon(Icons.auto_fix_high_outlined,
-            size: 64, color: Colors.grey[300]),
+        Icon(Icons.auto_fix_high_outlined, size: 64, color: Colors.grey[300]),
         const SizedBox(height: 16),
         Text(
           'Keine Zauber vorbereitet',
-          style: AppTextStyles.sectionTitle
-              .copyWith(color: Colors.grey[400]),
+          style: AppTextStyles.sectionTitle.copyWith(color: Colors.grey[400]),
         ),
         const SizedBox(height: 8),
         Text(
@@ -719,8 +766,9 @@ class SpellTabState extends State<SpellTab>
               const SizedBox(width: 4),
               Text(
                 '(${spells.length})',
-                style: AppTextStyles.bodySmall
-                    .copyWith(color: Colors.grey[400]),
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: Colors.grey[400],
+                ),
               ),
             ],
           ),
@@ -766,20 +814,23 @@ class SpellTabState extends State<SpellTab>
                         if (spell.ritual)
                           AppBadge(label: 'Ritual', color: Colors.teal),
                         if (spell.concentration)
-                          AppBadge(label: 'Konzentration', color: Colors.purple),
+                          AppBadge(
+                            label: 'Konzentration',
+                            color: Colors.purple,
+                          ),
                       ],
                     ),
                     const SizedBox(height: 2),
                     Text(
                       _spellSubtitle(spell),
-                      style: AppTextStyles.bodySmall
-                          .copyWith(color: Colors.grey[500]),
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: Colors.grey[500],
+                      ),
                     ),
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right,
-                  size: 18, color: Colors.grey[400]),
+              Icon(Icons.chevron_right, size: 18, color: Colors.grey[400]),
             ],
           ),
         ),
@@ -798,8 +849,8 @@ class SpellTabState extends State<SpellTab>
   }
 
   Future<void> _showSpellOptions(Spell spell) async {
-    final isPrepared  = _isPrepared(spell);
-    final isGranted   = _grantedSpellIds.contains(spell.id);
+    final isPrepared = _isPrepared(spell);
+    final isGranted = _grantedSpellIds.contains(spell.id);
     await showModalBottomSheet(
       context: context,
       builder: (_) => SafeArea(
@@ -817,7 +868,9 @@ class SpellTabState extends State<SpellTab>
             if (spell.level > 0 && !isGranted)
               ListTile(
                 leading: Icon(
-                  isPrepared ? Icons.bookmark_remove : Icons.bookmark_add_outlined,
+                  isPrepared
+                      ? Icons.bookmark_remove
+                      : Icons.bookmark_add_outlined,
                   color: widget.themeColor,
                 ),
                 title: Text(
@@ -831,8 +884,7 @@ class SpellTabState extends State<SpellTab>
               ),
             if (!isGranted)
               ListTile(
-                leading:
-                    const Icon(Icons.delete_outline, color: Colors.red),
+                leading: const Icon(Icons.delete_outline, color: Colors.red),
                 title: Text(
                   'Zauber entfernen',
                   style: AppTextStyles.body.copyWith(color: Colors.red),
