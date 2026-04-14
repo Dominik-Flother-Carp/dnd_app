@@ -8,6 +8,9 @@ import 'package:dnd_app/screens/character_sheet/tabs/skills_tab.dart';
 import 'package:dnd_app/screens/character_sheet/tabs/inventory_tab.dart';
 import 'package:dnd_app/screens/character_sheet/tabs/spell_tab.dart' show SpellTab, SpellTabState;
 import 'package:dnd_app/screens/character_sheet/tabs/features_tab.dart';
+import 'package:dnd_app/screens/character_sheet/dialogs/level_up_dialog.dart';
+import 'package:dnd_app/screens/character_sheet/dialogs/hit_dice_dialog.dart';
+import 'package:dnd_app/screens/character_sheet/dialogs/identity_sheet.dart';
 import 'package:dnd_app/theme/app_text_styles.dart';
 import 'package:dnd_app/theme/app_colors.dart';
 import 'package:dnd_app/models/spell_slot.dart';
@@ -15,287 +18,6 @@ import 'package:dnd_app/models/classes.dart';
 import 'package:dnd_app/models/class_feature.dart';
 import 'package:dnd_app/services/class_feature_service.dart';
 import 'package:dnd_app/services/compendium_service.dart';
-import 'package:dnd_app/widgets/widget_utils.dart';
-
-// ── Stufenaufstieg-Dialog ────────────────────────────────────────────────────
-
-class _LevelUpResult {
-  final String? newSubclass; // null = keine Unterklasse gewählt/erforderlich
-  final int hpGain;
-  const _LevelUpResult({this.newSubclass, required this.hpGain});
-}
-
-class _LevelUpDialog extends StatefulWidget {
-  final int newLevel;          // Das Level auf das aufgestiegen wird
-  final int hitDie;
-  final int conModifier;
-  final String characterClass;
-  final String currentSubclass; // leer = noch keine
-  final Color themeColor;
-
-  const _LevelUpDialog({
-    required this.newLevel,
-    required this.hitDie,
-    required this.conModifier,
-    required this.characterClass,
-    required this.currentSubclass,
-    required this.themeColor,
-  });
-
-  @override
-  State<_LevelUpDialog> createState() => _LevelUpDialogState();
-}
-
-class _LevelUpDialogState extends State<_LevelUpDialog> {
-  String? _selectedSubclass;
-  bool _useMax = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedSubclass = widget.currentSubclass.isEmpty
-        ? null
-        : widget.currentSubclass;
-  }
-
-  List<CharacterSubclass> get _availableSubs =>
-      availableSubclasses(widget.characterClass, widget.newLevel);
-
-  /// Unterklasse ist bei diesem Level-Up neu wählbar wenn:
-  /// - noch keine gewählt
-  /// - und es Unterklassen gibt die genau bei diesem Level freischalten
-  bool get _subclassChoiceRequired =>
-      widget.currentSubclass.isEmpty &&
-      _availableSubs.any((s) => s.unlocksAtLevel == widget.newLevel);
-
-  int get _hpGain {
-    final roll = _useMax ? widget.hitDie : (widget.hitDie / 2).ceil();
-    return (roll + widget.conModifier).clamp(1, 999);
-  }
-
-  bool get _canConfirm =>
-      !_subclassChoiceRequired || _selectedSubclass != null;
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(
-        'Stufenaufstieg auf Stufe ${widget.newLevel}',
-        style: AppTextStyles.sectionTitle,
-      ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ── HP-Gewinn ──────────────────────────────────────────────
-          Text('Trefferpunkte', style: AppTextStyles.bodySmall
-              .copyWith(color: Colors.grey[600])),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: SegmentedButton<bool>(
-                  segments: [
-                    ButtonSegment(
-                      value: false,
-                      label: Text(
-                        'Durchschnitt (+${(widget.hitDie / 2).ceil() + widget.conModifier})',
-                        style: AppTextStyles.bodySmall,
-                      ),
-                    ),
-                    ButtonSegment(
-                      value: true,
-                      label: Text(
-                        'Maximum (+${widget.hitDie + widget.conModifier})',
-                        style: AppTextStyles.bodySmall,
-                      ),
-                    ),
-                  ],
-                  selected: {_useMax},
-                  onSelectionChanged: (s) =>
-                      setState(() => _useMax = s.first),
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStateProperty.resolveWith(
-                      (states) => states.contains(WidgetState.selected)
-                          ? widget.themeColor
-                          : null,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          // ── Unterklasse ────────────────────────────────────────────
-          if (_subclassChoiceRequired) ...[
-            const SizedBox(height: 16),
-            Text('Unterklasse wählen',
-                style: AppTextStyles.bodySmall
-                    .copyWith(color: Colors.grey[600])),
-            const SizedBox(height: 8),
-            DropdownButtonFormField<String>(
-              initialValue: _selectedSubclass,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                isDense: true,
-                hintText: 'Wählen…',
-              ),
-              items: _availableSubs.map((s) => DropdownMenuItem(
-                value: s.name,
-                child: Text(s.name, style: AppTextStyles.body),
-              )).toList(),
-              onChanged: (v) => setState(() => _selectedSubclass = v),
-            ),
-          ],
-        ],
-      ),
-      actions: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('Abbrechen', style: AppTextStyles.body),
-            ),
-            const SizedBox(width: 10),
-            FilledButton(
-              onPressed: _canConfirm
-                  ? () => Navigator.pop(context, _LevelUpResult(
-                        newSubclass: _selectedSubclass,
-                        hpGain: _hpGain,
-                      ))
-                  : null,
-              style: FilledButton.styleFrom(
-                  backgroundColor: widget.themeColor),
-              child: Text('Aufsteigen', style: AppTextStyles.body),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-
-// ── Trefferwürfel-Dialog ──────────────────────────────────────────────────────
-
-class _HitDiceDialogResult {
-  final int amount;
-  const _HitDiceDialogResult(this.amount);
-}
-
-class _HitDiceDialog extends StatefulWidget {
-  final int available;
-  final int hitDie;
-  final int conModifier;
-  final Color themeColor;
-
-  const _HitDiceDialog({
-    required this.available,
-    required this.hitDie,
-    required this.conModifier,
-    required this.themeColor,
-  });
-
-  @override
-  State<_HitDiceDialog> createState() => _HitDiceDialogState();
-}
-
-class _HitDiceDialogState extends State<_HitDiceDialog> {
-  int _amount = 1;
-
-  @override
-  Widget build(BuildContext context) {
-    final conText = widget.conModifier >= 0
-        ? '+${widget.conModifier}'
-        : '${widget.conModifier}';
-
-    return AlertDialog(
-      title: Text(
-        'Trefferwürfel ausgeben',
-        style: AppTextStyles.sectionTitle,
-      ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: widget.themeColor.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Verfügbar',
-                    style: AppTextStyles.bodySmall
-                        .copyWith(color: Colors.grey)),
-                Text(
-                  '${widget.available} W${widget.hitDie}',
-                  style: AppTextStyles.statMedium
-                      .copyWith(color: widget.themeColor),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.remove_circle_outline),
-                color: widget.themeColor,
-                onPressed: _amount > 1
-                    ? () => setState(() => _amount--)
-                    : null,
-              ),
-              Column(
-                children: [
-                  Text(
-                    '$_amount',
-                    style: AppTextStyles.statLarge
-                        .copyWith(color: widget.themeColor),
-                  ),
-                  Text(
-                    'Würfel',
-                    style: AppTextStyles.labelXs
-                        .copyWith(color: Colors.grey),
-                  ),
-                ],
-              ),
-              IconButton(
-                icon: const Icon(Icons.add_circle_outline),
-                color: widget.themeColor,
-                onPressed: _amount < widget.available
-                    ? () => setState(() => _amount++)
-                    : null,
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Pro Würfel: W${widget.hitDie} + KON ($conText)',
-            style:
-                AppTextStyles.bodySmall.copyWith(color: Colors.grey),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text('Abbrechen', style: AppTextStyles.body),
-        ),
-        FilledButton(
-          onPressed: () =>
-              Navigator.pop(context, _HitDiceDialogResult(_amount)),
-          style: FilledButton.styleFrom(
-              backgroundColor: widget.themeColor),
-          child: Text('Ausgeben', style: AppTextStyles.body),
-        ),
-      ],
-    );
-  }
-}
 
 // ── Haupt-Screen ──────────────────────────────────────────────────────────────
 
@@ -635,7 +357,7 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => _IdentitySheet(
+      builder: (_) => IdentitySheet(
         character:    c,
         themeColor:   _themeColor,
       ),
@@ -645,9 +367,9 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
   Future<void> _showLevelUpDialog() async {
     final newLevel = _character!.level + 1;
     if (newLevel > 20) return;
-    final result = await showDialog<_LevelUpResult>(
+    final result = await showDialog<LevelUpResult>(
       context: context,
-      builder: (_) => _LevelUpDialog(
+      builder: (_) => LevelUpDialog(
         newLevel:        newLevel,
         hitDie:          _character!.hitDie,
         conModifier:     _character!.conModifier,
@@ -661,7 +383,7 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
       _character!.level          = newLevel;
       _character!.maxHitPoints  += result.hpGain;
       _character!.currentHitPoints = (_character!.currentHitPoints + result.hpGain)
-          .clamp(0, _character!.maxHitPoints);
+          .clamp(0, _character!.maxHitPoints).toInt();
       if (result.newSubclass != null) {
         _character!.subclass = result.newSubclass!;
       }
@@ -914,9 +636,9 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
 
   Future<void> _showUseHitDiceDialog() async {
     final available = _character!.level - _character!.usedHitDice;
-    final result = await showDialog<_HitDiceDialogResult>(
+    final result = await showDialog<HitDiceDialogResult>(
       context: context,
-      builder: (_) => _HitDiceDialog(
+      builder: (_) => HitDiceDialog(
         available: available,
         hitDie: _character!.hitDie,
         conModifier: _character!.conModifier,
@@ -1006,178 +728,5 @@ class _CharacterSheetScreenState extends State<CharacterSheetScreen>
       }
     }
     _character!.spellSlots = updated;
-  }
-}
-
-// ── Hilfsklasse für Identity-Sheet ───────────────────────────────────────────
-
-class _IdentityRow {
-  final String label;
-  final String value;
-  const _IdentityRow({required this.label, required this.value});
-}
-
-// ── Identity-Sheet ────────────────────────────────────────────────────────────
-
-class _IdentitySheet extends StatefulWidget {
-  final Character character;
-  final Color themeColor;
-
-  const _IdentitySheet({
-    required this.character,
-    required this.themeColor,
-  });
-
-  @override
-  State<_IdentitySheet> createState() => _IdentitySheetState();
-}
-
-class _IdentitySheetState extends State<_IdentitySheet> {
-  final _featureService = ClassFeatureService();
-  String? _classFluff;
-  String? _subclassFluff;
-  bool _fluffLoaded = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadFluff();
-  }
-
-  Future<void> _loadFluff() async {
-    final c = widget.character;
-    if (c.characterClass.isEmpty) {
-      setState(() => _fluffLoaded = true);
-      return;
-    }
-    final classFluff = await _featureService.getClassFluff(c.characterClass);
-    final subclassFluff = c.subclass.isNotEmpty
-        ? await _featureService.getSubclassFluff(c.characterClass, c.subclass)
-        : null;
-    if (mounted) setState(() {
-      _classFluff    = classFluff;
-      _subclassFluff = subclassFluff;
-      _fluffLoaded   = true;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final c = widget.character;
-    final rows = <_IdentityRow>[
-      if (c.characterClass.isNotEmpty)
-        _IdentityRow(
-          label: 'Klasse',
-          value: c.subclass.isNotEmpty
-              ? '${c.characterClass} · ${c.subclass}'
-              : c.characterClass,
-        ),
-      if (c.race.isNotEmpty)
-        _IdentityRow(label: 'Rasse', value: c.race),
-      if (c.alignment.isNotEmpty)
-        _IdentityRow(label: 'Gesinnung', value: c.alignment),
-      if (c.background.isNotEmpty)
-        _IdentityRow(label: 'Hintergrund', value: c.background),
-    ];
-
-    return DraggableScrollableSheet(
-      expand: false,
-      initialChildSize: (_classFluff != null || _subclassFluff != null) ? 0.6 : 0.4,
-      minChildSize: 0.3,
-      maxChildSize: 0.92,
-      builder: (_, ctrl) => Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius:
-              const BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          children: [
-            // Griffleiste
-            Padding(
-              padding: const EdgeInsets.only(top: 12, bottom: 8),
-              child: Container(
-                width: 40, height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey[400],
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                controller: ctrl,
-                padding: const EdgeInsets.fromLTRB(24, 4, 24, 32),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(c.name, style: AppTextStyles.sectionTitle),
-                    const SizedBox(height: 16),
-                    // Identitäts-Zeilen
-                    ...rows.map((r) => Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            width: 100,
-                            child: Text(r.label,
-                                style: AppTextStyles.bodySmall
-                                    .copyWith(color: Colors.grey[500])),
-                          ),
-                          Expanded(
-                            child: Text(r.value,
-                                style: AppTextStyles.body),
-                          ),
-                        ],
-                      ),
-                    )),
-                    if (rows.isEmpty)
-                      Text('Keine weiteren Angaben.',
-                          style: AppTextStyles.bodySmall
-                              .copyWith(color: Colors.grey)),
-                    // Fluff-Texte
-                    if (!_fluffLoaded)
-                      const Padding(
-                        padding: EdgeInsets.only(top: 8),
-                        child: LinearProgressIndicator(),
-                      )
-                    else ...[
-                      if (_classFluff != null && _classFluff!.isNotEmpty) ...[
-                        const SizedBox(height: 16),
-                        Divider(color: Colors.grey[200]),
-                        const SizedBox(height: 12),
-                        Text(
-                          widget.character.characterClass,
-                          style: AppTextStyles.cardTitle
-                              .copyWith(color: widget.themeColor),
-                        ),
-                        const SizedBox(height: 8),
-                        MarkdownText(_classFluff!),
-                      ],
-                      if (_subclassFluff != null &&
-                          _subclassFluff!.isNotEmpty) ...[
-                        const SizedBox(height: 16),
-                        if (_classFluff == null)
-                          Divider(color: Colors.grey[200]),
-                        if (_classFluff == null)
-                          const SizedBox(height: 12),
-                        Text(
-                          widget.character.subclass,
-                          style: AppTextStyles.cardTitle
-                              .copyWith(color: widget.themeColor),
-                        ),
-                        const SizedBox(height: 8),
-                        MarkdownText(_subclassFluff!),
-                      ],
-                    ],
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }
